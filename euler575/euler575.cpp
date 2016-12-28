@@ -3,16 +3,16 @@
 
 #include "stdafx.h"
 
-#define SIZE 5
+#define SIZE 2
 #define COUNT (SIZE*SIZE)
 #define ONE ((double)1)
 #define TWO ((double)2)
 #define THREE ((double)3)
 #define FOUR ((double)4)
 #define FIVE ((double)5)
-#define NUMCORNERS ((double)4)
-#define NUMSIDES (double)(SIZE - 2) * (double)4
-#define NUMMIDDLES (double)(COUNT - ((SIZE - 1) * 4))
+const double NUMCORNERS = (double)4;
+const double NUMSIDES = (double)(SIZE - 2) * (double)4;
+const double NUMMIDDLES = (double)(COUNT - ((SIZE - 1) * 4));
 
 using namespace std;
 
@@ -27,7 +27,7 @@ public:
 	virtual double get_move_middle() const = 0;
 };
 
-class strategy_heads
+class strategy_heads : public strategy
 {
 public:
 	double get_stay_corner() const	{return ONE / 3; 	}
@@ -40,7 +40,7 @@ public:
 	double get_move_middle() const { return FOUR / 5; }
 };
 
-class strategy_tails
+class strategy_tails : public strategy
 {
 public:
 	double get_stay_corner() const	{return ONE/TWO; 	}
@@ -135,14 +135,14 @@ public:
 
 	square (const square* old, const strategy* strat) : square()
 	{
-		p_corner = old->p_corner + ((strat->get_stay_corner() - strat->get_move_corner()) * ONE / NUMCORNERS);
-		p_side = old->p_side + ((strat->get_stay_side() - strat->get_move_side()) * ONE / NUMSIDES);
-		p_middle = old->p_middle + ((strat->get_stay_middle() - strat->get_move_middle()) * ONE / NUMMIDDLES);
+		p_corner = ((old->p_corner / NUMCORNERS) * strat->get_stay_corner()) * NUMCORNERS;
+		p_side = old->p_side + old->p_side * ((strat->get_stay_side() - strat->get_move_side()));
+		p_middle = old->p_middle + old->p_middle * ((strat->get_stay_middle() - strat->get_move_middle()));
 	}
 
 	double get_checksum() const
 	{
-		double checksum = p_side + p_middle + p_corner;
+		double checksum = p_side * NUMSIDES + p_middle * NUMMIDDLES + p_corner * NUMCORNERS;
 		return checksum;
 	}
 };
@@ -155,6 +155,14 @@ long* square::isSide;
 long* square::isCorner;
 long* square::x;
 long* square::y;
+
+ostream& operator<<(ostream& os, const square& s)
+{
+	os << fixed << setprecision(12) << (s.p_corner / NUMCORNERS) << "," <<
+		fixed << setprecision(12) << (s.p_side / NUMSIDES) << "," <<
+		fixed << setprecision(12) << (s.p_middle / NUMMIDDLES);
+	return os;
+}
 
 int main()
 {
@@ -170,24 +178,26 @@ int main()
 	if_heads->initialize();
 	if_tails->initialize();
 
+	cout << "Checksum: " << if_heads->get_checksum() << " , " << if_tails->get_checksum() << endl;
+
 	time_t start;
 	time(&start);
 	int i = 0;
 	double totalElapsed = 0;
-	while (true)
+	while (totalElapsed < 20)
 	{
 		square* new_if_heads = new square(if_heads, pstrat_heads);
 		square* new_if_tails = new square(if_tails, pstrat_tails);
 
-		if ((i++ % 100) == 0)
+		//if ((i++ % 100) == 0)
 		{
 			time_t now;
 			time(&now);
 			double elapsed = difftime(now, start);
-			if (elapsed > 2)
+			//if (elapsed > 2)
 			{
-				double p_square = (new_if_heads->p_square() + new_if_tails->p_square()) / 2;
-				cout << fixed << setprecision(12) << p_square << ", i = " << i << endl;
+				cout << "Checksum: " << new_if_heads->get_checksum() << " , " << new_if_tails->get_checksum() << endl;
+				cout << *new_if_heads << endl << endl << *new_if_tails << endl;
 
 				totalElapsed += elapsed;
 				start = now;
@@ -200,8 +210,7 @@ int main()
 		if_tails = new_if_tails;
 	}
 
-	cout << "Heads, corner: " << if_heads->p_corner << " side: " << if_heads->p_side << " middle: " << if_heads->p_middle << endl;
-	cout << "Tails, corner: " << if_tails->p_corner << " side: " << if_tails->p_side << " middle: " << if_tails->p_middle << endl;
+	cout << *if_heads << endl << endl << *if_tails << endl;
 
 	delete if_heads;
 	delete if_tails;
