@@ -6,28 +6,52 @@
 #define SIZE 5
 #define COUNT (SIZE*SIZE)
 #define ONE ((double)1)
+#define TWO ((double)2)
+#define THREE ((double)3)
+#define FOUR ((double)4)
+#define FIVE ((double)5)
+#define NUMCORNERS ((double)4)
+#define NUMSIDES (double)(SIZE - 2) * (double)4
+#define NUMMIDDLES (double)(COUNT - ((SIZE - 1) * 4))
 
 using namespace std;
 
-double strategy_heads_stay(long numMoves)
+class strategy
 {
-	return ONE / (numMoves + 1);
-}
+public:
+	virtual double get_stay_corner() const = 0;
+	virtual double get_move_corner() const = 0;
+	virtual double get_stay_side() const = 0;
+	virtual double get_move_side() const = 0;
+	virtual double get_stay_middle() const = 0;
+	virtual double get_move_middle() const = 0;
+};
 
-double strategy_heads_move(long numMoves)
+class strategy_heads
 {
-	return ONE / (numMoves + 1);
-}
+public:
+	double get_stay_corner() const	{return ONE / 3; 	}
+	double get_move_corner() const { return TWO / 3;  }
+	
+	double get_stay_side() const { return ONE / 4; }
+	double get_move_side() const { return THREE / 4; }
 
-double strategy_tails_stay(long numMoves)
-{
-	return 0.5;
-}
+	double get_stay_middle() const {return ONE / 5;	}
+	double get_move_middle() const { return FOUR / 5; }
+};
 
-double strategy_tails_move(long numMoves)
+class strategy_tails
 {
-	return 0.5 / numMoves;
-}
+public:
+	double get_stay_corner() const	{return ONE/TWO; 	}
+	double get_move_corner() const { return ONE / TWO;  }
+	
+	double get_stay_side() const { return ONE / TWO; }
+	double get_move_side() const { return ONE / TWO; }
+
+	double get_stay_middle() const {return ONE / TWO;	}
+	double get_move_middle() const { return ONE / TWO; }
+};
 
 class square
 {
@@ -95,9 +119,9 @@ public:
 
 	void initialize()
 	{
-		p_corner = ((double)4) / COUNT;
-		p_side = (double)(SIZE - 2) * (double)4 / COUNT;
-		p_middle = double(COUNT - ((SIZE - 1) * 4)) / COUNT;
+		p_corner = NUMCORNERS / COUNT;
+		p_side = NUMSIDES / COUNT;
+		p_middle = NUMMIDDLES / COUNT;
 	}
 
 	square()
@@ -109,65 +133,15 @@ public:
 		destroyed++;
 	}
 
-	square (const square* old, double (*get_p_move)(long), double (*get_p_stay)(long)) : square()
+	square (const square* old, strategy* strat) : square()
 	{
-		for (long i = 0; i < COUNT; i++)
-		{
-			double p_stay = get_p_stay(numMoves[i]);
-			double p = old->probability[i] * p_stay;
-			
-			{
-				//left:
-				long moveX = x[i] - 1;
-				if (moveX >= 0)
-				{
-					long move_i = get_i(moveX, y[i]);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;;
-				}
-			}
-			{
-				//right:
-				long moveX = x[i] + 1;
-				if (moveX < SIZE)
-				{
-					long move_i = get_i(moveX, y[i]);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			{
-				//up:
-				long moveY = y[i] - 1;
-				if (moveY >= 0)
-				{
-					long move_i = get_i(x[i], moveY);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			{
-				//down:
-				long moveY = y[i] + 1;
-				if (moveY < SIZE)
-				{
-					long move_i = get_i(x[i], moveY);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			
-			probability[i] = p;
-		}
+		p_corner = old->p_corner + strat->get_stay_corner() - strat->get_move_corner();
+
 	}
 
 	double get_checksum() const
 	{
-		double checksum = 0;
-		for (long i = 0; i < COUNT; i++)
-		{
-			checksum += probability[i];
-		}
+		double checksum = p_side + p_middle + p_corner;
 		return checksum;
 	}
 };
@@ -187,6 +161,11 @@ int main()
 
 	square* if_heads = new square;
 	square* if_tails = new square;
+	strategy_heads strat_heads;
+	strategy_tails strat_tails;
+	strategy* pstrat_heads = (strategy*)&strat_heads;
+	strategy* pstrat_tails = (strategy*)&strat_tails;
+
 	if_heads->initialize();
 	if_tails->initialize();
 
@@ -196,8 +175,8 @@ int main()
 	double totalElapsed = 0;
 	while (true)
 	{
-		square* new_if_heads = new square(if_heads, &strategy_heads_move, &strategy_heads_stay);
-		square* new_if_tails = new square(if_tails, &strategy_tails_move, &strategy_tails_stay);
+		square* new_if_heads = new square(if_heads, pstrat_heads);
+		square* new_if_tails = new square(if_tails, pstrat_tails);
 
 		if ((i++ % 100) == 0)
 		{
@@ -206,15 +185,9 @@ int main()
 			double elapsed = difftime(now, start);
 			if (elapsed > 2)
 			{
-				/*
 				double p_square = (new_if_heads->p_square() + new_if_tails->p_square()) / 2;
 				cout << fixed << setprecision(12) << p_square << ", i = " << i << endl;
-				*/
-				double p_corner = 0, p_side = 0, p_middle = 0;
-				new_if_heads->distribute(p_corner, p_side, p_middle);
-				cout << fixed << setprecision(12) << p_corner << ","
-					<< fixed << setprecision(12) << p_side << ","
-					<< fixed << setprecision(12) << p_middle << endl;
+
 				totalElapsed += elapsed;
 				start = now;
 			}
