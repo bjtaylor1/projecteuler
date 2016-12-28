@@ -133,10 +133,11 @@ public:
 		destroyed++;
 	}
 
-	square (const square* old, strategy* strat) : square()
+	square (const square* old, const strategy* strat) : square()
 	{
-		p_corner = old->p_corner + strat->get_stay_corner() - strat->get_move_corner();
-
+		p_corner = old->p_corner + ((strat->get_stay_corner() - strat->get_move_corner()) * ONE / NUMCORNERS);
+		p_side = old->p_side + ((strat->get_stay_side() - strat->get_move_side()) * ONE / NUMSIDES);
+		p_middle = old->p_middle + ((strat->get_stay_middle() - strat->get_move_middle()) * ONE / NUMMIDDLES);
 	}
 
 	double get_checksum() const
