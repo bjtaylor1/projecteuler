@@ -9,210 +9,83 @@
 
 using namespace std;
 
-double strategy_heads_stay(long numMoves)
-{
-	return ONE / (numMoves + 1);
-}
 
-double strategy_heads_move(long numMoves)
-{
-	return ONE / (numMoves + 1);
-}
-
-double strategy_tails_stay(long numMoves)
-{
-	return 0.5;
-}
-
-double strategy_tails_move(long numMoves)
-{
-	return 0.5 / numMoves;
-}
-
-class square
+class tile_type
 {
 public:
-	static long nextid;
-	static long created;
-	static long destroyed;
-	long id = nextid++;
-	static long* numMoves;
-	static long* x;
-	static long* y;
-	static long get_i(const long x, const long y)
-	{
-		long res = (y * SIZE) + x;
-		return res;
-	}
-
-	static void init()
-	{
-		numMoves = new long[COUNT];
-		x = new long[COUNT];
-		y = new long[COUNT];
-		for (long i = 0; i < COUNT; i++)
-		{
-			x[i] = i % SIZE;
-			y[i] = i / SIZE;
-			bool isLeftOrRight = x[i] == 0 || x[i] == (SIZE - 1);
-			bool isTopOrBottom = y[i] == 0 || y[i] == (SIZE - 1);
-			bool isSide = isLeftOrRight || isTopOrBottom;
-			bool isCorner = isLeftOrRight && isTopOrBottom;
-			if (isCorner) numMoves[i] = 2;
-			else if (isSide) numMoves[i] = 3;
-			else numMoves[i] = 4;
-		}
-	}
-
-	static void de_init()
-	{
-		delete[] numMoves;
-		delete[] x;
-		delete[] y;
-	}
-
-	double probability[COUNT];
-
-	double p_square() const
-	{
-		int s;
-		double result = 0;
-		for (int squarenum = 1; (s = squarenum*squarenum) <= COUNT; squarenum++)
-		{
-			result += probability[s - 1];
-		}
-		return result;
-	}
-
-	void initialize()
-	{
-		for (long i = 0; i < COUNT; i++)
-		{
-			probability[i] = ONE / COUNT;
-		}
-	}
-
-	square()
-	{
-		created++;
-	}
-	~square()
-	{
-		destroyed++;
-	}
-
-	square (const square* old, double (*get_p_move)(long), double (*get_p_stay)(long)) : square()
-	{
-		for (long i = 0; i < COUNT; i++)
-		{
-			double p_stay = get_p_stay(numMoves[i]);
-			double p = old->probability[i] * p_stay;
-			
-			{
-				//left:
-				long moveX = x[i] - 1;
-				if (moveX >= 0)
-				{
-					long move_i = get_i(moveX, y[i]);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;;
-				}
-			}
-			{
-				//right:
-				long moveX = x[i] + 1;
-				if (moveX < SIZE)
-				{
-					long move_i = get_i(moveX, y[i]);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			{
-				//up:
-				long moveY = y[i] - 1;
-				if (moveY >= 0)
-				{
-					long move_i = get_i(x[i], moveY);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			{
-				//down:
-				long moveY = y[i] + 1;
-				if (moveY < SIZE)
-				{
-					long move_i = get_i(x[i], moveY);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			
-			probability[i] = p;
-		}
-	}
-
-	double get_checksum() const
-	{
-		double checksum = 0;
-		for (long i = 0; i < COUNT; i++)
-		{
-			checksum += probability[i];
-		}
-		return checksum;
-	}
+	double in, out;
+	tile_type() : in(0), out(0) {}
 };
 
-long square::nextid = 0;
-long square::created = 0;
-long square::destroyed = 0;
-long* square::numMoves;
-long* square::x;
-long* square::y;
+class tile
+{
+public:
+	int x, y, i;
+	tile_type *tt_heads, *tt_tails;
+	vector<tile*> neighbours;
+
+	tile(int _i, 
+		tile_type* tt_corner_heads, tile_type* tt_side_heads, tile_type* tt_middle_heads, 
+		tile_type* tt_corner_tails, tile_type* tt_side_tails, tile_type* tt_middle_tails) : i(_i)
+	{
+		x = _i % SIZE;
+		y = _i / SIZE;
+		bool isLeftOrRight = x == 0 || x == (SIZE - 1);
+		bool isTopOrBottom = y == 0 || y == (SIZE - 1);
+		bool isSide = isLeftOrRight != isTopOrBottom;
+		bool isCorner = isLeftOrRight && isTopOrBottom;
+
+		if (isCorner)
+		{
+			tt_heads = tt_corner_heads;
+			tt_tails = tt_corner_tails;
+		}
+		else if (isSide)
+		{
+			tt_heads = tt_corner_heads;
+			tt_tails = tt_corner_tails;
+		}
+		else
+		{
+			tt_heads = tt_corner_heads;
+			tt_tails = tt_corner_tails;
+		}
+	}
+	
+
+};
+
 
 int main()
 {
-	square::init();
-
-	square* if_heads = new square;
-	square* if_tails = new square;
-	if_heads->initialize();
-	if_tails->initialize();
-
-	time_t start;
-	time(&start);
-	int i = 0;
-	double totalElapsed = 0;
-	while (totalElapsed < 20)
+	vector<tile> tiles;
+	//make the tiles
+	for (long i = 0; i < COUNT; i++)
 	{
-		square* new_if_heads = new square(if_heads, &strategy_heads_move, &strategy_heads_stay);
-		square* new_if_tails = new square(if_tails, &strategy_tails_move, &strategy_tails_stay);
+		tile_type corner_h, side_h, middle_h, corner_t, side_t, middle_t;
+		tile tile(i, &corner_h, &side_h, &middle_h, &corner_t, &side_t, &middle_t);
+		tiles.push_back(tile);
+	}
+	long xdiff[] = { 0, 1, 0,-1 }; //T,R,B,L
+	long ydiff[] = { 1, 0,-1, 0 };
 
-		if ((i++ % 1000) == 0)
+	for (long i = 0; i < COUNT; i++)
+	{
+		tile& tile = tiles.at(i);
+		for (long move = 0; i < 4; i++)
 		{
-			time_t now;
-			time(&now);
-			double elapsed = difftime(now, start);
-			if (elapsed > 2)
+			long newx = tile.x + xdiff[move];
+			long newy = tile.y + ydiff[move];
+			if (newx >= 0 && newx < SIZE && newy >= 0 && newy < SIZE)
 			{
-				double p_square = (new_if_heads->p_square() + new_if_tails->p_square()) / 2;
-				cout << fixed << setprecision(12) << p_square << ", i = " << i << endl;
-				totalElapsed += elapsed;
-				start = now;
+				long newi = (newy * SIZE) + newx;
+				tile.neighbours.push_back(&tiles.at(newi));
 			}
 		}
-
-		delete if_heads;
-		delete if_tails;
-		if_heads = new_if_heads;
-		if_tails = new_if_tails;
 	}
 
-	delete if_heads;
-	delete if_tails;
-	square::de_init();
-	cout << "Created: " << square::created << ", destroyed = " << square::destroyed << " (" << (square::created - square::destroyed) << " diff)" << endl;
+	//print neighbours map:
+	
 
     return 0;
 }
