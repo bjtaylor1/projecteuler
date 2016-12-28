@@ -77,7 +77,8 @@ public:
 		delete[] y;
 	}
 
-	double probability[COUNT];
+	//double probability[COUNT];
+	double p_corner, p_side, p_middle;
 
 	double p_square() const
 	{
@@ -85,27 +86,18 @@ public:
 		double result = 0;
 		for (int squarenum = 1; (s = squarenum*squarenum) <= COUNT; squarenum++)
 		{
-			result += probability[s - 1];
+			if (isCorner[s]) result += p_corner;
+			else if (isSide[s]) result += p_side;
+			else result += p_middle;
 		}
 		return result;
 	}
 
-	void distribute(double& p_corner, double& p_side, double& p_middle) const
-	{
-		for (int i = 0; i < COUNT; i++)
-		{
-			if (isCorner[i]) p_corner += probability[i];
-			else if (isSide[i]) p_side += probability[i];
-			else p_middle += probability[i];
-		}
-	}
-
 	void initialize()
 	{
-		for (long i = 0; i < COUNT; i++)
-		{
-			probability[i] = ONE / COUNT;
-		}
+		p_corner = ((double)4) / COUNT;
+		p_side = (double)(SIZE - 2) * (double)4 / COUNT;
+		p_middle = double(COUNT - ((SIZE - 1) * 4)) / COUNT;
 	}
 
 	square()
