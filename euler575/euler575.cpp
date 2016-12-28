@@ -37,6 +37,8 @@ public:
 	static long destroyed;
 	long id = nextid++;
 	static long* numMoves;
+	static long* isSide;
+	static long* isCorner;
 	static long* x;
 	static long* y;
 	static long get_i(const long x, const long y)
@@ -50,16 +52,18 @@ public:
 		numMoves = new long[COUNT];
 		x = new long[COUNT];
 		y = new long[COUNT];
+		isSide = new long[COUNT];
+		isCorner = new long[COUNT];
 		for (long i = 0; i < COUNT; i++)
 		{
 			x[i] = i % SIZE;
 			y[i] = i / SIZE;
 			bool isLeftOrRight = x[i] == 0 || x[i] == (SIZE - 1);
 			bool isTopOrBottom = y[i] == 0 || y[i] == (SIZE - 1);
-			bool isSide = isLeftOrRight || isTopOrBottom;
-			bool isCorner = isLeftOrRight && isTopOrBottom;
-			if (isCorner) numMoves[i] = 2;
-			else if (isSide) numMoves[i] = 3;
+			isSide[i] = isLeftOrRight || isTopOrBottom;
+			isCorner[i] = isLeftOrRight && isTopOrBottom;
+			if (isCorner[i]) numMoves[i] = 2;
+			else if (isSide[i]) numMoves[i] = 3;
 			else numMoves[i] = 4;
 		}
 	}
@@ -67,6 +71,8 @@ public:
 	static void de_init()
 	{
 		delete[] numMoves;
+		delete[] isSide;
+		delete[] isCorner;
 		delete[] x;
 		delete[] y;
 	}
@@ -82,6 +88,16 @@ public:
 			result += probability[s - 1];
 		}
 		return result;
+	}
+
+	void distribute(double& p_corner, double& p_side, double& p_middle) const
+	{
+		for (int i = 0; i < COUNT; i++)
+		{
+			if (isCorner[i]) p_corner += probability[i];
+			else if (isSide[i]) p_side += probability[i];
+			else p_middle += probability[i];
+		}
 	}
 
 	void initialize()
@@ -168,6 +184,8 @@ long square::nextid = 0;
 long square::created = 0;
 long square::destroyed = 0;
 long* square::numMoves;
+long* square::isSide;
+long* square::isCorner;
 long* square::x;
 long* square::y;
 
@@ -184,20 +202,27 @@ int main()
 	time(&start);
 	int i = 0;
 	double totalElapsed = 0;
-	while (totalElapsed < 20)
+	while (true)
 	{
 		square* new_if_heads = new square(if_heads, &strategy_heads_move, &strategy_heads_stay);
 		square* new_if_tails = new square(if_tails, &strategy_tails_move, &strategy_tails_stay);
 
-		if ((i++ % 1000) == 0)
+		if ((i++ % 100) == 0)
 		{
 			time_t now;
 			time(&now);
 			double elapsed = difftime(now, start);
 			if (elapsed > 2)
 			{
+				/*
 				double p_square = (new_if_heads->p_square() + new_if_tails->p_square()) / 2;
 				cout << fixed << setprecision(12) << p_square << ", i = " << i << endl;
+				*/
+				double p_corner = 0, p_side = 0, p_middle = 0;
+				new_if_heads->distribute(p_corner, p_side, p_middle);
+				cout << fixed << setprecision(12) << p_corner << ","
+					<< fixed << setprecision(12) << p_side << ","
+					<< fixed << setprecision(12) << p_middle << endl;
 				totalElapsed += elapsed;
 				start = now;
 			}
