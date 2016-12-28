@@ -200,6 +200,9 @@ int main()
 		if_tails = new_if_tails;
 	}
 
+	cout << "Heads, corner: " << if_heads->p_corner << " side: " << if_heads->p_side << " middle: " << if_heads->p_middle << endl;
+	cout << "Tails, corner: " << if_tails->p_corner << " side: " << if_tails->p_side << " middle: " << if_tails->p_middle << endl;
+
 	delete if_heads;
 	delete if_tails;
 	square::de_init();
