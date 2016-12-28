@@ -164,6 +164,21 @@ public:
 	}
 };
 
+ostream& operator<<(ostream& os, const square& s)
+{
+	for (int y = 0; y < SIZE; y++)
+	{
+		for (int x = 0; x < SIZE; x++)
+		{
+			if (x > 0) cout << ",";
+			cout << fixed << setprecision(12) << s.probability[square::get_i(x, y)];
+		}
+		cout << endl;
+	}
+	return os;
+}
+
+
 long square::nextid = 0;
 long square::created = 0;
 long square::destroyed = 0;
@@ -208,10 +223,13 @@ int main()
 		if_heads = new_if_heads;
 		if_tails = new_if_tails;
 	}
+	cout << *if_heads << endl << endl << *if_tails << endl;
+
 
 	delete if_heads;
 	delete if_tails;
 	square::de_init();
+
 	cout << "Created: " << square::created << ", destroyed = " << square::destroyed << " (" << (square::created - square::destroyed) << " diff)" << endl;
 
     return 0;
