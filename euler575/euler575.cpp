@@ -91,8 +91,10 @@ void adjust(tile_type* tt1, tile_type* tt2, tile_type* tt3)
 }
 
 
+//https://projecteuler.net/problem=575
 //wrong: 0.000989640562 / 0.000989640563
 // ?  0.000989640557 / 0.000989640558 ?
+// 0.000989640561(28) = correct
 int main()
 {
 	cout << fixed << setprecision(14);
