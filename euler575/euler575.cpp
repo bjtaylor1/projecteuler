@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-#define SIZE 3
+#define SIZE 5
 #define COUNT (SIZE*SIZE)
 #define ONE ((double)1)
 
@@ -26,13 +26,15 @@ public:
 	double gives, current;
 	double weight;
 	tiletype type;
-	tile_type(long _weight, double _gives, tiletype _type) : gives(_gives), weight(_weight), current((double)_weight / COUNT), type(_type) {}
+	tile_type(long _weight, double _gives, tiletype _type) : gives(_gives), weight(_weight), current((double)_weight / COUNT), type(_type), squares(0) {}
 	vector<tile_type*> neighbours;
-
-	void apply_transfers()
+	double squares;
+	
+	double p_square() const
 	{
-
-
+		if (weight == 0) return 0;
+		double result = current * (squares) / weight;
+		return result;
 	}
 };
 
@@ -87,7 +89,7 @@ int main()
 	tile_type	corner_h(corners, ONE / 3, corner), side_h(sides, ONE / 4, side), middle_h(middles, ONE / 5, middle),
 		corner_t(corners, ONE / 4, corner), side_t(sides, ONE / 6, side), middle_t(middles, ONE / 8, middle);
 
-	tile_type* tile_types[] = { &corner_t, &side_t, &middle_t };
+	tile_type* tile_types[] = { &corner_t, &side_t, &middle_t, &corner_h, &side_h, &middle_h };
 
 	for (long i = 0; i < COUNT; i++)
 	{
@@ -110,7 +112,13 @@ int main()
 				t.add_neighbour(&tiles.at(newi));
 			}
 		}
+	}
 
+	long square;
+	for (long i = 1; (square = (i*i)) <= COUNT; i++)
+	{
+		tiles.at(square - 1).tt_heads->squares++;
+		tiles.at(square - 1).tt_tails->squares++;
 	}
 
 	for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
@@ -153,18 +161,22 @@ int main()
 		}
 
 
-		double checksum = 0;
 
 
 		if (i % 10 == 0)
 		{
+			double checksum = 0;
 			for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
 			{
 				if (tt > 0) cout << ",";
 				cout << fixed << setprecision(12) << tile_types[tt]->current;
 				checksum += tile_types[tt]->current;
 			}
-			cout << ", checksum = " << checksum << endl;
+			double p_square_h = corner_h.p_square() + side_h.p_square() + middle_h.p_square();
+			double p_square_t = corner_t.p_square() + side_t.p_square() + middle_t.p_square();
+			double p_square = (p_square_h + p_square_t) / 2;
+
+			cout << ", checksum = " << checksum << ", p_square = " << p_square << endl;
 		}
 	}
 
