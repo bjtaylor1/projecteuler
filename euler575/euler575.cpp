@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-#define SIZE 5
+#define SIZE 1000
 #define COUNT (SIZE*SIZE)
 #define ONE ((double)1)
 
@@ -81,9 +81,21 @@ public:
 
 };
 
+void adjust(tile_type* tt1, tile_type* tt2, tile_type* tt3)
+{
+	double checksum = tt1->current + tt2->current + tt3->current;
+	double adjust = 1 / checksum;
+	tt1->current *= adjust;
+	tt2->current *= adjust;
+	tt3->current *= adjust;
+}
 
+
+//wrong: 0.000989640562 / 0.000989640563
+// ?  0.000989640557 / 0.000989640558 ?
 int main()
 {
+	cout << fixed << setprecision(14);
 	vector<tile> tiles;
 	//make the tiles
 	tile_type	corner_h(corners, ONE / 3, corner), side_h(sides, ONE / 4, side), middle_h(middles, ONE / 5, middle),
@@ -132,9 +144,10 @@ int main()
 	}
 
 
-
-	for (int i = 0; i < 1000; i++)
+	unsigned long long i = 0;
+	while(true)
 	{
+		i++;
 		stack<pair<tile_type*, double>> gains;
 		stack<pair<tile_type*, double>> losses;
 
@@ -160,23 +173,21 @@ int main()
 			losses.pop();
 		}
 
-
-
-
+		adjust(&corner_h, &side_h, &middle_h);
+		adjust(&corner_t, &side_t, &middle_t);
 		if (i % 10 == 0)
 		{
 			double checksum = 0;
+			
 			for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
 			{
-				if (tt > 0) cout << ",";
-				cout << fixed << setprecision(12) << tile_types[tt]->current;
 				checksum += tile_types[tt]->current;
 			}
 			double p_square_h = corner_h.p_square() + side_h.p_square() + middle_h.p_square();
 			double p_square_t = corner_t.p_square() + side_t.p_square() + middle_t.p_square();
 			double p_square = (p_square_h + p_square_t) / 2;
 
-			cout << ", checksum = " << checksum << ", p_square = " << p_square << endl;
+			cout << "checksum = " << checksum << ", p_square = " <<  p_square << endl;
 		}
 	}
 
