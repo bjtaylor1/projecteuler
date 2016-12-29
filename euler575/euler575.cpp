@@ -29,6 +29,15 @@ public:
 	tile_type(long _weight, double _gives, tiletype _type) : gives(_gives), weight(_weight), current((double)_weight / COUNT), type(_type) {}
 	vector<tile_type*> neighbours;
 
+	void apply_transfers()
+	{
+		while (!transfers.empty())
+		{
+			current -= transfers.top();
+			transfers.pop();
+		}
+
+	}
 };
 
 
@@ -110,8 +119,6 @@ int main()
 
 	for (int i = 0; i < 10; i++)
 	{
-		map<pair<tiletype, tiletype>, double> transfers;
-
 		for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
 		{
 			for (vector<tile_type*>::iterator it = tile_types[tt]->neighbours.begin(); it != tile_types[tt]->neighbours.end(); it++)
@@ -121,17 +128,19 @@ int main()
 				(*it)->transfers.push(amountToGive );
 			}
 		}
+		double checksum = 0;
 		for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
 		{
-			while (!tile_types[tt]->transfers.empty())
+			tile_types[tt]->apply_transfers();
+			//if (i % 10 == 0)
 			{
-				tile_types[tt]->current -= tile_types[tt]->transfers.top();
-				tile_types[tt]->transfers.pop();
+				if (tt > 0) cout << ",";
+				cout << fixed << setprecision(12) << tile_types[tt]->current;
+				checksum += tile_types[tt]->current;
 			}
-			if (tt > 0) cout << ",";
-			cout << fixed << setprecision(12) << tile_types[tt]->current;
 		}
-		cout << endl;
+		cout << ", checksum = " << checksum << endl;
+		
 	}
 	
 	
