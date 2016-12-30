@@ -12,14 +12,41 @@ namespace euler579
 {
     class Cube : IEquatable<Cube>
     {
+        private readonly Lazy<bool> isStraight;
+        public bool IsStraight { get { return isStraight.Value; } }
         public Vector3D[] Vertices { get;  }
         public Vector3D[] OrderedVertices { get; }
+
+        private static readonly Vector3D xAxis = new Vector3D(1, 0, 0);
+        private static readonly Vector3D yAxis = new Vector3D(0, 1, 0);
+        private static readonly Vector3D zAxis = new Vector3D(0, 0, 1);
 
         public Cube(Vector3D[] vertices)
         {
             if (vertices.Length != 8) throw new InvalidOperationException("Sanity check failed.");
             OrderedVertices = vertices.OrderBy(v => v.X).ThenBy(v => v.Y).ThenBy(v => v.Z).ToArray();
             Vertices = vertices.ToArray();
+            isStraight = new Lazy<bool>(CalculateIsStraight);
+        }
+
+        private bool CalculateIsStraight()
+        {
+            var straight = Vertices.Skip(1).Take(3).All(p =>
+            {
+                var vector3D = p - Vertices[0];
+                var result = IsParallelToAxis(vector3D, xAxis) || 
+                    IsParallelToAxis(vector3D, yAxis) || 
+                    IsParallelToAxis(vector3D, zAxis);
+                return result;
+            });
+            return straight;
+        }
+
+        private static bool IsParallelToAxis(Vector3D vector3D, Vector3D axis)
+        {
+            var angleBetweenXAxis = Vector3D.AngleBetween(vector3D, axis);
+            var result = (int) Math.Round(Math.Abs(angleBetweenXAxis), 0)%90 == 0;
+            return result;
         }
 
         public override string ToString()
@@ -165,18 +192,14 @@ namespace euler579
 
         static void Main(string[] args)
         {
-            //var cubes1 = GetCubes(1);
-            var cubes2 = GetCubes(2);
-            foreach (var cube in cubes2)
+            for (int i = 1; i <= 5; i++)
             {
-                var s = cube.ToString();
-                if (Console.WindowWidth < s.Length + 2) Console.SetWindowSize(s.Length + 2, Console.WindowHeight);
-                Console.Out.WriteLine(cube);
-            }
-            
-            //var cubes3 = GetCubes(3);
-            //var cubes4 = GetCubes(4);
+                var cubes = GetCubes(i);
+                var straight = cubes.Count(c => c.IsStraight);
+                var nonStraight = cubes.Length - straight;
+                Console.Out.WriteLine($"C({i}) = {cubes.Length}, {straight}/{nonStraight}");
 
+            }
         }
     }
 }
