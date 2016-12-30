@@ -13,18 +13,58 @@ namespace euler579
 {
     class Plane
     {
+        public Vector3D Origin { get; set; }
+        public Vector3D V1 { get; set; }
+        public Vector3D V2 { get; set; }
+        private readonly string name;
         public double A { get; }
         public double B { get; }
         public double C { get; }
         public double D { get; }
 
-        public Plane (Vector3D origin, Vector3D v1, Vector3D v2)
+        public override string ToString()
         {
+            return $"{name}";
+        }
+
+        public Plane (Vector3D origin, Vector3D v1, Vector3D v2, string name)
+        {
+            Origin = origin;
+            V1 = v1;
+            V2 = v2;
+            this.name = name;
             var normal = Vector3D.CrossProduct(v1, v2);
             A  = normal.X;
             B = normal.Y;
             C = normal.Z;
             D = -Vector3D.DotProduct(origin, normal);
+        }
+
+        // sing portion of http://forums.codeguru.com/showthread.php?378277-Distance-between-plane-and-a-point
+        public int GetSide(Vector3D p)
+        {
+            return Math.Sign(A*p.X + B*p.Y + C*p.Z + D);
+        }
+
+    }
+
+    class PlanePair
+    {
+        public Plane Plane1 { get; }
+        public Plane Plane2 { get; }
+
+        public PlanePair(Plane plane1, Plane plane2)
+        {
+            Plane1 = plane1;
+            Plane2 = plane2;
+        }
+
+        public bool IsBetweenOrOn(Vector3D point)
+        {
+            var side1 = Plane1.GetSide(point);
+            var side2 = Plane2.GetSide(point);
+            var isBetweenOrOn = side1 == 0 || side2 == 0 || side1 != side2;
+            return isBetweenOrOn;
         }
     }
 
@@ -35,8 +75,13 @@ namespace euler579
         public bool IsStraight { get { return isStraight.Value; } }
         public int LatticePoints { get { return latticePoints.Value; } }
 
+
         public Vector3D[] Vertices { get;  }
         public Vector3D[] OrderedVertices { get; }
+        public Vector3D A { get { return Definitions[0]; } }
+        public Vector3D B { get { return Definitions[1]; } }
+        public Vector3D C { get { return Definitions[2]; } }
+        public Vector3D O { get { return Vertices[0]; } }
 
         private static readonly Vector3D xAxis = new Vector3D(1, 0, 0);
         private static readonly Vector3D yAxis = new Vector3D(0, 1, 0);
@@ -54,21 +99,34 @@ namespace euler579
             latticePoints = new Lazy<int>(CalculateLatticePoints);
         }
 
-
-
         private int CalculateLatticePoints()
         {
+            var front = new Plane(O, A, B, "front");
+            var back = new Plane(O+C, A, B, "back");
+            var left = new Plane(O, B, C, "left");
+            var right = new Plane(O + A, B, C, "right");
+            var bottom = new Plane(O, A, C, "bottom");
+            var top = new Plane(O + B, A, C, "top");
 
-            int sideLength = (int) Definitions[0].Length;
-            int result = 0;
-            for (int x = 0; x <= sideLength; x++)
+            var oppositeFaces = new[]
             {
-                for (int y = 0; y <= sideLength; y++)
+                new PlanePair(front,back), 
+                new PlanePair(left,right), 
+                new PlanePair(bottom, top)
+            };
+            
+            int result = 0;
+            var minBounds = new Vector3D(Vertices.Min(v => v.X), Vertices.Min(v => v.Y), Vertices.Min(v => v.Z));
+            var maxBounds = new Vector3D(Vertices.Max(v => v.X), Vertices.Max(v => v.Y), Vertices.Max(v => v.Z));
+
+            for (int x = (int)Math.Round(minBounds.X,0); x <= (int)Math.Round(maxBounds.X,0); x++)
+            {
+                for (int y = (int) Math.Round(minBounds.Y,0); y <= (int)Math.Round(maxBounds.Y,0); y++)
                 {
-                    for(int z= 0; z <= sideLength; z++)
+                    for(int z= (int)Math.Round(minBounds.Z, 0); z <= (int)Math.Round(maxBounds.Z,0); z++)
                     {
-                        var v = Vertices[0] + Definitions[0]*x / sideLength + Definitions[1]*y/sideLength + Definitions[2]*z/sideLength;
-                        if (Program.IsIntegral(v))
+                        var v = new Vector3D(x,y,z);
+                        if (oppositeFaces.All(pp => pp.IsBetweenOrOn(v)))
                         {
                             result++;
                         }
@@ -243,13 +301,6 @@ namespace euler579
 
         static void Main(string[] args)
         {
-            var va = new Vector3D(1,1,1);
-            var vb = new Vector3D(-1,1,0);
-            var vc = new Vector3D(2, 0, 3);
-            var plane = new Plane(va, vb - va, vc - va);
-
-
-
             var cube1 = new Cube(new[]
             {
                 new Vector3D(0, 0, 0),
