@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,33 +11,81 @@ using System.Windows.Media.Media3D;
 
 namespace euler579
 {
+    class Plane
+    {
+        public double A { get; }
+        public double B { get; }
+        public double C { get; }
+        public double D { get; }
+
+        public Plane (Vector3D origin, Vector3D v1, Vector3D v2)
+        {
+            var normal = Vector3D.CrossProduct(v1, v2);
+            A  = normal.X;
+            B = normal.Y;
+            C = normal.Z;
+            D = -Vector3D.DotProduct(origin, normal);
+        }
+    }
+
     class Cube : IEquatable<Cube>
     {
+        public Vector3D[] Definitions { get; }
         private readonly Lazy<bool> isStraight;
         public bool IsStraight { get { return isStraight.Value; } }
+        public int LatticePoints { get { return latticePoints.Value; } }
+
         public Vector3D[] Vertices { get;  }
         public Vector3D[] OrderedVertices { get; }
 
         private static readonly Vector3D xAxis = new Vector3D(1, 0, 0);
         private static readonly Vector3D yAxis = new Vector3D(0, 1, 0);
         private static readonly Vector3D zAxis = new Vector3D(0, 0, 1);
+        private Lazy<int> latticePoints;
 
-        public Cube(Vector3D[] vertices)
+        public Cube(Vector3D[] vertices, Vector3D[] definitions = null)
         {
+            if (definitions == null) definitions = vertices.Skip(1).Take(3).Select(v => v - vertices[0]).ToArray();
+            Definitions = definitions;
             if (vertices.Length != 8) throw new InvalidOperationException("Sanity check failed.");
             OrderedVertices = vertices.OrderBy(v => v.X).ThenBy(v => v.Y).ThenBy(v => v.Z).ToArray();
             Vertices = vertices.ToArray();
             isStraight = new Lazy<bool>(CalculateIsStraight);
+            latticePoints = new Lazy<int>(CalculateLatticePoints);
+        }
+
+
+
+        private int CalculateLatticePoints()
+        {
+
+            int sideLength = (int) Definitions[0].Length;
+            int result = 0;
+            for (int x = 0; x <= sideLength; x++)
+            {
+                for (int y = 0; y <= sideLength; y++)
+                {
+                    for(int z= 0; z <= sideLength; z++)
+                    {
+                        var v = Vertices[0] + Definitions[0]*x / sideLength + Definitions[1]*y/sideLength + Definitions[2]*z/sideLength;
+                        if (Program.IsIntegral(v))
+                        {
+                            result++;
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         private bool CalculateIsStraight()
         {
-            var straight = Vertices.Skip(1).Take(3).All(p =>
+            var straight = Definitions.All(p =>
             {
-                var vector3D = p - Vertices[0];
-                var result = IsParallelToAxis(vector3D, xAxis) || 
-                    IsParallelToAxis(vector3D, yAxis) || 
-                    IsParallelToAxis(vector3D, zAxis);
+                var result = 
+                    IsParallelToAxis(p, xAxis) || 
+                    IsParallelToAxis(p, yAxis) || 
+                    IsParallelToAxis(p, zAxis);
                 return result;
             });
             return straight;
@@ -93,6 +142,7 @@ namespace euler579
     {
         static void AddCubesFrom(int n, Vector3D[] vertices, List<Cube> cubes )
         {
+            System.Windows.Media.Media3D.Geometry3D g;
             for (int x = 0; x <= n; x++)
             {
                 for (int y = 0; y <= n; y++)
@@ -146,7 +196,7 @@ namespace euler579
             };
             if (points.All(IsIntegral) && points.All(v => IsInBounds(n, v)))
             {
-                cube = new Cube(points);
+                cube = new Cube(points, new [] { a,b,c});
                 return true;
             }
             else
@@ -157,11 +207,12 @@ namespace euler579
 
         }
 
-        static bool IsIntegral(Vector3D v)
+        public static bool IsIntegral(Vector3D v)
         {
-            return IsIntegral(v.X) &&
-                IsIntegral(v.Y) &&
-                IsIntegral(v.Z);
+            var isIntegral = IsIntegral(v.X) &&
+                             IsIntegral(v.Y) &&
+                             IsIntegral(v.Z);
+            return isIntegral;
         }
 
         static bool IsIntegral(double d)
@@ -192,13 +243,46 @@ namespace euler579
 
         static void Main(string[] args)
         {
-            for (int i = 1; i <= 5; i++)
+            var va = new Vector3D(1,1,1);
+            var vb = new Vector3D(-1,1,0);
+            var vc = new Vector3D(2, 0, 3);
+            var plane = new Plane(va, vb - va, vc - va);
+
+
+
+            var cube1 = new Cube(new[]
+            {
+                new Vector3D(0, 0, 0),
+                new Vector3D(3, 0, 0),
+                new Vector3D(0, 3, 0),
+                new Vector3D(0, 0, 3),
+                new Vector3D(0, 3, 3),
+                new Vector3D(3, 0, 3),
+                new Vector3D(3, 3, 0),
+                new Vector3D(3, 3, 3)
+            });
+            Console.Out.WriteLine(cube1.LatticePoints);
+
+            var cube2 = new Cube(new []
+            {
+                new Vector3D(0, 2, 2),
+                new Vector3D(1, 4, 4),
+                new Vector3D(2, 0, 3),
+                new Vector3D(2, 3, 0),
+                new Vector3D(3, 2, 5),
+                new Vector3D(3, 5, 2),
+                new Vector3D(4, 1, 1),
+                new Vector3D(5, 3, 3)
+            });
+            Console.Out.WriteLine(cube2.LatticePoints);
+            
+            for (int i = 1; i <= 10; i++)
             {
                 var cubes = GetCubes(i);
-                var straight = cubes.Count(c => c.IsStraight);
-                var nonStraight = cubes.Length - straight;
-                Console.Out.WriteLine($"C({i}) = {cubes.Length}, {straight}/{nonStraight}");
-
+                var cubesByLatticePoints = cubes.GroupBy(c => c.LatticePoints);
+                var latticePointsDist = string.Join(", ", cubesByLatticePoints.OrderBy(g => g.Key).Select(g => $"{g.Count()} x {g.Key:0000}"));
+                var totalLatticePoints = cubes.Sum(c => c.LatticePoints);
+                Console.Out.WriteLine($"C({i}) = {cubes.Length}, S = {latticePointsDist}, total: {totalLatticePoints}");
             }
         }
     }
