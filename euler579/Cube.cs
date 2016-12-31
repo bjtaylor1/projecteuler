@@ -9,12 +9,24 @@ namespace euler579
         public Vector3D[] Definitions { get; }
         private readonly Lazy<bool> isStraight;
         public bool IsStraight { get { return isStraight.Value; } }
-        public int LatticePoints { get { return latticePoints.Value; } }
+        public int LatticePointsInside { get { return latticePoints.Value.Item1; } }
+        public int LatticePointsSurface { get { return latticePoints.Value.Item2; } }
+        public int LatticePoints { get { return LatticePointsInside + LatticePointsSurface; } }
 
+        public bool Regular
+        {
+            get { return Program.IsIntegral(Math.Pow(LatticePoints, 1.0/3)); }
+        }
 
         public Vector3D[] Vertices { get;  }
         public Vector3D[] OrderedVertices { get; }
         public Vector3D A { get { return Definitions[0]; } }
+
+        public Vector3D UniqueA
+        {
+            get { return uniqueA.Value; }
+        }
+
         public Vector3D B { get { return Definitions[1]; } }
         public Vector3D C { get { return Definitions[2]; } }
         public Vector3D O { get { return Vertices[0]; } }
@@ -22,7 +34,8 @@ namespace euler579
         private static readonly Vector3D xAxis = new Vector3D(1, 0, 0);
         private static readonly Vector3D yAxis = new Vector3D(0, 1, 0);
         private static readonly Vector3D zAxis = new Vector3D(0, 0, 1);
-        private Lazy<int> latticePoints;
+        private Lazy<Tuple<int,int>> latticePoints;
+        private Lazy<Vector3D> uniqueA;
 
         public Cube(Vector3D[] vertices, Vector3D[] definitions = null)
         {
@@ -32,10 +45,19 @@ namespace euler579
             OrderedVertices = vertices.OrderBy(v => v.X).ThenBy(v => v.Y).ThenBy(v => v.Z).ToArray();
             Vertices = vertices.ToArray();
             isStraight = new Lazy<bool>(CalculateIsStraight);
-            latticePoints = new Lazy<int>(CalculateLatticePoints);
+            latticePoints = new Lazy<Tuple<int,int>>(CalculateLatticePoints);
+            uniqueA = new Lazy<Vector3D>(CalculateUniqueA);
         }
 
-        private int CalculateLatticePoints()
+        private Vector3D CalculateUniqueA()
+        {
+            var points = new[] {A.X, A.Y, A.Z}.Select(Math.Abs).ToArray();
+            Array.Sort(points);
+            var result = new Vector3D(points[0], points[1], points[2]);
+            return result;
+        }
+
+        private Tuple<int, int> CalculateLatticePoints()
         {
             var front = new Plane(O, A, B, "front");
             var back = new Plane(O+C, A, B, "back");
@@ -50,8 +72,10 @@ namespace euler579
                 new PlanePair(left,right), 
                 new PlanePair(bottom, top)
             };
+            var allFaces = new[] {front, back, left, right, bottom, top};
             
-            int result = 0;
+            int inside = 0;
+            int surface = 0;
             var minBounds = new Vector3D(Vertices.Min(v => v.X), Vertices.Min(v => v.Y), Vertices.Min(v => v.Z));
             var maxBounds = new Vector3D(Vertices.Max(v => v.X), Vertices.Max(v => v.Y), Vertices.Max(v => v.Z));
 
@@ -64,12 +88,15 @@ namespace euler579
                         var v = new Vector3D(x,y,z);
                         if (oppositeFaces.All(pp => pp.IsBetweenOrOn(v)))
                         {
-                            result++;
+                            if (allFaces.Any(p => p.GetSide(v) == 0))
+                                surface++;
+                            else
+                                inside++;
                         }
                     }
                 }
             }
-            return result;
+            return Tuple.Create(inside, surface);
         }
 
         private bool CalculateIsStraight()
