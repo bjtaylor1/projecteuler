@@ -99,7 +99,7 @@ namespace euler579
             Cube cube;
             if (TryMakeCubeFrom(20, o, a, b, c, out cube, true))
             {
-                LogManager.GetCurrentClassLogger().Info($"Inside/Surface/Total: {cube.LatticePointsInside} / {cube.LatticePointsSurface} / {cube.LatticePoints}");
+                LogManager.GetCurrentClassLogger().Info($"Side: {cube.A.Length}, Inside/Surface/Total: {cube.LatticePointsInside} / {cube.LatticePointsSurface} / {cube.LatticePoints}");
             }
         }
 
