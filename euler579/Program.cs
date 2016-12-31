@@ -32,49 +32,6 @@ namespace euler579
 
         static void Main(string[] args)
         {
-            foreach (var line in File.ReadAllLines("info.log"))
-            {
-                var m = Regex.Match(line, @"^C\((\d+)\)(.+)$");
-                var n = int.Parse(m.Groups[1].Value);
-                var rest = m.Groups[2].Value;
-                var products = Regex.Matches(rest, @"(\d+) x (\d+)").Cast<Match>().Select(m1 => int.Parse(m1.Groups[2].Value))
-                    .Where(i => !IsIntegral(Math.Pow(i, 1d/3)))
-                    .Distinct();
-                LogManager.GetCurrentClassLogger().Info($"{n}, {string.Join(", ", products.Select(s => s.ToString()))}");
-            }
-            return;
-            for (long i = 1; i <= 14; i++)
-            {
-                LogManager.GetCurrentClassLogger().Info($"{i}: {GetNumStraightLatticePoints(i)}");
-            }
-            return;
-
-            var cube1 = new Cube(new[]
-            {
-                new Vector3D(0, 0, 0),
-                new Vector3D(3, 0, 0),
-                new Vector3D(0, 3, 0),
-                new Vector3D(0, 0, 3),
-                new Vector3D(0, 3, 3),
-                new Vector3D(3, 0, 3),
-                new Vector3D(3, 3, 0),
-                new Vector3D(3, 3, 3)
-            });
-            Console.Out.WriteLine(cube1.LatticePoints);
-
-            var cube2 = new Cube(new[]
-            {
-                new Vector3D(0, 2, 2),
-                new Vector3D(1, 4, 4),
-                new Vector3D(2, 0, 3),
-                new Vector3D(2, 3, 0),
-                new Vector3D(3, 2, 5),
-                new Vector3D(3, 5, 2),
-                new Vector3D(4, 1, 1),
-                new Vector3D(5, 3, 3)
-            });
-            Console.Out.WriteLine(cube2.LatticePoints);
-            Console.WindowWidth = 200;
             for (int i = 1; i <= 30; i++)
             {
                 var cubes = GetCubes(i);
