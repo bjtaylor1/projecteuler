@@ -11,6 +11,10 @@ namespace euler579
         public bool IsStraight { get { return isStraight.Value; } }
         public int LatticePoints { get { return latticePoints.Value; } }
 
+        public bool Regular
+        {
+            get { return Program.IsIntegral(Math.Pow(LatticePoints, 1.0/3)); }
+        }
 
         public Vector3D[] Vertices { get;  }
         public Vector3D[] OrderedVertices { get; }

@@ -32,6 +32,7 @@ namespace euler579
 
         static void Main(string[] args)
         {
+/*
             foreach (var line in File.ReadAllLines("info.log"))
             {
                 var m = Regex.Match(line, @"^C\((\d+)\)(.+)$");
@@ -75,13 +76,21 @@ namespace euler579
             });
             Console.Out.WriteLine(cube2.LatticePoints);
             Console.WindowWidth = 200;
+*/
             for (int i = 1; i <= 30; i++)
             {
                 var cubes = GetCubes(i);
+/*
                 var cubesByLatticePoints = cubes.GroupBy(c => c.LatticePoints);
                 var latticePointsDist = string.Join(", ", cubesByLatticePoints.OrderBy(g => g.Key).Select(g => $"{g.Count()} x {g.Key}"));
                 var totalLatticePoints = cubes.Sum(c => c.LatticePoints);
                 LogManager.GetCurrentClassLogger().Info($"C({i}) = {cubes.Length}, S = {latticePointsDist}, total: {totalLatticePoints}");
+*/
+                var irregularCubes = cubes.Where(c => !c.Regular).ToArray()
+                    .GroupBy(c => Tuple.Create((int)c.A.Length,c.LatticePoints))
+                    .OrderBy(c => c.Key.Item1).ThenBy(c => c.Key.Item2);
+                var sideLengthsAndLatticePoints = string.Join(", ", irregularCubes.Select(c => $"{c.Key.Item1},{c.Key.Item2}"));
+                LogManager.GetCurrentClassLogger().Info(sideLengthsAndLatticePoints);
             }
         }
 
@@ -160,7 +169,7 @@ namespace euler579
             return isIntegral;
         }
 
-        static bool IsIntegral(double d)
+        public static bool IsIntegral(double d)
         {
             return Math.Abs(d - Math.Round(d, 0)) < 1e-9;
         }
