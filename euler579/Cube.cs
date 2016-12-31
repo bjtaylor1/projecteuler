@@ -51,8 +51,7 @@ namespace euler579
 
         private Vector3D CalculateUniqueA()
         {
-            var points = new[] {A.X, A.Y, A.Z};
-            if (points.All(p => p <= 0)) points = points.Select(p => p * -1).ToArray();
+            var points = new[] {A.X, A.Y, A.Z}.Select(Math.Abs).ToArray();
             Array.Sort(points);
             var result = new Vector3D(points[0], points[1], points[2]);
             return result;
