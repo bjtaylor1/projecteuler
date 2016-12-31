@@ -32,22 +32,26 @@ namespace euler579_findtriples
                     var squareRoot = Math.Pow(sumSquares, 0.5);
                     if (IsIntegral(squareRoot))
                     {
+
                         Output(triple, (int) squareRoot, triples);
                     }
                 }
             }
             else
             {
-                for(int i = triple.Any() ? triple.Max() : 0; i < 100; i++)
+                for(int i = triple.Any() ? triple.Max() : 1; i < 100; i++)
                     PrintOut(triple.Concat(new [] {i}).ToArray(), triples);
             }
         }
+
 
         static void Main(string[] args)
         {
             var triples = new List<Tuple<int[], int>>();
             PrintOut(new int[] {}, triples);
-            foreach (var triple in triples.OrderBy(t => t.Item2))
+            foreach (var triple in triples
+                .Where(t => t.Item1.Distinct().Count() == 3)
+                .OrderBy(t => t.Item2))
             {
                 LogManager.GetCurrentClassLogger().Info($"{string.Join(" + ", triple.Item1.Select(i => i.ToString()))} = {triple.Item2}");
             }

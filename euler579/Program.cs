@@ -32,7 +32,11 @@ namespace euler579
 
         static void Main(string[] args)
         {
-            GetCubes(15);
+            //var o = new Vector3D(10, 10, 10);
+            //var v = new Vector3D(1, 6, 18);
+            
+
+            GetCubes(25);
         }
 
         static void AddCubesFrom(int n, Vector3D[] vertices, List<Cube> cubes )
@@ -83,7 +87,7 @@ namespace euler579
             }
         }
 
-        static bool TryMakeCubeFrom(int n, Vector3D origin, Vector3D a, Vector3D b, Vector3D c, out Cube cube)
+        public static bool TryMakeCubeFrom(int n, Vector3D origin, Vector3D a, Vector3D b, Vector3D c, out Cube cube)
         {
             var points = new[]
             {
