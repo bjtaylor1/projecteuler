@@ -13,3 +13,6 @@
 #include <iostream>
 #include <ctime>
 #include <iomanip>
+#include <vector>
+#include <map>
+#include <stack>

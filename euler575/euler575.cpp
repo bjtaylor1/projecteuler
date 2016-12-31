@@ -3,235 +3,231 @@
 
 #include "stdafx.h"
 
-#define SIZE 5
+#define SIZE 1000
 #define COUNT (SIZE*SIZE)
 #define ONE ((double)1)
 
+const double corners = 4;
+const double sides = ((SIZE - 2) * 4);
+const double middles = COUNT - sides - corners;
+
 using namespace std;
 
-double strategy_heads_stay(long numMoves)
+enum tiletype
 {
-	return ONE / (numMoves + 1);
-}
+	corner, middle, side
+};
 
-double strategy_heads_move(long numMoves)
-{
-	return ONE / (numMoves + 1);
-}
-
-double strategy_tails_stay(long numMoves)
-{
-	return 0.5;
-}
-
-double strategy_tails_move(long numMoves)
-{
-	return 0.5 / numMoves;
-}
-
-class square
+class tile_type
 {
 public:
-	static long nextid;
-	static long created;
-	static long destroyed;
-	long id = nextid++;
-	static long* numMoves;
-	static long* x;
-	static long* y;
-	static long get_i(const long x, const long y)
-	{
-		long res = (y * SIZE) + x;
-		return res;
-	}
+	vector<double> transfers;
 
-	static void init()
-	{
-		numMoves = new long[COUNT];
-		x = new long[COUNT];
-		y = new long[COUNT];
-		for (long i = 0; i < COUNT; i++)
-		{
-			x[i] = i % SIZE;
-			y[i] = i / SIZE;
-			bool isLeftOrRight = x[i] == 0 || x[i] == (SIZE - 1);
-			bool isTopOrBottom = y[i] == 0 || y[i] == (SIZE - 1);
-			bool isSide = isLeftOrRight || isTopOrBottom;
-			bool isCorner = isLeftOrRight && isTopOrBottom;
-			if (isCorner) numMoves[i] = 2;
-			else if (isSide) numMoves[i] = 3;
-			else numMoves[i] = 4;
-		}
-	}
-
-	static void de_init()
-	{
-		delete[] numMoves;
-		delete[] x;
-		delete[] y;
-	}
-
-	double probability[COUNT];
-
+	double gives, current;
+	double weight;
+	tiletype type;
+	tile_type(long _weight, double _gives, tiletype _type) : gives(_gives), weight(_weight), current((double)_weight / COUNT), type(_type), squares(0) {}
+	vector<tile_type*> neighbours;
+	double squares;
+	
 	double p_square() const
 	{
-		int s;
-		double result = 0;
-		for (int squarenum = 1; (s = squarenum*squarenum) <= COUNT; squarenum++)
-		{
-			result += probability[s - 1];
-		}
+		if (weight == 0) return 0;
+		//probability of it being on a square is simply the probability of it being on this
+		//tile type at all, multiplied by the proportion of this type's tiles that are squares (squares/weight).
+		double result = current * (squares) / weight;
 		return result;
-	}
-
-	void initialize()
-	{
-		for (long i = 0; i < COUNT; i++)
-		{
-			probability[i] = ONE / COUNT;
-		}
-	}
-
-	square()
-	{
-		created++;
-	}
-	~square()
-	{
-		destroyed++;
-	}
-
-	square (const square* old, double (*get_p_move)(long), double (*get_p_stay)(long)) : square()
-	{
-		for (long i = 0; i < COUNT; i++)
-		{
-			double p_stay = get_p_stay(numMoves[i]);
-			double p = old->probability[i] * p_stay;
-			
-			{
-				//left:
-				long moveX = x[i] - 1;
-				if (moveX >= 0)
-				{
-					long move_i = get_i(moveX, y[i]);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;;
-				}
-			}
-			{
-				//right:
-				long moveX = x[i] + 1;
-				if (moveX < SIZE)
-				{
-					long move_i = get_i(moveX, y[i]);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			{
-				//up:
-				long moveY = y[i] - 1;
-				if (moveY >= 0)
-				{
-					long move_i = get_i(x[i], moveY);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			{
-				//down:
-				long moveY = y[i] + 1;
-				if (moveY < SIZE)
-				{
-					long move_i = get_i(x[i], moveY);
-					double pMove = get_p_move(numMoves[move_i]);
-					p += old->probability[move_i] * pMove;
-				}
-			}
-			
-			probability[i] = p;
-		}
-	}
-
-	double get_checksum() const
-	{
-		double checksum = 0;
-		for (long i = 0; i < COUNT; i++)
-		{
-			checksum += probability[i];
-		}
-		return checksum;
 	}
 };
 
-ostream& operator<<(ostream& os, const square& s)
+
+class tile
 {
-	for (int y = 0; y < SIZE; y++)
+public:
+	int x, y, i;
+	tile_type *tt_heads, *tt_tails;
+
+	tile(int _i,
+		tile_type* tt_corner_heads, tile_type* tt_side_heads, tile_type* tt_middle_heads,
+		tile_type* tt_corner_tails, tile_type* tt_side_tails, tile_type* tt_middle_tails) : i(_i)
 	{
-		for (int x = 0; x < SIZE; x++)
+		x = _i % SIZE;
+		y = _i / SIZE;
+		bool isLeftOrRight = x == 0 || x == (SIZE - 1);
+		bool isTopOrBottom = y == 0 || y == (SIZE - 1);
+		bool isSide = isLeftOrRight != isTopOrBottom;
+		bool isCorner = isLeftOrRight && isTopOrBottom;
+
+		if (isCorner)
 		{
-			if (x > 0) cout << ",";
-			cout << fixed << setprecision(12) << s.probability[square::get_i(x, y)];
+			tt_heads = tt_corner_heads;
+			tt_tails = tt_corner_tails;
 		}
-		cout << endl;
+		else if (isSide)
+		{
+			tt_heads = tt_side_heads;
+			tt_tails = tt_side_tails;
+		}
+		else
+		{
+			tt_heads = tt_middle_heads;
+			tt_tails = tt_middle_tails;
+		}
 	}
-	return os;
+
+	void add_neighbour(tile* neighbour)
+	{
+		tt_heads->neighbours.push_back(neighbour->tt_heads);
+		tt_tails->neighbours.push_back(neighbour->tt_tails);
+	}
+
+};
+
+void adjust(tile_type* tt1, tile_type* tt2, tile_type* tt3)
+{
+	double checksum = tt1->current + tt2->current + tt3->current;
+	double adjust = 1 / checksum;
+	tt1->current *= adjust;
+	tt2->current *= adjust;
+	tt3->current *= adjust;
 }
 
 
-long square::nextid = 0;
-long square::created = 0;
-long square::destroyed = 0;
-long* square::numMoves;
-long* square::x;
-long* square::y;
-
+//https://projecteuler.net/problem=575
+//wrong: 0.000989640562 / 0.000989640563
+// ?  0.000989640557 / 0.000989640558 ?
+// 0.000989640561(28) = correct
 int main()
 {
-	square::init();
+	cout << fixed << setprecision(14);
+	vector<tile> tiles;
+	//make a tile type for each distinct type of tile, assigning it the probability that it transfers each time
+	//there are 6 in total - 3 for the 'heads' case, 3 for the 'tails' case.
+	//we treat the heads and tails cases completely separately right until the calculation of the result, since that's how they're described in the problem
 
-	square* if_heads = new square;
-	square* if_tails = new square;
-	if_heads->initialize();
-	if_tails->initialize();
+	tile_type	
+		corner_h(corners, ONE / 3, corner), side_h(sides, ONE / 4, side), middle_h(middles, ONE / 5, middle),
+		corner_t(corners, ONE / 4, corner), side_t(sides, ONE / 6, side), middle_t(middles, ONE / 8, middle);
 
-	time_t start;
-	time(&start);
-	int i = 0;
-	double totalElapsed = 0;
-	while (totalElapsed < 20)
+	tile_type* tile_types[] = { &corner_t, &side_t, &middle_t, &corner_h, &side_h, &middle_h };
+
+	//assign each tile in the matrix a tile type
+	for (long i = 0; i < COUNT; i++)
 	{
-		square* new_if_heads = new square(if_heads, &strategy_heads_move, &strategy_heads_stay);
-		square* new_if_tails = new square(if_tails, &strategy_tails_move, &strategy_tails_stay);
+		tile tile(i, &corner_h, &side_h, &middle_h, &corner_t, &side_t, &middle_t);
+		tiles.push_back(tile);
+	}
 
-		if ((i++ % 1000) == 0)
+
+	long xdiff[] = { 0, 1, 0,-1 }; //T,R,B,L
+	long ydiff[] = { -1, 0, 1, 0 };
+
+	//work out each tile's neighbours:
+	for (long i = 0; i < COUNT; i++)
+	{
+		tile& t = tiles.at(i);
+		for (long move = 0; move < 4; move++) //look a the top, right, bottom and left tiles
 		{
-			time_t now;
-			time(&now);
-			double elapsed = difftime(now, start);
-			if (elapsed > 2)
+			long newx = t.x + xdiff[move];
+			long newy = t.y + ydiff[move];
+
+			//is it within the grid?
+			if (newx >= 0 && newx < SIZE && newy >= 0 && newy < SIZE)
 			{
-				double p_square = (new_if_heads->p_square() + new_if_tails->p_square()) / 2;
-				cout << fixed << setprecision(12) << p_square << ", i = " << i << endl;
-				totalElapsed += elapsed;
-				start = now;
+				long newi = (newy * SIZE) + newx;
+				t.add_neighbour(&tiles.at(newi));
 			}
 		}
-
-		delete if_heads;
-		delete if_tails;
-		if_heads = new_if_heads;
-		if_tails = new_if_tails;
 	}
-	cout << *if_heads << endl << endl << *if_tails << endl;
+
+	//make a record of how many tiles of square numbers are in each tile type
+	long square;
+	for (long i = 1; (square = (i*i)) <= COUNT; i++)
+	{
+		tiles.at(square - 1).tt_heads->squares++;
+		tiles.at(square - 1).tt_tails->squares++;
+	}
+
+	//work out how much probability each tile type transfers to its neighbours each time
+	for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
+	{
+		for (vector<tile_type*>::iterator it = tile_types[tt]->neighbours.begin(); it != tile_types[tt]->neighbours.end(); it++)
+		{
+			double amountToGive = (*it)->gives;
+			tile_types[tt]->transfers.push_back(-amountToGive);
+			(*it)->transfers.push_back(amountToGive);
+		}
+	}
 
 
-	delete if_heads;
-	delete if_tails;
-	square::de_init();
+	unsigned long long i = 0;
+	while(true) //simply stop the program when the number of decimal places > 12 has stopped changing (asymptotic)
+	{
+		i++;
+		stack<pair<tile_type*, double>> gains;
+		stack<pair<tile_type*, double>> losses;
 
-	cout << "Created: " << square::created << ", destroyed = " << square::destroyed << " (" << (square::created - square::destroyed) << " diff)" << endl;
+		//for each tile type...
+		for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
+		{
+			double gainByThisTileType = 0;
+			//look at all the neighbours of this tile type
+			//(this could probably be optimized by grouping the neighbouring tile types and summing up the TOTAL transfer for each one - 
+			//some of the neighbours will be the same type)
+			for (vector<tile_type*>::iterator it = tile_types[tt]->neighbours.begin(); it != tile_types[tt]->neighbours.end(); it++)
+			{
+				//the amount of probability in each tile is the CURRENT amount of probability in this tile type, divided by the number of tiles
+				//in this tile type (the WEIGHT).
+				double amountPerTile = (*it)->current / (*it)->weight;
 
-    return 0;
+				//the amount that this tile transfers is the amount in the tile, multiplied by the amount of probability it transfers
+				double gainFromThisNeighbour = (*it)->gives * amountPerTile;
+
+				//this particular neighbouring tile type loses this amount of probability
+				losses.push(pair<tile_type*, double>(*it, gainFromThisNeighbour));
+
+				//...whilst this tile type gains it
+				gainByThisTileType += gainFromThisNeighbour;
+			}
+			//record the total gains for the tile type from all its neighbours
+			gains.push(pair<tile_type*, double>(tile_types[tt], gainByThisTileType));
+		}
+
+		//amortize the gains and losses 
+		//(don't do this during the loop, as the effect needs to be based only on the previous state, not the constantly-changing state,
+		//i.e. each iteration is immutable)
+		while (!gains.empty())
+		{
+			gains.top().first->current += gains.top().second;
+			gains.pop();
+		}
+		while (!losses.empty())
+		{
+			losses.top().first->current -= losses.top().second;
+			losses.pop();
+		}
+
+		//correct rounding errors:
+		adjust(&corner_h, &side_h, &middle_h);
+		adjust(&corner_t, &side_t, &middle_t);
+
+		//every so often, print the results
+		if (i % 10 == 0)
+		{
+			double checksum = 0;
+			
+			for (int tt = 0; tt < sizeof(tile_types) / sizeof(tile_type*); tt++)
+			{
+				checksum += tile_types[tt]->current;
+			}
+			//work out the probability of it being on a square
+			double p_square_h = corner_h.p_square() + side_h.p_square() + middle_h.p_square();
+			double p_square_t = corner_t.p_square() + side_t.p_square() + middle_t.p_square();
+			double p_square = (p_square_h + p_square_t) / 2;
+
+			cout << "checksum = " << checksum << ", p_square = " <<  p_square << endl;
+		}
+	}
+	return 0;
 }
 
