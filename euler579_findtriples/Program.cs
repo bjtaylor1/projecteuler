@@ -9,11 +9,12 @@ namespace euler579_findtriples
 {
     class Program
     {
-        static void Output(int[] triple, int square)
+        static void Output(int[] triple, int square, List<Tuple<int[], int>> triples )
         {
             if (triple.Sum(i => i*i) == square*square)
             {
-                LogManager.GetCurrentClassLogger().Info($"{string.Join(" + ", triple.Select(i => i.ToString()))} = {square}");
+                triples.Add(Tuple.Create(triple, square));
+
             }
         }
         static bool IsIntegral(double d)
@@ -21,27 +22,35 @@ namespace euler579_findtriples
             return Math.Abs(d - Math.Round(d, 0)) < 1e-9;
         }
 
-        static void PrintOut(int[] triple)
+        static void PrintOut(int[] triple, List<Tuple<int[], int>> triples)
         {
-            if (triple.Length == 2)
+            if (triple.Length == 3)
             {
-                var sumSquares = triple.Sum(i => Math.Pow(i, 2));
-                var squareRoot = Math.Pow(sumSquares, 0.5);
-                if (IsIntegral(squareRoot))
+                if (triple.Count(i => i != 0) >= 2)
                 {
-                    Output(triple, (int)squareRoot);
+                    var sumSquares = triple.Sum(i => Math.Pow(i, 2));
+                    var squareRoot = Math.Pow(sumSquares, 0.5);
+                    if (IsIntegral(squareRoot))
+                    {
+                        Output(triple, (int) squareRoot, triples);
+                    }
                 }
             }
             else
             {
-                for(int i = triple.Any() ? triple.Max() : 1; i < 100; i++)
-                    PrintOut(triple.Concat(new [] {i}).ToArray());
+                for(int i = triple.Any() ? triple.Max() : 0; i < 100; i++)
+                    PrintOut(triple.Concat(new [] {i}).ToArray(), triples);
             }
         }
 
         static void Main(string[] args)
         {
-            PrintOut(new int[] {} );
+            var triples = new List<Tuple<int[], int>>();
+            PrintOut(new int[] {}, triples);
+            foreach (var triple in triples.OrderBy(t => t.Item2))
+            {
+                LogManager.GetCurrentClassLogger().Info($"{string.Join(" + ", triple.Item1.Select(i => i.ToString()))} = {triple.Item2}");
+            }
         }
     }
 }
