@@ -93,7 +93,7 @@ namespace euler579
             else
             {
                 var distinctCount = pointsA.Distinct().Count();
-                if (distinctCount == 2) return 3; //e.g. 1,2,2
+                if (distinctCount == 2) return 4; //e.g. 1,2,2
                 else if (distinctCount == 3) return 6; //e.g. 1,2,2
                 else throw new InvalidOperationException("Sanity check failed.");
             }

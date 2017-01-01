@@ -18,22 +18,26 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-            var triplesAll = TripleFinder.FindTriples(500).ToArray();
-            for (int index = 0; index < triplesAll.Length; index++)
-            {
-                var triple = triplesAll[index];
-                if (!triplesAll.Take(index).Any(t => triple.IsMultipleOf(t)))
-                {
-                    triple.IsUnique = true;
-                }
-            }
-            File.WriteAllLines("triples.csv", new [] {"Dimensions,A,B,C,Square,Unique"}.Concat(
-                triplesAll.Select(t => $"{t.Dimensions},{string.Join(",", t.Sides.Select(s => s.ToString()))},{t.IsUnique}")));
             
-//            var cubes = TripleFinder.FindTriplesSlow(n).Select(t => new { Triple = t, Cubes = t.GetCubes(n) }).ToArray();
-
-
-
+            var allTriples = File.ReadAllLines("triples.csv")
+                .Select(line => line.Split(',').Select(int.Parse).ToArray())
+                .Select(ints => new Triple(ints.Take(3).ToArray(), ints.Last()))
+                .ToArray();
+            for (int n = 1; n <= 10; n++)
+            {
+                var triples = allTriples
+                    .Where(t => t.Square <= n)
+                    .ToArray();
+                var cubes = triples.SelectMany(t => t.GetCubes(n)).ToArray();
+                var s = cubes.Sum(c =>
+                {
+                    var repeatability = c.GetRepeatability(n);
+                    var combinations = c.GetCombinations();
+                    var i = c.LatticePoints*repeatability*combinations;
+                    return i;
+                });
+                LogManager.GetCurrentClassLogger().Info($"n = {n}, S = {s}");
+            }
         }
 
         static long GetNumStraightLatticePoints(long n)
