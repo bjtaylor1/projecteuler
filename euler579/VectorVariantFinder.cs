@@ -43,30 +43,23 @@ namespace euler579
                 result.Add(p);
             else
             {
-                for (int i = -1; i <= 1; i += 2)
+                for (int i = -1; i <= 1; i += 1)
                     AddSignPermutation(p.Concat(new[] { i }).ToArray(), result);
             }
         }
 
-        public static Vector3D[] FindAllVariants(Vector3D v)
+        public static Vector3D[] FindAllVariantsAtRightAnglesTo(Vector3D v)
         {
-            var points = new[] { v.X, v.Y, v.Z, 0 };
-            var vs = new List<Vector3D>();
-            foreach (var p1 in permutations)
-            {
-                foreach (var p2 in permutations)
-                {
-                    foreach (var s in signPermutations)
-                    {
-                        var a = points[p1[0]] + s[0] * points[p2[0]];
-                        var b = points[p1[1]] + s[1] * points[p2[1]];
-                        var c = points[p1[2]] + s[1] * points[p2[2]];
-                        var variant = new Vector3D(a, b, c);
-                        vs.Add(variant);
-                    }
-                }
-            }
-            return vs.Distinct().ToArray();
+            var points = new[] { (int)v.X, (int)v.Y, (int)v.Z};
+            var possibleQuantities = Permutations.Of(new[] {-1, 0, 1}, 3, true);
+            var possibleNumbers = possibleQuantities.Select(qs => qs.Select((q, i) => q*points[i]).Sum()).OrderBy(n => n).Distinct().ToArray();
+            var possibleVectors = Permutations.Of(possibleNumbers, 3, true)
+                .Select(nums => new Vector3D(nums[0], nums[1], nums[2]))
+                .Where(vn => Math.Abs(vn.LengthSquared - v.LengthSquared) < 1e-9 &&
+                    Math.Abs(Math.Abs(Vector3D.AngleBetween(vn, v)) - 90) < 1e-9)
+                .ToArray();
+
+            return possibleVectors;
         }
 
     }

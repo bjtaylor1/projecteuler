@@ -17,7 +17,33 @@ namespace euler579
             return cubes.Distinct().ToArray();
         }
 
-        private static void AddCubesFrom(int n, Vector3D[] vertices, List<Cube> cubes )
+        public static Vector3D[] FindVectorsAtRightAnglesTo(Vector3D v)
+        {
+            var vectors = new List<Vector3D>();
+            var n = (int)v.Length;
+            for (int x = -n; x <= n; x++)
+            {
+                for (int y = -n; y <= n; y++)
+                {
+                    for (int z = -n; z <= n; z++)
+                    {
+                        if (!(x == 0 && y == 0 && z == 0))
+                        {
+                            var vr = new Vector3D(x, y, z);
+                            if (Math.Abs(vr.LengthSquared - v.LengthSquared) < 1e-9 &&
+                                Math.Abs(Math.Abs(Vector3D.AngleBetween(vr, v)) - 90) < 1e-9)
+                            {
+                                vectors.Add(vr);
+                            }
+                        }
+                    }
+                }
+            }
+            return vectors.Distinct().ToArray();
+        }
+
+
+        public static void AddCubesFrom(int n, Vector3D[] vertices, List<Cube> cubes)
         {
             System.Windows.Media.Media3D.Geometry3D g;
             for (int x = 0; x <= n; x++)
@@ -27,9 +53,10 @@ namespace euler579
                     for (int z = 0; z <= n; z++)
                     {
                         var v = new Vector3D(x, y, z);
+
                         if (!vertices.Contains(v))
                         {
-                            var newVertices = vertices.Concat(new[] {v}).ToArray();
+                            var newVertices = vertices.Concat(new[] { v }).ToArray();
                             if (newVertices.Length == 3)
                             {
                                 var v0 = newVertices[0];
@@ -41,10 +68,10 @@ namespace euler579
                                 {
                                     var crossProduct = Vector3D.CrossProduct(sideA, sideB);
                                     //make it the same length, and we have a choice of plus or minus
-                                    var sideC1 = crossProduct*(sideA.Length/crossProduct.Length);
-                                    var sideC2 = crossProduct*-(sideA.Length/crossProduct.Length);
+                                    var sideC1 = crossProduct * (sideA.Length / crossProduct.Length);
+                                    var sideC2 = crossProduct * -(sideA.Length / crossProduct.Length);
                                     Cube cube;
-                                    foreach (var sideC in new[] {sideC1,sideC2})
+                                    foreach (var sideC in new[] { sideC1, sideC2 })
                                     {
                                         throw new NotImplementedException("No bounds check...");
                                         if (Cube.TryMakeCubeFrom(v1, sideA, sideB, sideC, out cube) && !cubes.Any(c => (int)c.A.LengthSquared == (int)cube.A.LengthSquared))
@@ -53,7 +80,7 @@ namespace euler579
                                             cubes.Add(cube);
                                         }
                                     }
-                                    
+
                                 }
                             }
                             else

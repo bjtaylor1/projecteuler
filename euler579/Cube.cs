@@ -36,20 +36,20 @@ namespace euler579
         private static readonly Vector3D zAxis = new Vector3D(0, 0, 1);
         private Lazy<Tuple<int, int>> latticePoints;
         private Lazy<Vector3D> uniqueA;
-        private readonly Vector3D minBounds;
-        private readonly Vector3D maxBounds;
+        public Vector3D MinBounds { get; }
+        public Vector3D MaxBounds { get; }
         private static readonly Vector3D ORIGIN = new Vector3D(0, 0, 0);
 
         public Cube(Vector3D[] vertices, Vector3D[] definitions = null)
         {
-            minBounds = new Vector3D(vertices.Min(v => v.X), vertices.Min(v => v.Y), vertices.Min(v => v.Z));
-            if (!Equals(minBounds, ORIGIN))
+            MinBounds = new Vector3D(vertices.Min(v => v.X), vertices.Min(v => v.Y), vertices.Min(v => v.Z));
+            if (!Equals(MinBounds, ORIGIN))
             {
-                vertices = vertices.Select(v => v - minBounds).ToArray();
-                minBounds = ORIGIN;
+                vertices = vertices.Select(v => v - MinBounds).ToArray();
+                MinBounds = ORIGIN;
             }
 
-            maxBounds = new Vector3D(vertices.Max(v => v.X), vertices.Max(v => v.Y), vertices.Max(v => v.Z));
+            MaxBounds = new Vector3D(vertices.Max(v => v.X), vertices.Max(v => v.Y), vertices.Max(v => v.Z));
             if (definitions == null) definitions = vertices.Skip(1).Take(3).Select(v => v - vertices[0]).ToArray();
             Definitions = definitions;
             if (vertices.Length != 8) throw new InvalidOperationException("Sanity check failed.");
@@ -58,9 +58,9 @@ namespace euler579
             isStraight = new Lazy<bool>(CalculateIsStraight);
             latticePoints = new Lazy<Tuple<int, int>>(CalculateLatticePoints);
             uniqueA = new Lazy<Vector3D>(CalculateUniqueA);
-            Width = (int)Math.Round(minBounds.X, 0) - (int)Math.Round(maxBounds.X, 0);
-            Height = (int)Math.Round(minBounds.Y, 0) - (int)Math.Round(maxBounds.Y, 0);
-            Depth = (int)Math.Round(minBounds.Z, 0) - (int)Math.Round(maxBounds.Z, 0);
+            Width = (int)Math.Round(MinBounds.X, 0) - (int)Math.Round(MaxBounds.X, 0);
+            Height = (int)Math.Round(MinBounds.Y, 0) - (int)Math.Round(MaxBounds.Y, 0);
+            Depth = (int)Math.Round(MinBounds.Z, 0) - (int)Math.Round(MaxBounds.Z, 0);
             Dimensions = new[] {Width, Height, Depth};
         }
 
@@ -75,6 +75,28 @@ namespace euler579
             Array.Sort(points);
             var result = new Vector3D(points[0], points[1], points[2]);
             return result;
+        }
+
+        public int GetRepeatability(int n)
+        {
+            var repeatability = (n + 1 - MaxBounds.X)*
+                    (n + 1 - MaxBounds.Y)*
+                    (n + 1 - MaxBounds.Z)
+                    ;
+            return (int)repeatability;
+        }
+
+        public int GetCombinations()
+        {
+            var pointsA = new[] {(int) A.X, (int) A.Y, (int) A.Z};
+            if (pointsA.Count(p => p == 0) == 2) return 1;
+            else
+            {
+                var distinctCount = pointsA.Distinct().Count();
+                if (distinctCount == 2) return 3; //e.g. 1,2,2
+                else if (distinctCount == 3) return 6; //e.g. 1,2,2
+                else throw new InvalidOperationException("Sanity check failed.");
+            }
         }
 
         private Tuple<int, int> CalculateLatticePoints()
@@ -97,11 +119,11 @@ namespace euler579
             int inside = 0;
             int surface = 0;
 
-            for (int x = (int)Math.Round(minBounds.X,0); x <= (int)Math.Round(maxBounds.X,0); x++)
+            for (int x = (int)Math.Round(MinBounds.X,0); x <= (int)Math.Round(MaxBounds.X,0); x++)
             {
-                for (int y = (int) Math.Round(minBounds.Y,0); y <= (int)Math.Round(maxBounds.Y,0); y++)
+                for (int y = (int) Math.Round(MinBounds.Y,0); y <= (int)Math.Round(MaxBounds.Y,0); y++)
                 {
-                    for(int z= (int)Math.Round(minBounds.Z, 0); z <= (int)Math.Round(maxBounds.Z,0); z++)
+                    for(int z= (int)Math.Round(MinBounds.Z, 0); z <= (int)Math.Round(MaxBounds.Z,0); z++)
                     {
                         var v = new Vector3D(x,y,z);
                         if (oppositeFaces.All(pp => pp.IsBetweenOrOn(v)))

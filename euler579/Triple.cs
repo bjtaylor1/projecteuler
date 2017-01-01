@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Media.Media3D;
-using euler579;
-using NLog;
 
-namespace euler579_findtriples
+namespace euler579
 {
     public class Triple
     {
@@ -33,7 +30,7 @@ namespace euler579_findtriples
         {
             var cubes = new List<Cube>();
             var o = new Vector3D(0, 0, 0);
-            var vs = VectorVariantFinder.FindAllVariants(Vector);
+            var vs = VectorVariantFinder.FindAllVariantsAtRightAnglesTo(Vector);
             var bs = vs.Where(v => Math.Abs(v.LengthSquared - Vector.LengthSquared) < 1e-9 
                         && Math.Abs(Math.Abs(Vector3D.AngleBetween(v, Vector)) - 90) < 1e-9);
             foreach (var b in bs)
