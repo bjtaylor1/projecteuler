@@ -58,9 +58,9 @@ namespace euler579
             isStraight = new Lazy<bool>(CalculateIsStraight);
             latticePoints = new Lazy<Tuple<int, int>>(CalculateLatticePoints);
             uniqueA = new Lazy<Vector3D>(CalculateUniqueA);
-            Width = (int)Math.Round(MinBounds.X, 0) - (int)Math.Round(MaxBounds.X, 0);
-            Height = (int)Math.Round(MinBounds.Y, 0) - (int)Math.Round(MaxBounds.Y, 0);
-            Depth = (int)Math.Round(MinBounds.Z, 0) - (int)Math.Round(MaxBounds.Z, 0);
+            Width = (int)Math.Abs(Math.Round(MinBounds.X, 0) - (int)Math.Round(MaxBounds.X, 0));
+            Height = (int)Math.Abs(Math.Round(MinBounds.Y, 0) - (int)Math.Round(MaxBounds.Y, 0));
+            Depth = (int)Math.Abs(Math.Round(MinBounds.Z, 0) - (int)Math.Round(MaxBounds.Z, 0));
             Dimensions = new[] {Width, Height, Depth};
         }
 
