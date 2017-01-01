@@ -4,7 +4,7 @@ using System.Windows.Media.Media3D;
 
 namespace euler579
 {
-    internal class Cube : IEquatable<Cube>
+    public class Cube : IEquatable<Cube>
     {
         public Vector3D[] Definitions { get; }
         private readonly Lazy<bool> isStraight;
@@ -34,20 +34,40 @@ namespace euler579
         private static readonly Vector3D xAxis = new Vector3D(1, 0, 0);
         private static readonly Vector3D yAxis = new Vector3D(0, 1, 0);
         private static readonly Vector3D zAxis = new Vector3D(0, 0, 1);
-        private Lazy<Tuple<int,int>> latticePoints;
+        private Lazy<Tuple<int, int>> latticePoints;
         private Lazy<Vector3D> uniqueA;
+        private readonly Vector3D minBounds;
+        private readonly Vector3D maxBounds;
+        private static readonly Vector3D ORIGIN = new Vector3D(0, 0, 0);
 
         public Cube(Vector3D[] vertices, Vector3D[] definitions = null)
         {
+            minBounds = new Vector3D(vertices.Min(v => v.X), vertices.Min(v => v.Y), vertices.Min(v => v.Z));
+            if (!Equals(minBounds, ORIGIN))
+            {
+                vertices = vertices.Select(v => v - minBounds).ToArray();
+                minBounds = ORIGIN;
+            }
+
+            maxBounds = new Vector3D(vertices.Max(v => v.X), vertices.Max(v => v.Y), vertices.Max(v => v.Z));
             if (definitions == null) definitions = vertices.Skip(1).Take(3).Select(v => v - vertices[0]).ToArray();
             Definitions = definitions;
             if (vertices.Length != 8) throw new InvalidOperationException("Sanity check failed.");
             OrderedVertices = vertices.OrderBy(v => v.X).ThenBy(v => v.Y).ThenBy(v => v.Z).ToArray();
             Vertices = vertices.ToArray();
             isStraight = new Lazy<bool>(CalculateIsStraight);
-            latticePoints = new Lazy<Tuple<int,int>>(CalculateLatticePoints);
+            latticePoints = new Lazy<Tuple<int, int>>(CalculateLatticePoints);
             uniqueA = new Lazy<Vector3D>(CalculateUniqueA);
+            Width = (int)Math.Round(minBounds.X, 0) - (int)Math.Round(maxBounds.X, 0);
+            Height = (int)Math.Round(minBounds.Y, 0) - (int)Math.Round(maxBounds.Y, 0);
+            Depth = (int)Math.Round(minBounds.Z, 0) - (int)Math.Round(maxBounds.Z, 0);
+            Dimensions = new[] {Width, Height, Depth};
         }
+
+        public int[] Dimensions { get;}
+        public int Depth { get;  }
+        public int Height { get; }
+        public int Width { get;  }
 
         private Vector3D CalculateUniqueA()
         {
@@ -76,8 +96,6 @@ namespace euler579
             
             int inside = 0;
             int surface = 0;
-            var minBounds = new Vector3D(Vertices.Min(v => v.X), Vertices.Min(v => v.Y), Vertices.Min(v => v.Z));
-            var maxBounds = new Vector3D(Vertices.Max(v => v.X), Vertices.Max(v => v.Y), Vertices.Max(v => v.Z));
 
             for (int x = (int)Math.Round(minBounds.X,0); x <= (int)Math.Round(maxBounds.X,0); x++)
             {
@@ -98,6 +116,7 @@ namespace euler579
             }
             return Tuple.Create(inside, surface);
         }
+
 
         private bool CalculateIsStraight()
         {
@@ -121,7 +140,7 @@ namespace euler579
 
         public override string ToString()
         {
-            return string.Join("   ", OrderedVertices.Select(o => $"{{{o.X:0},{o.Y:0},{o.Z:0}}}"));
+            return String.Join("   ", OrderedVertices.Select(o => $"{{{o.X:0},{o.Y:0},{o.Z:0}}}"));
         }
 
         public bool Equals(Cube other)
@@ -156,6 +175,32 @@ namespace euler579
         public static bool operator !=(Cube left, Cube right)
         {
             return !Equals(left, right);
+        }
+
+        public static bool TryMakeCubeFrom(Vector3D origin, Vector3D a, Vector3D b, Vector3D c, out Cube cube)
+        {
+            var points = new[]
+            {
+                origin,
+                origin + a,
+                origin + b,
+                origin + c,
+                origin + a + b,
+                origin + a + c,
+                origin + b + c,
+                origin + a + b + c
+            };
+            if (points.All(Program.IsIntegral))
+            {
+                cube = new Cube(points, new [] { a,b,c});
+                return true;
+            }
+            else
+            {
+                cube = null;
+                return false;
+            }
+
         }
     }
 }
