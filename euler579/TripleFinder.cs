@@ -14,7 +14,7 @@ namespace euler579
         {
             if (sides.Length == 3)
             {
-                var sumSquares = sides.Sum(i => Math.Pow(i, 2));
+                var sumSquares = sides.Sum(i => i*i);
                 var squareRoot = Math.Pow(sumSquares, 0.5);
                 if (squareRoot <= maxSide + 1e-9 && IsIntegral(squareRoot))
                 {
@@ -28,7 +28,8 @@ namespace euler579
             }
             else
             {
-                for (int i = sides.Any() ? sides.Max() : 0; i <= maxSide; i++)
+                var maxBound = sides.Length == 2 ? Math.Ceiling(Math.Sqrt(maxSide*maxSide - sides.Sum(i => i*i))) : maxSide;
+                for (int i = sides.Any() ? sides.Max() : 0; i <= maxBound; i++)
                 {
                     if(sides.Length == 0) Console.Out.Write($"\r{(double)i/maxSide:0.00%}");
                     MakeTriples(sides.Concat(new [] {i}).ToArray(),maxSide, process);

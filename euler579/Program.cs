@@ -19,11 +19,15 @@ namespace euler579
         static void Main(string[] args)
         {
             using(var sw =new StreamWriter("triples.csv"))
-            TripleFinder.FindTriples(500, triple =>
             {
-                if(triple.Square > 500) throw new InvalidOperationException("too big.");
-                sw.WriteLine($"{string.Join(",", triple.Sides.Select(i => i.ToString()))},{triple.Square}");
-            });
+                var n = 500;
+                TripleFinder.FindTriples(n, triple =>
+                {
+                    if(triple.Square > n) throw new InvalidOperationException("too big.");
+                    // ReSharper disable once AccessToDisposedClosure
+                    sw.WriteLine($"{string.Join(",", triple.Sides.Select(i => i.ToString()))},{triple.Square}");
+                });
+            }
         }
 
         private static void CalculateResult() //correct
