@@ -51,9 +51,9 @@ namespace euler579
         public static Vector3D[] FindAllVariantsAtRightAnglesTo(Vector3D v)
         {
             var points = new[] { (int)v.X, (int)v.Y, (int)v.Z};
-            var possibleQuantities = Permutations.Of(new[] {-1, 0, 1}, 3, true);
+            var possibleQuantities = Permutations.Of(new[] {-1, 0, 1}, 3, true, false);
             var possibleNumbers = possibleQuantities.Select(qs => qs.Select((q, i) => q*points[i]).Sum()).OrderBy(n => n).Distinct().ToArray();
-            var possibleVectors = Permutations.Of(possibleNumbers, 3, true)
+            var possibleVectors = Permutations.Of(possibleNumbers, 3, true, false)
                 .Select(nums => new Vector3D(nums[0], nums[1], nums[2]))
                 .Where(vn => Math.Abs(vn.LengthSquared - v.LengthSquared) < 1e-9 &&
                     Math.Abs(Math.Abs(Vector3D.AngleBetween(vn, v)) - 90) < 1e-9)

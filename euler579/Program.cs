@@ -18,8 +18,19 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-            int n = 10;
-            var cubes = TripleFinder.FindTriples(n).Select(t => new { Triple = t, Cubes = t.GetCubes(n) }).ToArray();
+            var triplesAll = TripleFinder.FindTriples(500).ToArray();
+            for (int index = 0; index < triplesAll.Length; index++)
+            {
+                var triple = triplesAll[index];
+                if (!triplesAll.Take(index).Any(t => triple.IsMultipleOf(t)))
+                {
+                    triple.IsUnique = true;
+                }
+            }
+            File.WriteAllLines("triples.csv", new [] {"Dimensions,A,B,C,Square,Unique"}.Concat(
+                triplesAll.Select(t => $"{t.Dimensions},{string.Join(",", t.Sides.Select(s => s.ToString()))},{t.IsUnique}")));
+            
+//            var cubes = TripleFinder.FindTriplesSlow(n).Select(t => new { Triple = t, Cubes = t.GetCubes(n) }).ToArray();
 
 
 
