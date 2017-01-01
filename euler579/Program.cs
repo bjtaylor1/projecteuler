@@ -18,7 +18,16 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-            
+            using(var sw =new StreamWriter("triples.csv"))
+            TripleFinder.FindTriples(500, triple =>
+            {
+                if(triple.Square > 500) throw new InvalidOperationException("too big.");
+                sw.WriteLine($"{string.Join(",", triple.Sides.Select(i => i.ToString()))},{triple.Square}");
+            });
+        }
+
+        private static void CalculateResult() //correct
+        {
             var allTriples = File.ReadAllLines("triples.csv")
                 .Select(line => line.Split(',').Select(int.Parse).ToArray())
                 .Select(ints => new Triple(ints.Take(3).ToArray(), ints.Last()))
