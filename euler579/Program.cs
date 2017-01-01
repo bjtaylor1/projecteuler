@@ -20,7 +20,7 @@ namespace euler579
         {
             using(var sw =new StreamWriter("triples.csv"))
             {
-                var n = 500;
+                var n = 5000;
                 TripleFinder.FindTriples(n, triple =>
                 {
                     if(triple.Square > n) throw new InvalidOperationException("too big.");
