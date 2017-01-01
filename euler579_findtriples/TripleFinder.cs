@@ -7,7 +7,7 @@ using NLog;
 
 namespace euler579_findtriples
 {
-    class Program
+    class TripleFinder
     {
         static void Output(int[] triple, int square)
         {

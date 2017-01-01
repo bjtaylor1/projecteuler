@@ -36,7 +36,7 @@ namespace euler579
         {
             var result = new List<int[]>();
             AddPermutation(new int [] {}, result);
-            return result.Where(p => !p.SequenceEqual(new[] {0, 1, 2, 3, 4, 5})).ToArray();
+            return result.ToArray();
         }
 
         private static int[][] GetAllSignPermutations()
@@ -52,7 +52,7 @@ namespace euler579
                 result.Add(p);
             else
             {
-                for(int i = 0; i <= 2; i++)
+                for(int i = 0; i <= 3; i++)
                     if(!p.Contains(i)) AddPermutation(p.Concat(new [] {i}).ToArray(), result);
             }
         }
@@ -70,23 +70,32 @@ namespace euler579
 
         static Vector3D[] FindAllVariants(Vector3D v)
         {
-            var points = new[] {v.X, v.Y, v.Z};
+            var points = new[] {v.X, v.Y, v.Z, 0};
             var vs = new List<Vector3D>();
-            foreach (var p in permutations)
+            foreach (var p1 in permutations)
             {
-                foreach (var s in signPermutations)
+                foreach (var p2 in permutations)
                 {
-                    var variant = new Vector3D(s[0] * points[p[0]], s[1] * points[p[1]], s[2] * points[p[2]]);
-                    vs.Add(variant);
+                    foreach (var s in signPermutations)
+                    {
+                        var a = points[p1[0]] + s[0]* points[p2[0]];
+                        var b = points[p1[1]] + s[1]* points[p2[1]];
+                        var c = points[p1[2]] + s[1]* points[p2[2]];
+                        var variant = new Vector3D(a,b,c);
+                        vs.Add(variant);
+                    }
                 }
             }
-            return vs.ToArray();
+            return vs.Distinct().ToArray();
         }
 
         static void Main(string[] args)
         {
-            MakeCubeFromVector(new Vector3D(2,3,6));
-            MakeCubeFromVector(new Vector3D(1, 6, 18));
+            var triples = TripleFinder.FindTriples(100).Where(t => t.Dimensions >= 2).ToArray();
+            foreach (var triple in triples)
+            {
+                MakeCubeFromVector(triple.Vector);
+            }
         }
 
         private static void MakeCubeFromVector(Vector3D a)
