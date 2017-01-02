@@ -38,6 +38,9 @@ namespace euler579
             return !Equals(left, right);
         }
 
+        public Triple(int[] sides): this(sides, (int)Math.Sqrt(sides.Select(s => s* s).Sum()))
+        {
+        }
         public Triple(int[] sides, int square)
         {
             Array.Sort(sides);

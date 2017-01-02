@@ -20,6 +20,10 @@ namespace euler579
         static void Main(string[] args)
         {
 /*
+            var cubes = new Triple(new [] {4,4,7}).GetCubes(20);
+            Console.Out.WriteLine(cubes.First().LatticePoints);
+*/
+/*
             new Triple(new[] { 1, 0, 0 }, 5).GetCubes(100);
             new Triple(new[] { 3, 4, 0 }, 5).GetCubes(100);
             new Triple(new[] { 4, 4, 7 }, 9).GetCubes(100);
@@ -51,6 +55,7 @@ namespace euler579
         private static void CalculateResult(int n) //correct
         {
             long result = 0;
+            var contributionByCombination = new Dictionary<int, long>();
             using (var file = File.OpenRead("triples.csv"))
             {
                 using (var sr = new StreamReader(file))
@@ -67,7 +72,14 @@ namespace euler579
                             var cubes = triple.GetCubes(n).Where(c => !cubesUsed.Contains(c)).ToArray();
                             var s = cubes.Sum(c =>
                             {
-                                long i = (long)c.LatticePoints * c.GetRepeatability(n) * c.GetCombinations();
+                                var combinations = c.GetCombinations();
+                                long i = (long)c.LatticePoints * c.GetRepeatability(n) * combinations;
+                                if (combinations >= 8)
+                                {
+                                    long contribution ;
+                                    if(!contributionByCombination.TryGetValue(combinations, out contribution)) contribution = 0;
+                                    contributionByCombination[combinations] = contribution + i;
+                                }
                                 return i;
                             });
                             cubesUsed.AddRange(cubes);
@@ -76,7 +88,13 @@ namespace euler579
                     }
                 }
             }
-            LogManager.GetCurrentClassLogger().Info($"S({n}) = {result}");
+            foreach (var kvp in contributionByCombination)
+            {
+                LogManager.GetCurrentClassLogger().Info($"Combinations of {kvp.Key} contributed {kvp.Value:0,000}");
+            }
+            LogManager.GetCurrentClassLogger().Info($"total by high combinations = {contributionByCombination.Values.Sum():0,000}");
+            
+            LogManager.GetCurrentClassLogger().Info($"S({n}) = {result:0,000}");
         }
 
 
