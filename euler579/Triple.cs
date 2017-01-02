@@ -80,11 +80,13 @@ namespace euler579
             var vs = VectorVariantFinder.FindAllVariantsExcluding1D(Vector);
             var basicCubes = GetCubesFromVector(n, Vector);
             var extraCubes = vs.SelectMany(v => GetCubesFromVector(n, v)).Distinct().Where(c => !basicCubes.Contains(c)).ToArray();
+/*
             if (basicCubes.Any() && extraCubes.Any())
             {
                 var combsBasic = string.Join(",", basicCubes.GroupBy(c => c.GetCombinations()).OrderBy(g => g.Count()).Select(g => $"{g.Count()}x{g.Key}"));
                 LogManager.GetCurrentClassLogger().Debug($"{Vector}: Basic combinations: {combsBasic}, Extras: {extraCubes.Length} ({string.Join(", ", extraCubes.Select(c => c.A.ToString()))})");
             }
+*/
             var allCubes = basicCubes.Concat(extraCubes).Distinct().ToArray();
             return allCubes;
         }

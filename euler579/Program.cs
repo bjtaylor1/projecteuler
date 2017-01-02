@@ -19,9 +19,9 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-//            for(int n = 1; n <= 10; n++)
+            for(int n = 1; n <= 10; n++)
 //            CalculateResult(n);
-            CalculateResult(10);
+            CalculateResult(n);
             //FindTriples();
         }
 
@@ -59,7 +59,7 @@ namespace euler579
                                 var repeatability = c.GetRepeatability(n);
                                 var combinations = 1;//c.GetCombinations();
                                 long i = (long)c.LatticePoints * repeatability * combinations;
-                                LogManager.GetCurrentClassLogger().Debug($"{i} from {triple} => {c.A}");
+                                //LogManager.GetCurrentClassLogger().Debug($"{i} from {triple} => {c.A}");
                                 return i;
                             });
                             var oldResult = result;
