@@ -78,20 +78,18 @@ namespace euler579
         public Cube[] GetCubes(int n)
         {
             var vs = VectorVariantFinder.FindAllVariantsExcluding1D(Vector);
-            var basicCubes = GetCubesFromVector(n, Vector);
-            var extraCubes = vs.SelectMany(v => GetCubesFromVector(n, v)).Distinct().Where(c => !basicCubes.Contains(c)).ToArray();
-/*
-            if (basicCubes.Any() && extraCubes.Any())
+            var basicCube = GetCubesFromVector(n, Vector);
+            var extraCubes = vs.Select(v => GetCubesFromVector(n, v)).Distinct().Where(c => c != basicCube).ToArray();
+            if (extraCubes.Any() && basicCube.GetCombinations() != extraCubes.Length + 1)
             {
-                var combsBasic = string.Join(",", basicCubes.GroupBy(c => c.GetCombinations()).OrderBy(g => g.Count()).Select(g => $"{g.Count()}x{g.Key}"));
-                LogManager.GetCurrentClassLogger().Debug($"{Vector}: Basic combinations: {combsBasic}, Extras: {extraCubes.Length} ({string.Join(", ", extraCubes.Select(c => c.A.ToString()))})");
+                var combsBasic = basicCube.GetCombinations();
+                LogManager.GetCurrentClassLogger().Debug($"{Vector}: Basic combinations: {combsBasic}, Extras: {extraCubes.Length} ({string.Join(", ", extraCubes.Select(c => c.A.ToString()))}\nBasic:\n{string.Join(", ", basicCube.Definitions.Select(d => d.ToString()))}\nExtras:\n{string.Join("\n", extraCubes.Select(c => string.Join(", ", c.Definitions.Select(d => d.ToString()))))})");
             }
-*/
-            var allCubes = basicCubes.Concat(extraCubes).Distinct().ToArray();
+            var allCubes = new[] { basicCube}.Concat(extraCubes).Distinct().ToArray();
             return allCubes;
         }
 
-        private static Cube[] GetCubesFromVector(int n, Vector3D vector)
+        private static Cube GetCubesFromVector(int n, Vector3D vector)
         {
             var cubes = new List<Cube>();
             var o = new Vector3D(0, 0, 0);
@@ -108,7 +106,8 @@ namespace euler579
                     cubes.Add(cube);
                 }
             }
-            return cubes.ToArray();
+            if(cubes.Count > 1) throw new InvalidOperationException("More than one cube from a vector!");
+            return cubes.Single();
         }
     }
 }

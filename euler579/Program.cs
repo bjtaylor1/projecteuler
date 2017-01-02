@@ -19,8 +19,8 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-            for(int n = 1; n <= 10; n++)
-//            CalculateResult(n);
+//            for(int n = 1; n <= 10; n++)
+            const int n = 50;
             CalculateResult(n);
             //FindTriples();
         }
