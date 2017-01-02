@@ -22,6 +22,13 @@ namespace euler579
         public static Vector3D[] FindAllVariants(Vector3D v, Func<Vector3D, Vector3D, bool> predicate, Func<int[], bool> numbersPredicate  )
         {
             var points = new[] { (int)v.X, (int)v.Y, (int)v.Z};
+            var pointsPerms = new[] {points};// Permutations.Of(points,3 , false, false);
+            var possibleVectors = pointsPerms.SelectMany(p => PossibleVectors(v, predicate, numbersPredicate, p)).Distinct().ToArray();
+            return possibleVectors;
+        }
+
+        private static Vector3D[] PossibleVectors(Vector3D v, Func<Vector3D, Vector3D, bool> predicate, Func<int[], bool> numbersPredicate, int[] points)
+        {
             var possibleQuantities = Permutations.Of(new[] {-1, 0, 1}, 3, true, false);
             var possibleNumbers = possibleQuantities.Select(qs => qs.Select((q, i) => q*points[i]).Sum()).OrderBy(n => n).Distinct().ToArray();
             var possibleVectors = Permutations.Of(possibleNumbers, 3, true, false)
@@ -29,9 +36,7 @@ namespace euler579
                 .Select(nums => new Vector3D(nums[0], nums[1], nums[2]))
                 .Where(vn => Math.Abs(vn.LengthSquared - v.LengthSquared) < 1e-9 && predicate(vn, v))
                 .ToArray();
-
             return possibleVectors;
         }
-
     }
 }

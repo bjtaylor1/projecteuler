@@ -79,7 +79,10 @@ namespace euler579
         {
             var vs = VectorVariantFinder.FindAllVariantsExcluding1D(Vector);
             var basicCube = GetCubesFromVector(n, Vector);
-            var extraCubes = vs.Select(v => GetCubesFromVector(n, v)).Distinct().Where(c => c != basicCube).ToArray();
+
+            if (basicCube == null) return new Cube[] {};
+
+            var extraCubes = vs.Select(v => GetCubesFromVector(n, v)).Distinct().Where(c => c != null && c != basicCube).ToArray();
             if (extraCubes.Any() && basicCube.GetCombinations() != extraCubes.Length + 1)
             {
                 var combsBasic = basicCube.GetCombinations();
@@ -106,7 +109,9 @@ namespace euler579
                     cubes.Add(cube);
                 }
             }
+
             if(cubes.Count > 1) throw new InvalidOperationException("More than one cube from a vector!");
+            if (!cubes.Any()) return null;
             return cubes.Single();
         }
     }
