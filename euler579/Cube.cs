@@ -6,9 +6,8 @@ namespace euler579
 {
     public class Cube : IEquatable<Cube>
     {
+        public int NumDimensions { get; }
         public Vector3D[] Definitions { get; }
-        private readonly Lazy<bool> isStraight;
-        public bool IsStraight { get { return isStraight.Value; } }
         public int LatticePointsInside { get { return latticePoints.Value.Item1; } }
         public int LatticePointsSurface { get { return latticePoints.Value.Item2; } }
         public int LatticePoints { get { return LatticePointsInside + LatticePointsSurface; } }
@@ -34,11 +33,13 @@ namespace euler579
         private static readonly Vector3D xAxis = new Vector3D(1, 0, 0);
         private static readonly Vector3D yAxis = new Vector3D(0, 1, 0);
         private static readonly Vector3D zAxis = new Vector3D(0, 0, 1);
+        private static readonly Vector3D[] axes = {xAxis, yAxis, zAxis};
         private Lazy<Tuple<int, int>> latticePoints;
         private Lazy<Vector3D> uniqueA;
         public Vector3D MinBounds { get; }
         public Vector3D MaxBounds { get; }
         private static readonly Vector3D ORIGIN = new Vector3D(0, 0, 0);
+        private int? combinations = null;
 
         public Cube(Vector3D[] vertices, Vector3D[] definitions = null)
         {
@@ -55,19 +56,21 @@ namespace euler579
             if (vertices.Length != 8) throw new InvalidOperationException("Sanity check failed.");
             OrderedVertices = vertices.OrderBy(v => v.X).ThenBy(v => v.Y).ThenBy(v => v.Z).ToArray();
             Vertices = vertices.ToArray();
-            isStraight = new Lazy<bool>(CalculateIsStraight);
             latticePoints = new Lazy<Tuple<int, int>>(CalculateLatticePoints);
             uniqueA = new Lazy<Vector3D>(CalculateUniqueA);
             Width = (int)Math.Abs(Math.Round(MinBounds.X, 0) - (int)Math.Round(MaxBounds.X, 0));
             Height = (int)Math.Abs(Math.Round(MinBounds.Y, 0) - (int)Math.Round(MaxBounds.Y, 0));
             Depth = (int)Math.Abs(Math.Round(MinBounds.Z, 0) - (int)Math.Round(MaxBounds.Z, 0));
             Dimensions = new[] {Width, Height, Depth};
+            var numAxesParallel = axes.Count(a => definitions.Any(d => IsParallelToAxis(d,a)));
+            NumDimensions = 3 - numAxesParallel;
         }
 
         public int[] Dimensions { get;}
         public int Depth { get;  }
         public int Height { get; }
         public int Width { get;  }
+        public int? RepeatabilityCombinations { get; set; }
 
         private Vector3D CalculateUniqueA()
         {
@@ -88,7 +91,17 @@ namespace euler579
 
         public int GetCombinations()
         {
-            var pointsA = new[] {(int) A.X, (int) A.Y, (int) A.Z};
+            if (!combinations.HasValue) throw new InvalidOperationException("Combinations has not been set");
+            return combinations.Value;
+
+/*
+            var distinction = new[] {(int)A.X, (int)A.Y, (int)A.Z}.Where(i => i != 0).Distinct().Count();
+            if (distinction == 1) return 1;
+            else return (int) Math.Pow(2, distinction - 1);
+*/
+
+
+            /*var pointsA = new[] {(int) A.X, (int) A.Y, (int) A.Z};
             if (pointsA.Count(p => p == 0) == 2) return 1;
             else
             {
@@ -96,7 +109,7 @@ namespace euler579
                 if (distinctCount == 2) return 4; //e.g. 1,2,2
                 else if (distinctCount == 3) return 6; //e.g. 1,2,2
                 else throw new InvalidOperationException("Sanity check failed.");
-            }
+            }*/
         }
 
         private Tuple<int, int> CalculateLatticePoints()
@@ -140,23 +153,10 @@ namespace euler579
         }
 
 
-        private bool CalculateIsStraight()
-        {
-            var straight = Definitions.All(p =>
-            {
-                var result = 
-                    IsParallelToAxis(p, xAxis) || 
-                    IsParallelToAxis(p, yAxis) || 
-                    IsParallelToAxis(p, zAxis);
-                return result;
-            });
-            return straight;
-        }
-
         private static bool IsParallelToAxis(Vector3D vector3D, Vector3D axis)
         {
-            var angleBetweenXAxis = Vector3D.AngleBetween(vector3D, axis);
-            var result = (int) Math.Round(Math.Abs(angleBetweenXAxis), 0)%90 == 0;
+            var angle = Vector3D.AngleBetween(vector3D, axis);
+            var result = (int) Math.Round(Math.Abs(angle), 0)%180 == 0;
             return result;
         }
 
@@ -223,6 +223,11 @@ namespace euler579
                 return false;
             }
 
+        }
+
+        public void SetCombinations(int i)
+        {
+            combinations = i;
         }
     }
 }

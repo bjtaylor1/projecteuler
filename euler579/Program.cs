@@ -19,7 +19,12 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-//            for(int n = 1; n <= 10; n++)
+            new Triple(new[] { 1, 0, 0 }, 5).GetCubes(100);
+            new Triple(new[] { 3, 4, 0 }, 5).GetCubes(100);
+            new Triple(new[] { 4, 4, 7 }, 9).GetCubes(100);
+            new Triple(new[] { 2, 3, 6 }, 7).GetCubes(100);
+
+            //            for(int n = 1; n <= 10; n++)
             const int n = 50;
             CalculateResult(n);
             //FindTriples();
@@ -39,6 +44,8 @@ namespace euler579
             }
         }
 
+        private static List<Cube> cubesUsed = new List<Cube>();
+
         private static void CalculateResult(int n) //correct
         {
             long result = 0;
@@ -50,60 +57,25 @@ namespace euler579
                     while ((line = sr.ReadLine()) != null)
                     {
                         var ints = line.Split(',').Select(int.Parse).ToArray();
-                        var triple = new Triple(ints.Take(3).ToArray(), ints.Last());
+                        var baseTripleSides = ints.Take(3).ToArray();
+                        var tripleSquare = ints.Last();
+                        var triple = new Triple(baseTripleSides, tripleSquare);
                         if (triple.Square <= n)
                         {
-                            var cubes = triple.GetCubes(n);
+                            var cubes = triple.GetCubes(n).Where(c => !cubesUsed.Contains(c)).ToArray();
                             var s = cubes.Sum(c =>
                             {
-                                var repeatability = c.GetRepeatability(n);
-                                var combinations = 1;//c.GetCombinations();
-                                long i = (long)c.LatticePoints * repeatability * combinations;
-                                //LogManager.GetCurrentClassLogger().Debug($"{i} from {triple} => {c.A}");
+                                if(!c.RepeatabilityCombinations.HasValue) throw new InvalidOperationException($"{nameof(c.RepeatabilityCombinations)} not set");
+                                long i = (long)c.LatticePoints * c.RepeatabilityCombinations.Value;
                                 return i;
                             });
-                            var oldResult = result;
+                            cubesUsed.AddRange(cubes);
                             result += s;
-                            //if(cubes.Any()) LogManager.GetCurrentClassLogger().Debug($"{triple}: {cubes.Length} cubes, {oldResult} + {s} = {result}");
-                            //else Console.Write($"\r{triple.Sides[0]},{triple.Sides[1]}");
                         }
                     }
                 }
             }
             LogManager.GetCurrentClassLogger().Info($"S({n}) = {result}");
-/*
-                var allTriples = File.ReadAllLines("triples.csv")
-                    .Select(line => line.Split(',').Select(int.Parse).ToArray())
-                    .Select(ints => new Triple(ints.Take(3).ToArray(), ints.Last()))
-                    .ToArray();
-
-            var triples = allTriples
-                    .Where(t => t.Square <= n)
-                    .ToArray();
-                var cubes = triples.SelectMany(t => t.GetCubes(n)).ToArray();
-                var s = cubes.Sum(c =>
-                {
-                    var repeatability = c.GetRepeatability(n);
-                    var combinations = c.GetCombinations();
-                    long i = (long)c.LatticePoints*repeatability*combinations;
-                    return i;
-                });
-                LogManager.GetCurrentClassLogger().Info($"n = {n}, S = {s}");
-*/
-            
-        }
-
-        static long GetNumStraightLatticePoints(long n)
-        {
-            long result = 0;
-            long a = n, b = 2;
-            while (a >= 1)
-            {
-                result += (long)(Math.Pow(a, 3) * Math.Pow(b, 3));
-                a--;
-                b++;
-            }
-            return result;
         }
 
 

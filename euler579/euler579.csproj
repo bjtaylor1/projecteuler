@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="BruteForceCubeFinder.cs" />
     <Compile Include="Cube.cs" />
+    <Compile Include="IntArrayEqualityComparer.cs" />
     <Compile Include="Permutations.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlanePair.cs" />
