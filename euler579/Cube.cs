@@ -132,11 +132,12 @@ namespace euler579
             int inside = 0;
             int surface = 0;
 
-            for (int x = (int)Math.Round(MinBounds.X,0); x <= (int)Math.Round(MaxBounds.X,0); x++)
+            if(MinBounds.X < 0 || MinBounds.Y < 0 || MinBounds.Z < 0) throw new InvalidOperationException("Should be aligned");
+            for (int x = 0; x <= (int)Math.Ceiling(MaxBounds.X); x++)
             {
-                for (int y = (int) Math.Round(MinBounds.Y,0); y <= (int)Math.Round(MaxBounds.Y,0); y++)
+                for (int y = 0; y <= (int)Math.Ceiling(MaxBounds.Y); y++)
                 {
-                    for(int z= (int)Math.Round(MinBounds.Z, 0); z <= (int)Math.Round(MaxBounds.Z,0); z++)
+                    for(int z= 0; z <= (int)Math.Ceiling(MaxBounds.Z); z++)
                     {
                         var v = new Vector3D(x,y,z);
                         if (oppositeFaces.All(pp => pp.IsBetweenOrOn(v)))

@@ -65,14 +65,12 @@ namespace euler579
             bool isMultiple = Math.Abs(multiples.Max() - multiples.Min()) < 2e-9;
             return isMultiple;
         }
-        
 
         public Vector3D Vector { get;  }
 
         public int[] Sides { get; }
         public int Square { get; }
         public int Dimensions { get; }
-        private static List<int> extrasAndDimensions = new List<int>();
         public override string ToString()
         {
             return $"{string.Join(",", Sides.Select(s => s.ToString()))} => {Square} ({Dimensions}D)";
@@ -80,9 +78,6 @@ namespace euler579
 
         public Cube[] GetCubes(int n)
         {
-/*
-            var vs = VectorVariantFinder.FindAllCombinationsOf(Vector);
-*/
             var basicCube = GetCubeFromVector(n, Vector);
 
             if (basicCube != null)
@@ -90,18 +85,8 @@ namespace euler579
                 var vs = VectorVariantFinder.FindAllCombinationsOf(Vector);
                 var extraCubes = vs.Select(v => GetCubeFromVector(n, v)).Distinct().Where(c => c != null && c != basicCube).ToArray();
                 basicCube.SetCombinations(extraCubes.Length + 1);
-                //LogManager.GetCurrentClassLogger().Info($"Cube.A = {basicCube.A}, Combinations = {basicCube.GetCombinations()}, totalIncExtras = {extraCubes.Length + 1}, extras A's: {string.Join("   ", extraCubes.Select(e => e.A))}");
             }
-/*
-            var extraCubes = vs.Select(v => GetCubeFromVector(n, v)).Distinct().Where(c => c != null && c != basicCube).ToArray();
-            if (extraCubes.Any() && (basicCube?.GetCombinations() ?? 0) != extraCubes.Length + 1)
-            {
-                var combsBasic = basicCube?.GetCombinations().ToString() ?? "none";
-                var basicDefinitions = basicCube == null ? "none" : string.Join(", ", basicCube?.Definitions.Select(d => d.ToString()));
-                LogManager.GetCurrentClassLogger().Debug($"{Vector}: Basic combinations: {combsBasic}, Dimensions: {basicCube.NumDimensions}, Extras: {extraCubes.Length} ({string.Join(", ", extraCubes.Select(c => c.A.ToString()))}\nBasic:\n{basicDefinitions}\nExtras:\n{string.Join("\n", extraCubes.Select(c => string.Join(", ", c.Definitions.Select(d => d.ToString()))))})");
-            }
-*/
-            var allCubes = new[] { basicCube}/*.Concat(extraCubes).Distinct()*/.Where(c => c != null).ToArray();
+            var allCubes = new[] { basicCube}.Where(c => c != null).ToArray();
             return allCubes;
         }
 

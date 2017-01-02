@@ -31,7 +31,7 @@ namespace euler579
 */
 
             //            for(int n = 1; n <= 10; n++)
-            const int n = 50;
+            const int n = 5000;
             CalculateResult(n);
             //FindTriples();
         }
@@ -50,8 +50,6 @@ namespace euler579
             }
         }
 
-        private static List<Cube> cubesUsed = new List<Cube>();
-
         private static void CalculateResult(int n) //correct
         {
             long result = 0;
@@ -61,15 +59,17 @@ namespace euler579
                 using (var sr = new StreamReader(file))
                 {
                     string line;
+                    int count = 0;
                     while ((line = sr.ReadLine()) != null)
                     {
+                        Console.Write($"\r{(double)(count++)/1414662:0.000%}");
                         var ints = line.Split(',').Select(int.Parse).ToArray();
                         var baseTripleSides = ints.Take(3).ToArray();
                         var tripleSquare = ints.Last();
                         var triple = new Triple(baseTripleSides, tripleSquare);
                         if (triple.Square <= n)
                         {
-                            var cubes = triple.GetCubes(n).Where(c => !cubesUsed.Contains(c)).ToArray();
+                            var cubes = triple.GetCubes(n).ToArray();
                             var s = cubes.Sum(c =>
                             {
                                 var combinations = c.GetCombinations();
@@ -82,8 +82,8 @@ namespace euler579
                                 }
                                 return i;
                             });
-                            cubesUsed.AddRange(cubes);
                             result += s;
+                            if (result > 1e9) result -= (long)1e9;
                         }
                     }
                 }
