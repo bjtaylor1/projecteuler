@@ -18,27 +18,62 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-            using(var sw =new StreamWriter("triples.csv"))
+//            for(int n = 1; n <= 10; n++)
+//            CalculateResult(n);
+            CalculateResult(50);
+            //FindTriples();
+        }
+
+        private static void FindTriples()
+        {
+            using (var sw = new StreamWriter("triples.csv"))
             {
                 var n = 5000;
                 TripleFinder.FindTriples(n, triple =>
                 {
-                    if(triple.Square > n) throw new InvalidOperationException("too big.");
+                    if (triple.Square > n) throw new InvalidOperationException("too big.");
                     // ReSharper disable once AccessToDisposedClosure
                     sw.WriteLine($"{string.Join(",", triple.Sides.Select(i => i.ToString()))},{triple.Square}");
                 });
             }
         }
 
-        private static void CalculateResult() //correct
+        private static void CalculateResult(int n) //correct
         {
-            var allTriples = File.ReadAllLines("triples.csv")
-                .Select(line => line.Split(',').Select(int.Parse).ToArray())
-                .Select(ints => new Triple(ints.Take(3).ToArray(), ints.Last()))
-                .ToArray();
-            for (int n = 1; n <= 10; n++)
+            long result = 0;
+            using (var file = File.OpenRead("triples.csv"))
             {
-                var triples = allTriples
+                using (var sr = new StreamReader(file))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        var ints = line.Split(',').Select(int.Parse).ToArray();
+                        var triple = new Triple(ints.Take(3).ToArray(), ints.Last());
+                        if (triple.Square <= n)
+                        {
+                            var cubes = triple.GetCubes(n);
+                            var s = cubes.Sum(c =>
+                            {
+                                var repeatability = c.GetRepeatability(n);
+                                var combinations = c.GetCombinations();
+                                long i = (long)c.LatticePoints * repeatability * combinations;
+                                return i;
+                            });
+                            
+                            LogManager.GetCurrentClassLogger().Debug($"{triple}: {cubes.Length} cubes, {result} + {s} = {result += s}");
+                        }
+                    }
+                }
+            }
+            LogManager.GetCurrentClassLogger().Info($"S({n}) = {result}");
+/*
+                var allTriples = File.ReadAllLines("triples.csv")
+                    .Select(line => line.Split(',').Select(int.Parse).ToArray())
+                    .Select(ints => new Triple(ints.Take(3).ToArray(), ints.Last()))
+                    .ToArray();
+
+            var triples = allTriples
                     .Where(t => t.Square <= n)
                     .ToArray();
                 var cubes = triples.SelectMany(t => t.GetCubes(n)).ToArray();
@@ -46,11 +81,12 @@ namespace euler579
                 {
                     var repeatability = c.GetRepeatability(n);
                     var combinations = c.GetCombinations();
-                    var i = c.LatticePoints*repeatability*combinations;
+                    long i = (long)c.LatticePoints*repeatability*combinations;
                     return i;
                 });
                 LogManager.GetCurrentClassLogger().Info($"n = {n}, S = {s}");
-            }
+*/
+            
         }
 
         static long GetNumStraightLatticePoints(long n)
