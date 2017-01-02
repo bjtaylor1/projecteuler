@@ -48,7 +48,23 @@ namespace euler579
             Square = square;
             Dimensions = Sides.Count(s => s > 0);
             Vector = new Vector3D(Sides[0], Sides[1], Sides[2]);
+
+            IsPrimitive = CalcIsPrimitive();
         }
+
+        private bool CalcIsPrimitive()
+        {
+            
+            var nonZeroSides = Sides.Where(s => s != 0).ToArray();
+            for (int f = 2; f <= (int)Math.Ceiling((double)Sides.Max()); f++)
+            {
+                if (nonZeroSides.All(s => Program.IsIntegral((double) s/f)))
+                    return false;
+            }
+            return true;
+        }
+
+        public bool IsPrimitive { get;  }
 
         public bool IsUnique { get; set; }
 
@@ -76,7 +92,7 @@ namespace euler579
             return $"{string.Join(",", Sides.Select(s => s.ToString()))} => {Square} ({Dimensions}D)";
         }
 
-        public Cube[] GetCubes(int n)
+        public Cube GetCube(int n)
         {
             var basicCube = GetCubeFromVector(n, Vector);
 
@@ -86,8 +102,7 @@ namespace euler579
                 var extraCubes = vs.Select(v => GetCubeFromVector(n, v)).Distinct().Where(c => c != null && c != basicCube).ToArray();
                 basicCube.SetCombinations(extraCubes.Length + 1);
             }
-            var allCubes = new[] { basicCube}.Where(c => c != null).ToArray();
-            return allCubes;
+            return basicCube;
         }
 
         private static Cube GetCubeFromVector(int n, Vector3D vector)

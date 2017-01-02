@@ -19,21 +19,10 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-/*
-            var cubes = new Triple(new [] {4,4,7}).GetCubes(20);
-            Console.Out.WriteLine(cubes.First().LatticePoints);
-*/
-/*
-            new Triple(new[] { 1, 0, 0 }, 5).GetCubes(100);
-            new Triple(new[] { 3, 4, 0 }, 5).GetCubes(100);
-            new Triple(new[] { 4, 4, 7 }, 9).GetCubes(100);
-            new Triple(new[] { 2, 3, 6 }, 7).GetCubes(100);
-*/
+            PrimTriples();
 
-            //            for(int n = 1; n <= 10; n++)
-            const int n = 5000;
-            CalculateResult(n);
-            //FindTriples();
+//            Console.Out.WriteLine(new Triple(new [] {1,2,2}).IsPrimitive);
+//            CalculateResult(10);
         }
 
         private static void FindTriples()
@@ -50,52 +39,73 @@ namespace euler579
             }
         }
 
+        private static void PrimTriples()
+        {
+            using (var input = File.OpenRead("triples.csv"))
+            using (var output = File.OpenWrite("primitivetriples.csv"))
+            using (var sr = new StreamReader(input))
+            using(var sw = new StreamWriter(output))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                var ints = line.Split(',').Select(int.Parse).ToArray();
+                var baseTripleSides = ints.Take(3).ToArray();
+                var tripleSquare = ints.Last();
+                var triple = new Triple(baseTripleSides, tripleSquare);
+                    if (triple.IsPrimitive)
+                        sw.WriteLine(line);
+                }
+            }
+        }
+
         private static void CalculateResult(int n) //correct
         {
             long result = 0;
-            var contributionByCombination = new Dictionary<int, long>();
             using (var file = File.OpenRead("triples.csv"))
             {
                 using (var sr = new StreamReader(file))
+
                 {
                     string line;
                     int count = 0;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        Console.Write($"\r{(double)(count++)/1414662:0.000%}");
+                        Console.Write($"\r{(double)(count++) / 1414662:0.000%}");
                         var ints = line.Split(',').Select(int.Parse).ToArray();
                         var baseTripleSides = ints.Take(3).ToArray();
                         var tripleSquare = ints.Last();
                         var triple = new Triple(baseTripleSides, tripleSquare);
                         if (triple.Square <= n)
                         {
-                            var cubes = triple.GetCubes(n).ToArray();
-                            var s = cubes.Sum(c =>
+                            if (triple.IsPrimitive)
                             {
-                                var combinations = c.GetCombinations();
-                                long i = (long)c.LatticePoints * c.GetRepeatability(n) * combinations;
-                                if (combinations >= 8)
+                                var baseCube = triple.GetCube(n);
+                                if (baseCube != null)
                                 {
-                                    long contribution ;
-                                    if(!contributionByCombination.TryGetValue(combinations, out contribution)) contribution = 0;
-                                    contributionByCombination[combinations] = contribution + i;
+                                    var allCubes = new List<Cube> { baseCube };
+                                    var maxFactor = (int)((double)n / triple.Square);
+                                    for (int factor = 2; factor <= maxFactor; factor++)
+                                    {
+                                        var factoredTriple = new Triple(triple.Sides.Select(i => i * factor).ToArray(), triple.Square * factor);
+                                        var factoredCube = factoredTriple.GetCube(n);
+                                        if (factoredCube != null) allCubes.Add(factoredCube);
+                                        else break;
+                                    }
+                                    var totalContribution = allCubes.Sum(c => (long)c.LatticePoints * c.GetRepeatability(n) * c.GetCombinations());
+                                    LogManager.GetCurrentClassLogger().Debug($"{triple}: {totalContribution}");
+                                    result += totalContribution;
+                                    if (n == 5000 && result > 1e9) result -= (long)1e9;
                                 }
-                                return i;
-                            });
-                            result += s;
-                            if (result > 1e9) result -= (long)1e9;
+                            }
                         }
                     }
                 }
             }
-            foreach (var kvp in contributionByCombination)
-            {
-                LogManager.GetCurrentClassLogger().Info($"Combinations of {kvp.Key} contributed {kvp.Value:0,000}");
-            }
-            LogManager.GetCurrentClassLogger().Info($"total by high combinations = {contributionByCombination.Values.Sum():0,000}");
-            
-            LogManager.GetCurrentClassLogger().Info($"S({n}) = {result:0,000}");
+
+            LogManager.GetCurrentClassLogger().Info($"S({n}) = {result}");
         }
+
 
 
         public static bool IsIntegral(Vector3D v)
