@@ -19,10 +19,12 @@ namespace euler579
     {
         static void Main(string[] args)
         {
+/*
             new Triple(new[] { 1, 0, 0 }, 5).GetCubes(100);
             new Triple(new[] { 3, 4, 0 }, 5).GetCubes(100);
             new Triple(new[] { 4, 4, 7 }, 9).GetCubes(100);
             new Triple(new[] { 2, 3, 6 }, 7).GetCubes(100);
+*/
 
             //            for(int n = 1; n <= 10; n++)
             const int n = 50;
@@ -65,8 +67,7 @@ namespace euler579
                             var cubes = triple.GetCubes(n).Where(c => !cubesUsed.Contains(c)).ToArray();
                             var s = cubes.Sum(c =>
                             {
-                                if(!c.RepeatabilityCombinations.HasValue) throw new InvalidOperationException($"{nameof(c.RepeatabilityCombinations)} not set");
-                                long i = (long)c.LatticePoints * c.RepeatabilityCombinations.Value;
+                                long i = (long)c.LatticePoints * c.GetRepeatability(n) * c.GetCombinations();
                                 return i;
                             });
                             cubesUsed.AddRange(cubes);

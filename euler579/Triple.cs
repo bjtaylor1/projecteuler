@@ -86,19 +86,7 @@ namespace euler579
             {
                 var vs = VectorVariantFinder.FindAllCombinationsOf(Vector);
                 var extraCubes = vs.Select(v => GetCubeFromVector(n, v)).Distinct().Where(c => c != null && c != basicCube).ToArray();
-                var cubes = new[] {basicCube}.Concat(extraCubes).ToArray();
-                if(cubes.Select(c => c.GetRepeatability(n)).Distinct().Count() != 1)
-                    throw new InvalidOperationException("Different repeatabilities!");
-
-                var repeatabilityAndCombinations = cubes.Sum(c => c.GetRepeatability(n));
-                basicCube.RepeatabilityCombinations = repeatabilityAndCombinations;
-                var combinations = extraCubes.Length + 1;
-                if (!extrasAndDimensions.Contains(combinations))
-                {
-                    extrasAndDimensions.Add(combinations);
-                    LogManager.GetCurrentClassLogger().Info($"{basicCube.A}: {combinations}");
-                }
-                basicCube.SetCombinations(combinations);
+                basicCube.SetCombinations(extraCubes.Length + 1);
                 //LogManager.GetCurrentClassLogger().Info($"Cube.A = {basicCube.A}, Combinations = {basicCube.GetCombinations()}, totalIncExtras = {extraCubes.Length + 1}, extras A's: {string.Join("   ", extraCubes.Select(e => e.A))}");
             }
 /*
