@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Media3D;
+using NLog;
 
 namespace euler579
 {
@@ -76,17 +77,31 @@ namespace euler579
 
         public Cube[] GetCubes(int n)
         {
+            var vs = VectorVariantFinder.FindAllVariantsExcluding1D(Vector);
+            var basicCubes = GetCubesFromVector(n, Vector);
+            var extraCubes = vs.SelectMany(v => GetCubesFromVector(n, v)).Distinct().Where(c => !basicCubes.Contains(c)).ToArray();
+            if (basicCubes.Any() && extraCubes.Any())
+            {
+                var combsBasic = string.Join(",", basicCubes.GroupBy(c => c.GetCombinations()).OrderBy(g => g.Count()).Select(g => $"{g.Count()}x{g.Key}"));
+                LogManager.GetCurrentClassLogger().Debug($"{Vector}: Basic combinations: {combsBasic}, Extras: {extraCubes.Length} ({string.Join(", ", extraCubes.Select(c => c.A.ToString()))})");
+            }
+            var allCubes = basicCubes.Concat(extraCubes).Distinct().ToArray();
+            return allCubes;
+        }
+
+        private static Cube[] GetCubesFromVector(int n, Vector3D vector)
+        {
             var cubes = new List<Cube>();
             var o = new Vector3D(0, 0, 0);
-            var vs = VectorVariantFinder.FindAllVariantsAtRightAnglesTo(Vector);
-            var bs = vs.Where(v => Math.Abs(v.LengthSquared - Vector.LengthSquared) < 1e-9 
-                        && Math.Abs(Math.Abs(Vector3D.AngleBetween(v, Vector)) - 90) < 1e-9);
+            var vs = VectorVariantFinder.FindAllVariantsAtRightAnglesTo(vector);
+            var bs = vs.Where(v => Math.Abs(v.LengthSquared - vector.LengthSquared) < 1e-9
+                                   && Math.Abs(Math.Abs(Vector3D.AngleBetween(v, vector)) - 90) < 1e-9);
             foreach (var b in bs)
             {
-                var c = Vector3D.CrossProduct(Vector, b);
-                c *= (Vector.Length / c.Length);
+                var c = Vector3D.CrossProduct(vector, b);
+                c *= (vector.Length/c.Length);
                 Cube cube;
-                if (Cube.TryMakeCubeFrom(o, Vector, b, c, out cube) && cube.Dimensions.All(d => d <= n) && !cubes.Contains(cube))
+                if (Cube.TryMakeCubeFrom(o, vector, b, c, out cube) && cube.Dimensions.All(d => d <= n) && !cubes.Contains(cube))
                 {
                     cubes.Add(cube);
                 }

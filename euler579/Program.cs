@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace euler579
         {
 //            for(int n = 1; n <= 10; n++)
 //            CalculateResult(n);
-            CalculateResult(50);
+            CalculateResult(10);
             //FindTriples();
         }
 
@@ -56,12 +57,15 @@ namespace euler579
                             var s = cubes.Sum(c =>
                             {
                                 var repeatability = c.GetRepeatability(n);
-                                var combinations = c.GetCombinations();
+                                var combinations = 1;//c.GetCombinations();
                                 long i = (long)c.LatticePoints * repeatability * combinations;
+                                LogManager.GetCurrentClassLogger().Debug($"{i} from {triple} => {c.A}");
                                 return i;
                             });
-                            
-                            LogManager.GetCurrentClassLogger().Debug($"{triple}: {cubes.Length} cubes, {result} + {s} = {result += s}");
+                            var oldResult = result;
+                            result += s;
+                            //if(cubes.Any()) LogManager.GetCurrentClassLogger().Debug($"{triple}: {cubes.Length} cubes, {oldResult} + {s} = {result}");
+                            //else Console.Write($"\r{triple.Sides[0]},{triple.Sides[1]}");
                         }
                     }
                 }

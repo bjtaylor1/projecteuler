@@ -169,7 +169,7 @@ namespace euler579
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            var sequenceEqual = OrderedVertices.SequenceEqual(other.OrderedVertices);
+            var sequenceEqual = OrderedVertices.SequenceEqual(other.OrderedVertices, VectorIntEqualityComparer.Instance);
             return sequenceEqual;
         }
 
