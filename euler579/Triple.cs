@@ -80,15 +80,14 @@ namespace euler579
             var vs = VectorVariantFinder.FindAllVariantsExcluding1D(Vector);
             var basicCube = GetCubesFromVector(n, Vector);
 
-            if (basicCube == null) return new Cube[] {};
-
             var extraCubes = vs.Select(v => GetCubesFromVector(n, v)).Distinct().Where(c => c != null && c != basicCube).ToArray();
-            if (extraCubes.Any() && basicCube.GetCombinations() != extraCubes.Length + 1)
+            if (extraCubes.Any() && (basicCube?.GetCombinations() ?? 0) != extraCubes.Length + 1)
             {
-                var combsBasic = basicCube.GetCombinations();
-                LogManager.GetCurrentClassLogger().Debug($"{Vector}: Basic combinations: {combsBasic}, Extras: {extraCubes.Length} ({string.Join(", ", extraCubes.Select(c => c.A.ToString()))}\nBasic:\n{string.Join(", ", basicCube.Definitions.Select(d => d.ToString()))}\nExtras:\n{string.Join("\n", extraCubes.Select(c => string.Join(", ", c.Definitions.Select(d => d.ToString()))))})");
+                var combsBasic = basicCube?.GetCombinations().ToString() ?? "none";
+                var basicDefinitions = basicCube == null ? "none" : string.Join(", ", basicCube?.Definitions.Select(d => d.ToString()));
+                LogManager.GetCurrentClassLogger().Debug($"{Vector}: Basic combinations: {combsBasic}, Extras: {extraCubes.Length} ({string.Join(", ", extraCubes.Select(c => c.A.ToString()))}\nBasic:\n{basicDefinitions}\nExtras:\n{string.Join("\n", extraCubes.Select(c => string.Join(", ", c.Definitions.Select(d => d.ToString()))))})");
             }
-            var allCubes = new[] { basicCube}.Concat(extraCubes).Distinct().ToArray();
+            var allCubes = new[] { basicCube}.Concat(extraCubes).Distinct().Where(c => c != null).ToArray();
             return allCubes;
         }
 
