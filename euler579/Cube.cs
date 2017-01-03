@@ -177,7 +177,8 @@ namespace euler579
 
         public override string ToString()
         {
-            return String.Join("   ", OrderedVertices.Select(o => $"{{{o.X:0},{o.Y:0},{o.Z:0}}}"));
+            return $"A = {A} B = {B} C = {C}";
+//            return String.Join("   ", OrderedVertices.Select(o => $"{{{o.X:0},{o.Y:0},{o.Z:0}}}"));
         }
 
         public bool Equals(Cube other)

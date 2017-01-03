@@ -94,12 +94,22 @@ namespace euler579
 
         public Cube GetCube(int n)
         {
-            var basicCube = GetCubeFromVector(n, Vector).Single();
+            var possibleBasicCubes = GetCubeFromVector(n, Vector).ToArray();
+            var basicCube = possibleBasicCubes.First();
 
             if (basicCube != null)
             {
                 var vs = VectorVariantFinder.FindAllCombinationsOf(Vector);
                 var extraCubes = vs.SelectMany(v => GetCubeFromVector(n, v)).Distinct().Where(c => !c.Equals(basicCube)).ToArray();
+
+                if (possibleBasicCubes.Length > 1)
+                {
+                    var otherExtras = possibleBasicCubes.Skip(1).Where(c => !extraCubes.Contains(c)).ToArray();
+                    if (otherExtras.Any())
+                    {
+                        LogManager.GetCurrentClassLogger().Warn($"{this} yields other unseen extras {string.Join(",   ", otherExtras.Select(c => c.ToString()))}");
+                    }
+                }
                 basicCube.Variants = extraCubes;
             }
             return basicCube;

@@ -19,16 +19,21 @@ namespace euler579
     {
         static void Main(string[] args)
         {
-//            var c= new Triple(1,14,98).GetCube(5000);
-            FindTripleDuplicates();
-             //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
-//            var c1 = new Triple(new[] {1,4,8}).GetCube(50);
-//            var c2 = new Triple(new[] {4,4, 7}).GetCube(50);
-//            var cubes = c1.Variants.Concat(c1.Variants).Distinct().ToArray();
+            try
+            {
+//            var c = new Triple(41,62,98).GetCube(5000);
+            var c= new Triple(6,6,7).GetCube(5000);
+//                FindTripleDuplicates();
+                //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
+                //            var c1 = new Triple(new[] {1,4,8}).GetCube(50);
+                //            var c2 = new Triple(new[] {4,4, 7}).GetCube(50);
+                //            var cubes = c1.Variants.Concat(c1.Variants).Distinct().ToArray();
 
 
-            //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-            //CalculateResult(10);
+                //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
+                //CalculateResult(10);
+
+            } finally { DatabaseHelper.Instance.Dispose();}
         }
 
         private static void FindTripleDuplicates()
