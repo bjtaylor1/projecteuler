@@ -21,8 +21,6 @@ namespace euler579
         {
             try
             {
-                var cube = new Triple(0,0,49).GetCube(50);
-                Console.Out.WriteLine(cube.LatticePoints);
 //                FindTripleDuplicates();
                 //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
                 //            var c1 = new Triple(new[] {1,4,8}).GetCube(50);
@@ -31,7 +29,7 @@ namespace euler579
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-//                CalculateResult(50);
+                CalculateResult(50);
             }
             finally { DatabaseHelper.Instance.Dispose();}
         }

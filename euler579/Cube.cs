@@ -162,10 +162,6 @@ namespace euler579
                             else
                                 inside++;
                         }
-                        else
-                        {
-                            LogManager.GetCurrentClassLogger().Trace($"Not in: {v}");
-                        }
                     }
                 }
             }
