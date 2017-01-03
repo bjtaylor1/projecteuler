@@ -21,6 +21,8 @@ namespace euler579
         {
             try
             {
+                var cube = new Triple(0,0,49).GetCube(50);
+                Console.Out.WriteLine(cube.LatticePoints);
 //                FindTripleDuplicates();
                 //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
                 //            var c1 = new Triple(new[] {1,4,8}).GetCube(50);
@@ -29,9 +31,9 @@ namespace euler579
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-                CalculateResult(10);
-
-            } finally { DatabaseHelper.Instance.Dispose();}
+//                CalculateResult(50);
+            }
+            finally { DatabaseHelper.Instance.Dispose();}
         }
 
         private static void FindTripleDuplicates()
@@ -128,8 +130,12 @@ namespace euler579
                                             if (factoredCube != null) allCubes.Add(factoredCube);
                                             else break;
                                         }
-                                        var contributions = allCubes.Select(c => (long) c.LatticePoints*c.GetRepeatability(n)*c.GetCombinations()).ToArray();
-                                        var totalContribution = contributions.Sum();
+                                        var contributions = allCubes.Select(c =>
+                                        {
+                                            var contribution = new Contribution(c.LatticePoints, c.GetRepeatability(n), c.GetCombinations());
+                                            return contribution;
+                                        }).ToArray();
+                                        var totalContribution = contributions.Sum(c => c.Total);
                                         Console.Out.WriteLine();
                                         LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} (first: {contributions.First()}, {string.Join(",", contributions.Select(c => c.ToString()))})");
                                         result += totalContribution;
@@ -167,5 +173,27 @@ namespace euler579
             return Math.Abs(d - Math.Round(d, 0)) < 1e-9;
         }
         
+    }
+
+    internal class Contribution
+    {
+        public long LatticePoints { get; set; }
+        public long Repeatability { get; set; }
+        public long Combinations { get; set; }
+
+        public Contribution(long latticePoints, long repeatability, long combinations)
+        {
+            LatticePoints = latticePoints;
+            Repeatability = repeatability;
+            Combinations = combinations;
+            Total = LatticePoints*Repeatability*Combinations;
+        }
+
+        public long Total { get; set; }
+
+        public override string ToString()
+        {
+            return $"{LatticePoints}x{Repeatability}x{Combinations}={Total}";
+        }
     }
 }

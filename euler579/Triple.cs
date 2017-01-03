@@ -107,6 +107,7 @@ namespace euler579
                     var otherExtras = possibleBasicCubes.Skip(1).Where(c => !extraCubes.Contains(c)).ToArray();
                     if (otherExtras.Any())
                     {
+                        LogManager.GetCurrentClassLogger().Warn($"Variants of {basicCube}: {string.Join(" \n", otherExtras.Select(c => c.ToString()))}");
                     }
                 }
                 basicCube.Variants = extraCubes;

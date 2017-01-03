@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Windows.Media.Media3D;
+using NLog;
 
 namespace euler579
 {
@@ -94,16 +95,16 @@ namespace euler579
             return result;
         }
 
-        public int GetRepeatability(int n)
+        public long GetRepeatability(int n)
         {
-            var repeatability = (n + 1 - MaxBounds.X)*
+            var repeatability = (long)(n + 1 - MaxBounds.X)*
                     (n + 1 - MaxBounds.Y)*
                     (n + 1 - MaxBounds.Z)
                     ;
-            return (int)repeatability;
+            return (long)repeatability;
         }
 
-        public int GetCombinations()
+        public long GetCombinations()
         {
             if (Variants == null) throw new InvalidOperationException("Variants have not been set");
             return Variants.Length + 1;
@@ -160,6 +161,10 @@ namespace euler579
                                 surface++;
                             else
                                 inside++;
+                        }
+                        else
+                        {
+                            LogManager.GetCurrentClassLogger().Trace($"Not in: {v}");
                         }
                     }
                 }

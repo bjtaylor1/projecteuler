@@ -26,10 +26,10 @@ namespace euler579
             var pointA = origin;
             var pointB = origin + v1;
             var pointC = origin + v2;
-            A = ((int)pointB.Y - (int)pointA.Y)*((int)pointC.Z - (int)pointA.Z) - ((int)pointC.Y - (int)pointA.Y)*((int)pointB.Z - (int)pointA.Z);
-            B = ((int)pointB.Z - (int)pointA.Z)*((int)pointC.X - (int)pointA.X) - ((int)pointC.Z - (int)pointA.Z)*((int)pointB.X - (int)pointA.X);
-            C = ((int)pointB.X - (int)pointA.X)*((int)pointC.Y - (int)pointA.Y) - ((int)pointC.X - (int)pointA.X)*((int)pointB.Y - (int)pointA.Y);
-            D = -(A* (int)pointA.X + B* (int)pointA.Y + C* (int)pointA.Z);
+            A = ((int)Math.Round(pointB.Y) - (int)Math.Round(pointA.Y))*((int)Math.Round(pointC.Z) - (int)Math.Round(pointA.Z)) - ((int)Math.Round(pointC.Y) - (int)Math.Round(pointA.Y))*((int)Math.Round(pointB.Z) - (int)Math.Round(pointA.Z));
+            B = ((int)Math.Round(pointB.Z) - (int)Math.Round(pointA.Z))*((int)Math.Round(pointC.X) - (int)Math.Round(pointA.X)) - ((int)Math.Round(pointC.Z) - (int)Math.Round(pointA.Z))*((int)Math.Round(pointB.X) - (int)Math.Round(pointA.X));
+            C = ((int)Math.Round(pointB.X) - (int)Math.Round(pointA.X))*((int)Math.Round(pointC.Y) - (int)Math.Round(pointA.Y)) - ((int)Math.Round(pointC.X) - (int)Math.Round(pointA.X))*((int)Math.Round(pointB.Y) - (int)Math.Round(pointA.Y));
+            D = -(A* (int)Math.Round(pointA.X) + B* (int)Math.Round(pointA.Y) + C* (int)Math.Round(pointA.Z));
             
             //this is wrong!:
             /*Origin = origin;
