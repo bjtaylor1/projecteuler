@@ -19,7 +19,9 @@ namespace euler579
             {
                 variantsAtRightAnglesTo = DatabaseHelper.Instance.GetAllPrimitivesOfSameSquare(vector).SelectMany(vAlt => 
                     FindAllVariants(vAlt, vn => vn.IsAtRightAnglesTo(vector), ints => true)).ToArray();
-                //variantsAtRightAnglesTo = BruteForceCubeFinder.FindVectorsAtRightAnglesTo(vector);
+                
+                if(!variantsAtRightAnglesTo.Any())
+                    variantsAtRightAnglesTo = BruteForceCubeFinder.FindVectorsAtRightAnglesTo(vector);
             }
             return variantsAtRightAnglesTo;
         }
@@ -41,11 +43,12 @@ namespace euler579
             return possibleVectors;
         }
 
+        static readonly int[] factors = { -1,0, 1 };
+        // must allow 0 in order to work with e.g. 4,4,7.
+        static readonly int[][] possibleQuantities = Permutations.Of(factors, 3, true, false);
+
         private static Vector3D[] PossibleVectors(Vector3D v, Func<Vector3D, bool> predicate, Func<int[], bool> numbersPredicate, int[] points)
         {
-            var factors = new[] { -1,0, 1 };
-            // must allow 0 in order to work with e.g. 4,4,7.
-            var possibleQuantities = Permutations.Of(factors, 3, true, false);
             var possibleNumbers = possibleQuantities.Select(qs => qs.Select((q, i) => q*points[i]).Sum()).OrderBy(n => n).Distinct().ToArray();
             var possibleVectors = Permutations.Of(possibleNumbers, 3, true, false)
                 .Where(numbersPredicate)

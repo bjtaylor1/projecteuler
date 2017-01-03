@@ -21,8 +21,6 @@ namespace euler579
         {
             try
             {
-//            var c = new Triple(41,62,98).GetCube(5000);
-            var c= new Triple(6,6,7).GetCube(5000);
 //                FindTripleDuplicates();
                 //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
                 //            var c1 = new Triple(new[] {1,4,8}).GetCube(50);
@@ -31,7 +29,7 @@ namespace euler579
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-                //CalculateResult(10);
+                CalculateResult(10);
 
             } finally { DatabaseHelper.Instance.Dispose();}
         }
@@ -49,7 +47,8 @@ namespace euler579
                     int count = 0;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        Console.Write($"\r{(double)(count++) / 853831:0.000%}");
+                        Console.Write($"\r{count}, {(double)(count++) / 853831:0.000%}");
+
                         var ints = line.Split(',').Select(int.Parse).ToArray();
                         var baseTripleSides = ints.Take(3).ToArray();
                         var tripleSquare = ints.Last();
@@ -92,6 +91,7 @@ namespace euler579
         {
             
             long result = 0;
+
             using (var file = File.OpenRead("primitivetriplessorted.csv"))
             {
                 using (var sr = new StreamReader(file))
@@ -99,39 +99,52 @@ namespace euler579
                 {
                     string line;
                     int count = 0;
+                    DatabaseHelper.Instance.ResetDone();
                     while ((line = sr.ReadLine()) != null)
                     {
                         Console.Write($"\r{(double)(count++) / 853831:0.000%}");
                         var ints = line.Split(',').Select(int.Parse).ToArray();
-                        var baseTripleSides = ints.Take(3).ToArray();
-                        var tripleSquare = ints.Last();
-                        var triple = new Triple(baseTripleSides, tripleSquare);
-                        if (triple.Square <= n)
+                        if (!DatabaseHelper.Instance.IsDone(ints))
                         {
-                            //if (!triple.IsPrimitive) throw new InvalidOperationException("Should be primitive!");
+
+                            var baseTripleSides = ints.Take(3).ToArray();
+                            var tripleSquare = ints.Last();
+                            var triple = new Triple(baseTripleSides, tripleSquare);
+
+                            if (triple.Square <= n)
                             {
-                                var baseCube = triple.GetCube(n);
-                                if (baseCube != null)
+                                //if (!triple.IsPrimitive) throw new InvalidOperationException("Should be primitive!");
+                                //(should all be primitive - reading from the primitives-only file)
                                 {
-                                    var allCubes = new List<Cube> {baseCube};
-                                    var maxFactor = (int) ((double) n/triple.Square);
-                                    for (int factor = 2; factor <= maxFactor; factor++)
+                                    var baseCube = triple.GetCube(n);
+                                    if (baseCube != null)
                                     {
-                                        var factoredTriple = new Triple(triple.Sides.Select(i => i*factor).ToArray(), triple.Square*factor);
-                                        var factoredCube = factoredTriple.GetCube(n);
-                                        if (factoredCube != null) allCubes.Add(factoredCube);
-                                        else break;
+                                        var allCubes = new List<Cube> {baseCube};
+                                        var maxFactor = (int) ((double) n/triple.Square);
+                                        for (int factor = 2; factor <= maxFactor; factor++)
+                                        {
+                                            var factoredTriple = new Triple(triple.Sides.Select(i => i*factor).ToArray(), triple.Square*factor);
+                                            var factoredCube = factoredTriple.GetCube(n);
+                                            if (factoredCube != null) allCubes.Add(factoredCube);
+                                            else break;
+                                        }
+                                        var contributions = allCubes.Select(c => (long) c.LatticePoints*c.GetRepeatability(n)*c.GetCombinations()).ToArray();
+                                        var totalContribution = contributions.Sum();
+                                        Console.Out.WriteLine();
+                                        LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} (first: {contributions.First()}, {string.Join(",", contributions.Select(c => c.ToString()))})");
+                                        result += totalContribution;
+                                        if (n == 5000 && result > 1e9) result -= (long) 1e9;
+
+                                        DatabaseHelper.Instance.SetDone(baseTripleSides);
+                                        foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
+                                        {
+                                            DatabaseHelper.Instance.SetDone(duplicate);
+                                        }
                                     }
-                                    var contributions = allCubes.Select(c => (long) c.LatticePoints*c.GetRepeatability(n)*c.GetCombinations()).ToArray();
-                                    var totalContribution = contributions.Sum();
-                                    Console.Out.WriteLine();
-                                    LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} (first: {contributions.First()}, {string.Join(",", contributions.Select(c => c.ToString()))})");
-                                    result += totalContribution;
-                                    if (n == 5000 && result > 1e9) result -= (long) 1e9;
                                 }
                             }
+                            else break;
                         }
-                        else break;
                     }
                 }
             }

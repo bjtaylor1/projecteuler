@@ -95,7 +95,7 @@ namespace euler579
         public Cube GetCube(int n)
         {
             var possibleBasicCubes = GetCubeFromVector(n, Vector).ToArray();
-            var basicCube = possibleBasicCubes.First();
+            var basicCube = possibleBasicCubes.FirstOrDefault(); //might not be any if too big
 
             if (basicCube != null)
             {
@@ -107,7 +107,6 @@ namespace euler579
                     var otherExtras = possibleBasicCubes.Skip(1).Where(c => !extraCubes.Contains(c)).ToArray();
                     if (otherExtras.Any())
                     {
-                        LogManager.GetCurrentClassLogger().Warn($"{this} yields other unseen extras {string.Join(",   ", otherExtras.Select(c => c.ToString()))}");
                     }
                 }
                 basicCube.Variants = extraCubes;
