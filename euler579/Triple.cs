@@ -38,7 +38,7 @@ namespace euler579
             return !Equals(left, right);
         }
 
-        public Triple(int[] sides): this(sides, (int)Math.Sqrt(sides.Select(s => s* s).Sum()))
+        public Triple(params int[] sides): this(sides, (int)Math.Sqrt(sides.Select(s => s* s).Sum()))
         {
         }
         public Triple(int[] sides, int square)
@@ -89,23 +89,23 @@ namespace euler579
         public int Dimensions { get; }
         public override string ToString()
         {
-            return $"{string.Join(",", Sides.Select(s => s.ToString()))} => {Square} ({Dimensions}D)";
+            return $"{string.Join(",", Sides.Select(s => s.ToString()))} => {Square}";
         }
 
         public Cube GetCube(int n)
         {
-            var basicCube = GetCubeFromVector(n, Vector);
+            var basicCube = GetCubeFromVector(n, Vector).Single();
 
             if (basicCube != null)
             {
                 var vs = VectorVariantFinder.FindAllCombinationsOf(Vector);
-                var extraCubes = vs.Select(v => GetCubeFromVector(n, v)).Distinct().Where(c => c != null && c != basicCube).ToArray();
-                basicCube.SetCombinations(extraCubes.Length + 1);
+                var extraCubes = vs.SelectMany(v => GetCubeFromVector(n, v)).Distinct().Where(c => !c.Equals(basicCube)).ToArray();
+                basicCube.Variants = extraCubes;
             }
             return basicCube;
         }
 
-        private static Cube GetCubeFromVector(int n, Vector3D vector)
+        private static Cube[] GetCubeFromVector(int n, Vector3D vector)
         {
             var cubes = new List<Cube>();
             var o = new Vector3D(0, 0, 0);
@@ -117,20 +117,15 @@ namespace euler579
                 var c = Vector3D.CrossProduct(vector, b);
                 c *= (vector.Length/c.Length);
                 Cube cube;
-                if (Cube.TryMakeCubeFrom(o, vector, b, c, out cube) && cube.Dimensions.All(d => d <= n) && !cubes.Contains(cube))
+                if (Cube.TryMakeCubeFrom(o, vector, b, c, out cube) && !cubes.Contains(cube))
                 {
                     cubes.Add(cube);
                 }
             }
+            if(!cubes.Any()) throw new InvalidOperationException($"No cubes found for vector {vector}");
+            cubes.RemoveAll(cube => !cube.Dimensions.All(d => d <= n));
+            return cubes.Distinct().ToArray();
 
-            if(cubes.Count > 1) throw new InvalidOperationException("More than one cube from a vector!");
-            if (cubes.Any())
-            {
-                var cube = cubes.Single();
-                if (cube.A != vector) throw new InvalidOperationException("Cube's A not equal to triple vector");
-                return cube;
-            }
-            return null;
         }
     }
 }

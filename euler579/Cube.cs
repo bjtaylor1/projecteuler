@@ -66,11 +66,25 @@ namespace euler579
             NumDimensions = 3 - numAxesParallel;
         }
 
+        public int[][] GetDuplicateDefinitionPoints()
+        {
+            var allDefinitionPoint = Definitions.Select(v =>
+            {
+                var ints = new[] {(int) Math.Abs(v.X), (int)Math.Abs(v.Y), (int) Math.Abs(v.Z)};
+                Array.Sort(ints);
+                return ints;
+            }).ToArray();
+            var distinctDefinitionsPoints = allDefinitionPoint.Distinct(IntArrayEqualityComparer.Instance).ToArray();
+            var exceptA = distinctDefinitionsPoints.Except(new[] {allDefinitionPoint[0]}, IntArrayEqualityComparer.Instance).ToArray();
+            return exceptA;
+        }
+
         public int[] Dimensions { get;}
         public int Depth { get;  }
         public int Height { get; }
         public int Width { get;  }
         public int? RepeatabilityCombinations { get; set; }
+        public Cube[] Variants { get; set; }
 
         private Vector3D CalculateUniqueA()
         {
@@ -91,8 +105,8 @@ namespace euler579
 
         public int GetCombinations()
         {
-            if (!combinations.HasValue) throw new InvalidOperationException("Combinations has not been set");
-            return combinations.Value;
+            if (Variants == null) throw new InvalidOperationException("Variants have not been set");
+            return Variants.Length + 1;
 
 /*
             var distinction = new[] {(int)A.X, (int)A.Y, (int)A.Z}.Where(i => i != 0).Distinct().Count();
@@ -202,6 +216,7 @@ namespace euler579
 
         public static bool TryMakeCubeFrom(Vector3D origin, Vector3D a, Vector3D b, Vector3D c, out Cube cube)
         {
+            
             var points = new[]
             {
                 origin,
@@ -229,6 +244,15 @@ namespace euler579
         public void SetCombinations(int i)
         {
             combinations = i;
+        }
+
+        public string GetWpfSpec()
+        {
+            var order = new[] { 3, 5, 6, 7, 0, 1, 2, 4 };
+
+            var verticesInWpfOrder = order.Select(i => Vertices[i]).ToArray();
+            var wpfSpec = string.Join("   ", verticesInWpfOrder.Select(v => $"{(int) v.X} {(int) v.Y} {(int) v.Z}"));
+            return wpfSpec;
         }
     }
 }

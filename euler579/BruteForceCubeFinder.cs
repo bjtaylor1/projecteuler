@@ -10,13 +10,6 @@ namespace euler579
 {
     class BruteForceCubeFinder
     {
-        private static Cube[] GetCubes(int n)
-        {
-            var cubes = new List<Cube>();
-            AddCubesFrom(n, new Vector3D[0], cubes);
-            return cubes.Distinct().ToArray();
-        }
-
         public static Vector3D[] FindVectorsAtRightAnglesTo(Vector3D v)
         {
             var vectors = new List<Vector3D>();

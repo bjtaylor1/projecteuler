@@ -11,7 +11,9 @@ namespace euler579
     {
         public static Vector3D[] FindAllVariantsAtRightAnglesTo(Vector3D vector)
         {
-            return FindAllVariants(vector, (vn, v) => Math.Abs(Math.Abs(Vector3D.AngleBetween(vn, v)) - 90) < 1e-9, ints => true);
+            var variantsAtRightAnglesTo = FindAllVariants(vector, (vn, v) => Math.Abs(Math.Abs(Vector3D.AngleBetween(vn, v)) - 90) < 1e-9, ints => true);
+            if (!variantsAtRightAnglesTo.Any()) variantsAtRightAnglesTo = BruteForceCubeFinder.FindVectorsAtRightAnglesTo(vector);
+            return variantsAtRightAnglesTo;
         }
 
         public static Vector3D[] FindAllCombinationsOf(Vector3D v)
