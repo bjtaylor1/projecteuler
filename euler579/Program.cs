@@ -15,17 +15,18 @@ using NLog;
 
 namespace euler579
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
             try
             {
-//                var c = new Triple(1, 2, 2).GetCube(50);
-//                var latticePoints = c.LatticePoints;
-//                LogManager.GetCurrentClassLogger().Info($"{string.Join(", ", c.Vertices.Select(v => v.ToString()))} {latticePoints}");
+                //Console.Out.WriteLine(Prime.GetHighestPrimeFactor(35));
+                //                var c = new Triple(1, 2, 2).GetCube(50);
+                //                var latticePoints = c.LatticePoints;
+                //                LogManager.GetCurrentClassLogger().Info($"{string.Join(", ", c.Vertices.Select(v => v.ToString()))} {latticePoints}");
 
-                FindLatticePoints(50);
+                FindLatticePoints(5000);
                 //CalculateResult(5000);
                 //                FindTripleDuplicates();
                 //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
@@ -89,62 +90,58 @@ namespace euler579
                     string line;
                     int count = 0;
                     DatabaseHelper.Instance.ResetDone();
-                    
+
                     while ((line = sr.ReadLine()) != null)
                     {
                         Console.Write($"\r{(double)(count++) / 853831:0.000%}");
                         var ints = line.Split(',').Select(int.Parse).ToArray();
                         if (!DatabaseHelper.Instance.IsDone(ints))
                         {
-
-                            var baseTripleSides = ints.Take(3).ToArray();
-                            var tripleSquare = ints.Last();
-                            var triple = new Triple(baseTripleSides, tripleSquare);
-
-                            if (triple.Square <= n)
-                            {
-                                //if (!triple.IsPrimitive) throw new InvalidOperationException("Should be primitive!");
-                                //(should all be primitive - reading from the primitives-only file)
-                                {
-                                    var baseCube = triple.GetCube(n);
-                                    if (baseCube != null)
-                                    {
-                                        var latticePoints = baseCube.LatticePoints;
-                                        var cbf = baseCube.GetCountsByFace(); //points on non-parallel face
-                                        var pointsOnEdges = baseCube.GetPointsOnEdges();
-/*
-                                        var pattern = GetPattern(baseCube);
-                                        if(pattern != "unknown")
-                                            LogManager.GetCurrentClassLogger().Info($"Side {triple.Square}, pattern {pattern}: {baseCube}");
-                                        else
-*/
-                                        {
-                                            LogManager.GetCurrentClassLogger().Info($"Side: {triple.Square}, Cube: {baseCube}, CountsByFace: {cbf.ToCsvString("/")}   {cbf.Sum()}+{pointsOnEdges}+8={cbf.Sum()+pointsOnEdges+8}, LatticePoints: {baseCube.LatticePointsSurface - 8}+8+{baseCube.LatticePointsInside}={latticePoints}");
-                                        }
-
-                                        DatabaseHelper.Instance.SetDone(baseTripleSides);
-                                        foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
-                                        {
-                                            DatabaseHelper.Instance.SetDone(duplicate);
-                                        }
-                                    }
-                                }
-                            }
-                            else break;
+                            if (OutputCubeInfoForTriple(n, ints, true)) break;
                         } //else LogManager.GetCurrentClassLogger().Warn($"Done: {string.Join(",", ints.Select(i => i.ToString()))}");
                     }
                 }
             }
         }
 
+        private static bool OutputCubeInfoForTriple(int n, int[] ints, bool analyzeDuplicates)
+        {
+            var baseTripleSides = ints.Take(3).ToArray();
+            var tripleSquare = ints.Last();
+            var triple = new Triple(baseTripleSides, tripleSquare);
+
+            if (triple.Square <= n)
+            {
+                var baseCube = triple.GetCube(n);
+                if (baseCube != null)
+                {
+                    var latticePoints = baseCube.LatticePoints;
+                    var cbf = baseCube.GetCountsByFace(); //points on non-parallel face
+                    var pointsOnEdges = baseCube.GetPointsOnEdges();
+                    var pattern = GetPattern(baseCube);
+                    var logLevel = analyzeDuplicates && pattern == "unknown" ? LogLevel.Warn : LogLevel.Info;
+                    var factor = (cbf[0] + 1)/triple.Square;
+                    var equation = $"{triple.Square*triple.Square*triple.Square} x + {triple.Square*triple.Square} y = {triple.Square} z + 1 t == {baseCube.LatticePointsInside}";
+                    LogManager.GetCurrentClassLogger().Log(logLevel, $"Side: {triple.Square}, Factor: {factor}, Cube: {baseCube}, CountsByFace: {cbf.ToCsvString("/")}   {cbf.Sum()}+{pointsOnEdges}+8={cbf.Sum() + pointsOnEdges + 8}, LatticePoints: {baseCube.LatticePointsSurface - 8}+8+{baseCube.LatticePointsInside}={latticePoints}   {equation}");
+
+                    DatabaseHelper.Instance.SetDone(baseTripleSides);
+                    foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
+                    {
+                        if (analyzeDuplicates && pattern == "unknown") OutputCubeInfoForTriple(n, duplicate, false);
+                        DatabaseHelper.Instance.SetDone(duplicate);
+                    }
+                }
+                return false;
+            }
+            else return true;
+        }
+
         private static string GetPattern(Cube c)
         {
             var n = (ulong)c.A.Length;
-            var n2 = n*n;
-            //if (c.NumDimensions == 0) return "O";
-            if (c.LatticePointsSurface == 8+6*(n - 1)) return "A";
-            else if (c.LatticePointsSurface == 8+2*(n2 - 1) + 2*(n - 1) + 2*(n - 1)*2) return "B";
-            else if (c.LatticePointsSurface == 8+2*(5*n) + 2*(n - 1) + n - 5 + n - 3) return "C";
+            var n2 = n * n;
+            if (c.LatticePointsSurface == 8 + 2 * (n - 1) * (n + 1) + 4 * (n - 1)) return "A";
+            else if (c.LatticePointsSurface == 8 + 6 * (n - 1)) return "B";
             else return "unknown";
         }
 
