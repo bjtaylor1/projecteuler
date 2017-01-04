@@ -13,5 +13,10 @@ namespace euler579
         {
             return Math.Abs(Math.Abs(Vector3D.AngleBetween(vn, vector)) - 90) < 1e-9;
         }
+
+        public static string ToCsvString<T>(this IEnumerable<T> items, string separator = ", ")
+        {
+            return string.Join(separator, items.Select(t => t.ToString()));
+        }
     }
 }

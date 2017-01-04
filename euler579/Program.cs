@@ -21,7 +21,13 @@ namespace euler579
         {
             try
             {
-//                FindTripleDuplicates();
+//                var c = new Triple(1, 2, 2).GetCube(50);
+//                var latticePoints = c.LatticePoints;
+//                LogManager.GetCurrentClassLogger().Info($"{string.Join(", ", c.Vertices.Select(v => v.ToString()))} {latticePoints}");
+
+                FindLatticePoints(50);
+                //CalculateResult(5000);
+                //                FindTripleDuplicates();
                 //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
                 //            var c1 = new Triple(new[] {1,4,8}).GetCube(50);
                 //            var c2 = new Triple(new[] {4,4, 7}).GetCube(50);
@@ -29,18 +35,18 @@ namespace euler579
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-                CalculateResult(50);
+                //CalculateResult(50);
             }
-            finally { DatabaseHelper.Instance.Dispose();}
+            finally { DatabaseHelper.Instance.Dispose(); }
         }
 
         private static void FindTripleDuplicates()
         {
-            using(var output = File.OpenWrite("primitivetripleduplicates.csv"))
+            using (var output = File.OpenWrite("primitivetripleduplicates.csv"))
             using (var file = File.OpenRead("primitivetriplessorted.csv"))
             {
                 using (var sr = new StreamReader(file))
-                    using(var sw = new StreamWriter(output))
+                using (var sw = new StreamWriter(output))
 
                 {
                     string line;
@@ -63,7 +69,7 @@ namespace euler579
                         {
                             if (duplicateTriple.IsPrimitive)
                             {
-                                var outputLine = string.Join(",",triple.Sides.Select(s => s.ToString())) + "," + string.Join(",", duplicateTriple.Sides.Select(s => s.ToString()));
+                                var outputLine = string.Join(",", triple.Sides.Select(s => s.ToString())) + "," + string.Join(",", duplicateTriple.Sides.Select(s => s.ToString()));
                                 sw.WriteLine(outputLine);
                             }
                         }
@@ -71,6 +77,75 @@ namespace euler579
                     }
                 }
             }
+        }
+
+        private static void FindLatticePoints(int n)
+        {
+            using (var file = File.OpenRead("primitivetriplessorted.csv"))
+            {
+                using (var sr = new StreamReader(file))
+
+                {
+                    string line;
+                    int count = 0;
+                    DatabaseHelper.Instance.ResetDone();
+                    
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        Console.Write($"\r{(double)(count++) / 853831:0.000%}");
+                        var ints = line.Split(',').Select(int.Parse).ToArray();
+                        if (!DatabaseHelper.Instance.IsDone(ints))
+                        {
+
+                            var baseTripleSides = ints.Take(3).ToArray();
+                            var tripleSquare = ints.Last();
+                            var triple = new Triple(baseTripleSides, tripleSquare);
+
+                            if (triple.Square <= n)
+                            {
+                                //if (!triple.IsPrimitive) throw new InvalidOperationException("Should be primitive!");
+                                //(should all be primitive - reading from the primitives-only file)
+                                {
+                                    var baseCube = triple.GetCube(n);
+                                    if (baseCube != null)
+                                    {
+                                        var latticePoints = baseCube.LatticePoints;
+                                        var cbf = baseCube.GetCountsByFace(); //points on non-parallel face
+                                        var pointsOnEdges = baseCube.GetPointsOnEdges();
+/*
+                                        var pattern = GetPattern(baseCube);
+                                        if(pattern != "unknown")
+                                            LogManager.GetCurrentClassLogger().Info($"Side {triple.Square}, pattern {pattern}: {baseCube}");
+                                        else
+*/
+                                        {
+                                            LogManager.GetCurrentClassLogger().Info($"Side: {triple.Square}, Cube: {baseCube}, CountsByFace: {cbf.ToCsvString("/")}   {cbf.Sum()}+{pointsOnEdges}+8={cbf.Sum()+pointsOnEdges+8}, LatticePoints: {baseCube.LatticePointsSurface - 8}+8+{baseCube.LatticePointsInside}={latticePoints}");
+                                        }
+
+                                        DatabaseHelper.Instance.SetDone(baseTripleSides);
+                                        foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
+                                        {
+                                            DatabaseHelper.Instance.SetDone(duplicate);
+                                        }
+                                    }
+                                }
+                            }
+                            else break;
+                        } //else LogManager.GetCurrentClassLogger().Warn($"Done: {string.Join(",", ints.Select(i => i.ToString()))}");
+                    }
+                }
+            }
+        }
+
+        private static string GetPattern(Cube c)
+        {
+            var n = (ulong)c.A.Length;
+            var n2 = n*n;
+            //if (c.NumDimensions == 0) return "O";
+            if (c.LatticePointsSurface == 8+6*(n - 1)) return "A";
+            else if (c.LatticePointsSurface == 8+2*(n2 - 1) + 2*(n - 1) + 2*(n - 1)*2) return "B";
+            else if (c.LatticePointsSurface == 8+2*(5*n) + 2*(n - 1) + n - 5 + n - 3) return "C";
+            else return "unknown";
         }
 
         private static void FindTriples()
@@ -89,7 +164,7 @@ namespace euler579
 
         private static void CalculateResult(int n) //correct
         {
-            
+
             long result = 0;
 
             using (var file = File.OpenRead("primitivetriplessorted.csv"))
@@ -119,11 +194,11 @@ namespace euler579
                                     var baseCube = triple.GetCube(n);
                                     if (baseCube != null)
                                     {
-                                        var allCubes = new List<Cube> {baseCube};
-                                        var maxFactor = (int) ((double) n/triple.Square);
+                                        var allCubes = new List<Cube> { baseCube };
+                                        var maxFactor = (int)((double)n / triple.Square);
                                         for (int factor = 2; factor <= maxFactor; factor++)
                                         {
-                                            var factoredTriple = new Triple(triple.Sides.Select(i => i*factor).ToArray(), triple.Square*factor);
+                                            var factoredTriple = new Triple(triple.Sides.Select(i => i * factor).ToArray(), triple.Square * factor);
                                             var factoredCube = factoredTriple.GetCube(n);
                                             if (factoredCube != null) allCubes.Add(factoredCube);
                                             else break;
@@ -133,11 +208,11 @@ namespace euler579
                                             var contribution = new Contribution(c.LatticePoints, c.GetRepeatability(n), c.GetCombinations());
                                             return contribution;
                                         }).ToArray();
-                                        var totalContribution = contributions.Sum(c => c.Total);
+                                        var totalContribution = contributions.Sum(c => (long)(c.Total % (ulong)1e9));
                                         Console.Out.WriteLine();
-                                        LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} (first: {contributions.First()}, {string.Join(",", contributions.Select(c => c.ToString()))})");
+                                        LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} : {string.Join(",", contributions.Select(c => c.ToString()))})");
                                         result += totalContribution;
-                                        if (n == 5000 && result > 1e9) result -= (long) 1e9;
+                                        if (result > 1e9) result -= (long)1e9;
 
                                         DatabaseHelper.Instance.SetDone(baseTripleSides);
                                         foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
@@ -170,24 +245,24 @@ namespace euler579
         {
             return Math.Abs(d - Math.Round(d, 0)) < 1e-9;
         }
-        
+
     }
 
     internal class Contribution
     {
-        public long LatticePoints { get; set; }
-        public long Repeatability { get; set; }
-        public long Combinations { get; set; }
+        public ulong LatticePoints { get; set; }
+        public ulong Repeatability { get; set; }
+        public ulong Combinations { get; set; }
 
-        public Contribution(long latticePoints, long repeatability, long combinations)
+        public Contribution(ulong latticePoints, ulong repeatability, ulong combinations)
         {
             LatticePoints = latticePoints;
             Repeatability = repeatability;
             Combinations = combinations;
-            Total = LatticePoints*Repeatability*Combinations;
+            Total = (LatticePoints * Repeatability * Combinations) % (ulong)1e9;
         }
 
-        public long Total { get; set; }
+        public ulong Total { get; set; }
 
         public override string ToString()
         {
