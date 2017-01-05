@@ -21,7 +21,7 @@ namespace euler579
         {
             try
             {
-                //Console.Out.WriteLine(Prime.GetHighestPrimeFactor(35));
+                //Console.Out.WriteLine(Numerics.GetHighestPrimeFactor(35));
                 //                var c = new Triple(1, 2, 2).GetCube(50);
                 //                var latticePoints = c.LatticePoints;
                 //                LogManager.GetCurrentClassLogger().Info($"{string.Join(", ", c.Vertices.Select(v => v.ToString()))} {latticePoints}");
@@ -97,20 +97,21 @@ namespace euler579
                         var ints = line.Split(',').Select(int.Parse).ToArray();
                         if (!DatabaseHelper.Instance.IsDone(ints))
                         {
-                            if (OutputCubeInfoForTriple(n, ints, true)) break;
+                            var insideFormulaMatches = true;
+                            if (OutputCubeInfoForTriple(n, ints, false, ref insideFormulaMatches)) break;
                         } //else LogManager.GetCurrentClassLogger().Warn($"Done: {string.Join(",", ints.Select(i => i.ToString()))}");
                     }
                 }
             }
         }
 
-        private static bool OutputCubeInfoForTriple(int n, int[] ints, bool analyzeDuplicates)
+
+        private static bool OutputCubeInfoForTriple(int n, int[] ints, bool isDuplicate, ref bool insideFormulaMatches)
         {
             var baseTripleSides = ints.Take(3).ToArray();
-            var tripleSquare = ints.Last();
-            var triple = new Triple(baseTripleSides, tripleSquare);
-
-            if (triple.Square <= n)
+            var triple = new Triple(baseTripleSides);
+            insideFormulaMatches = true;
+            if (triple.Square <= n && triple.IsPrimitive)
             {
                 var baseCube = triple.GetCube(n);
                 if (baseCube != null)
@@ -119,16 +120,32 @@ namespace euler579
                     var cbf = baseCube.GetCountsByFace(); //points on non-parallel face
                     var pointsOnEdges = baseCube.GetPointsOnEdges();
                     var pattern = GetPattern(baseCube);
-                    var logLevel = analyzeDuplicates && pattern == "unknown" ? LogLevel.Warn : LogLevel.Info;
-                    var factor = (cbf[0] + 1)/triple.Square;
-                    var equation = $"{triple.Square*triple.Square*triple.Square} x + {triple.Square*triple.Square} y = {triple.Square} z + 1 t == {baseCube.LatticePointsInside}";
-                    LogManager.GetCurrentClassLogger().Log(logLevel, $"Side: {triple.Square}, Factor: {factor}, Cube: {baseCube}, CountsByFace: {cbf.ToCsvString("/")}   {cbf.Sum()}+{pointsOnEdges}+8={cbf.Sum() + pointsOnEdges + 8}, LatticePoints: {baseCube.LatticePointsSurface - 8}+8+{baseCube.LatticePointsInside}={latticePoints}   {equation}");
+
+                    var equation = $"{triple.Square * triple.Square * triple.Square} x + {triple.Square * triple.Square} y = {triple.Square} z + 1 t == {baseCube.LatticePointsInside}";
+
+
 
                     DatabaseHelper.Instance.SetDone(baseTripleSides);
-                    foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
+                    if (!isDuplicate)
                     {
-                        if (analyzeDuplicates && pattern == "unknown") OutputCubeInfoForTriple(n, duplicate, false);
-                        DatabaseHelper.Instance.SetDone(duplicate);
+                        foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
+                        {
+                            OutputCubeInfoForTriple(n, duplicate, true, ref insideFormulaMatches);
+                            DatabaseHelper.Instance.SetDone(duplicate);
+                        }
+                    }
+
+                    var pointsInsideSlow = baseCube.LatticePointsInside;
+                    var pointsInsideFast = PointsCalculatorFast.GetSurfacePoints(baseCube);
+                    var factor = Numerics.IntegralFactor(pointsInsideSlow - pointsInsideFast, (ulong)triple.Square - 1);
+                    var logLevel = pointsInsideFast == pointsInsideSlow ? LogLevel.Info : LogLevel.Warn;
+                    if (pointsInsideFast != pointsInsideSlow|| !insideFormulaMatches/* for duplicates*/)
+                    {
+                        var diff = pointsInsideSlow - pointsInsideFast;
+                        var logger = pattern + (isDuplicate ? "(dup)" : "") + (!insideFormulaMatches ? "(orig)" : "");
+                        LogManager.GetLogger(logger).Log(logLevel, $"{baseCube.A.Length}: {baseCube} {diff}: {factor}");
+                        LogManager.GetLogger(logger).Log(logLevel, $"Side: {triple.Square}, Cube: {baseCube}, CountsByFace: {cbf.ToCsvString("/")}   {cbf.Sum()}+{pointsOnEdges}+8={cbf.Sum() + pointsOnEdges + 8}, LatticePoints: {baseCube.LatticePointsSurface - 8}+8+{baseCube.LatticePointsInside}={latticePoints}   {equation}");
+                        insideFormulaMatches = false;
                     }
                 }
                 return false;
@@ -243,6 +260,18 @@ namespace euler579
             return Math.Abs(d - Math.Round(d, 0)) < 1e-9;
         }
 
+    }
+
+    public static class PointsCalculatorFast
+    {
+        public static ulong GetSurfacePoints(Cube c)
+        {
+            var s = (ulong)c.A.Length;
+            var s3 = s * s * s;
+            var hsf = Numerics.GetHighestSquareFactor(s);
+            var surfacePoints = s3 - (hsf + 2) * s + hsf + 1;
+            return surfacePoints;
+        }
     }
 
     internal class Contribution
