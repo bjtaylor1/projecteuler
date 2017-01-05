@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
+
 using NLog;
 
 namespace euler579
@@ -38,7 +38,6 @@ namespace euler579
 
         public static void AddCubesFrom(int n, VectorInt[] vertices, List<Cube> cubes)
         {
-            System.Windows.Media.Media3D.Geometry3D g;
             for (int x = 0; x <= n; x++)
             {
                 for (int y = 0; y <= n; y++)

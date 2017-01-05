@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media.Media3D;
 using NLog;
 
 namespace euler579
@@ -124,12 +123,16 @@ namespace euler579
                                    && Math.Abs(Math.Abs(VectorInt.AngleBetween(v, vector)) - 90) < 1e-9);
             foreach (var b in bs)
             {
-                var c = VectorInt.CrossProduct(vector, b);
-                c *= (double)vector.Length/c.Length;
-                Cube cube;
-                if (Cube.TryMakeCubeFrom(o, vector, b, c, out cube) && !cubes.Contains(cube))
+                var crossProduct = VectorInt.CrossProduct(vector, b);
+                VectorInt c;
+                if (VectorInt.TryMultiply(crossProduct, Math.Sqrt((double) vector.LengthSquared/crossProduct.LengthSquared), out c))
                 {
-                    cubes.Add(cube);
+                    c *= (double) vector.Length/c.Length;
+                    Cube cube;
+                    if (Cube.TryMakeCubeFrom(o, vector, b, c, out cube) && !cubes.Contains(cube))
+                    {
+                        cubes.Add(cube);
+                    }
                 }
             }
             if(!cubes.Any()) throw new InvalidOperationException($"No cubes found for vector {vector}");

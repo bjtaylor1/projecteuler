@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
-using MS.Internal.Media3D;
 
 namespace euler579
 {
@@ -41,6 +39,14 @@ namespace euler579
             }
         }
 
+        private double LengthDouble //MUST be private
+        {
+            get
+            {
+                return Math.Sqrt(LengthSquared);
+            }
+        }
+
         public static VectorInt CrossProduct(VectorInt vector1, VectorInt vector2)
         {
             VectorInt result;
@@ -53,8 +59,8 @@ namespace euler579
         public static double AngleBetween(VectorInt vector1, VectorInt vector2)
         {
             var rads = DotProduct(vector1, vector2) >= 0.0 ? 
-                2.0 * Math.Asin((vector1 - vector2).Length / 2.0) : 
-                Math.PI - 2.0 * Math.Asin((-vector1 - vector2).Length / 2.0);
+                2.0 * Math.Asin((vector1 - vector2).LengthDouble / 2.0) : 
+                Math.PI - 2.0 * Math.Asin((-vector1 - vector2).LengthDouble / 2.0);
             var degs = rads*180/Math.PI;
             return degs;
         }
@@ -90,6 +96,23 @@ namespace euler579
             var newY = Numerics.ToIntSafe(vector1._y * d);
             var newZ = Numerics.ToIntSafe(vector1._z * d);
             return new VectorInt(newX, newY, newZ);
+        }
+
+        public static bool TryMultiply(VectorInt vector1, double factor, out VectorInt result)
+        {
+            var newX = (vector1._x * factor);
+            var newY = (vector1._y * factor);
+            var newZ = (vector1._z * factor);
+            if (Numerics.IsIntegral(newX) && Numerics.IsIntegral(newY) && Numerics.IsIntegral(newZ))
+            {
+                result = new VectorInt((int) Math.Round(newX), (int) Math.Round(newY), (int) Math.Round(newZ));
+                return true;
+            }
+            else
+            {
+                result = default(VectorInt);
+                return false;
+            }
         }
     }
 }

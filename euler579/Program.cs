@@ -9,8 +9,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Media3D;
 using NLog;
 
 namespace euler579
