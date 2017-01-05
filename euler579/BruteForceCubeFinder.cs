@@ -10,9 +10,9 @@ namespace euler579
 {
     class BruteForceCubeFinder
     {
-        public static Vector3D[] FindVectorsAtRightAnglesTo(Vector3D v)
+        public static VectorInt[] FindVectorsAtRightAnglesTo(VectorInt v)
         {
-            var vectors = new List<Vector3D>();
+            var vectors = new List<VectorInt>();
             var n = (int)v.Length;
             for (int x = -n; x <= n; x++)
             {
@@ -22,9 +22,9 @@ namespace euler579
                     {
                         if (!(x == 0 && y == 0 && z == 0))
                         {
-                            var vr = new Vector3D(x, y, z);
+                            var vr = new VectorInt(x, y, z);
                             if (Math.Abs(vr.LengthSquared - v.LengthSquared) < 1e-9 &&
-                                Math.Abs(Math.Abs(Vector3D.AngleBetween(vr, v)) - 90) < 1e-9)
+                                Math.Abs(Math.Abs(VectorInt.AngleBetween(vr, v)) - 90) < 1e-9)
                             {
                                 vectors.Add(vr);
                             }
@@ -36,7 +36,7 @@ namespace euler579
         }
 
 
-        public static void AddCubesFrom(int n, Vector3D[] vertices, List<Cube> cubes)
+        public static void AddCubesFrom(int n, VectorInt[] vertices, List<Cube> cubes)
         {
             System.Windows.Media.Media3D.Geometry3D g;
             for (int x = 0; x <= n; x++)
@@ -45,7 +45,7 @@ namespace euler579
                 {
                     for (int z = 0; z <= n; z++)
                     {
-                        var v = new Vector3D(x, y, z);
+                        var v = new VectorInt(x, y, z);
 
                         if (!vertices.Contains(v))
                         {
@@ -57,9 +57,9 @@ namespace euler579
                                 var v2 = newVertices[2];
                                 var sideA = v0 - v1;
                                 var sideB = v2 - v1;
-                                if (Math.Abs(sideA.LengthSquared - sideB.LengthSquared) < 1e-9 && Math.Abs(Vector3D.AngleBetween(sideA, sideB) - 90) < 1e-9)
+                                if (Math.Abs(sideA.LengthSquared - sideB.LengthSquared) < 1e-9 && Math.Abs(VectorInt.AngleBetween(sideA, sideB) - 90) < 1e-9)
                                 {
-                                    var crossProduct = Vector3D.CrossProduct(sideA, sideB);
+                                    var crossProduct = VectorInt.CrossProduct(sideA, sideB);
                                     //make it the same length, and we have a choice of plus or minus
                                     var sideC1 = crossProduct * (sideA.Length / crossProduct.Length);
                                     var sideC2 = crossProduct * -(sideA.Length / crossProduct.Length);

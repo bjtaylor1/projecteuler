@@ -13,7 +13,7 @@ namespace euler579
             Plane2 = plane2;
         }
 
-        public bool IsBetweenOrOn(Vector3D point)
+        public bool IsBetweenOrOn(VectorInt point)
         {
             var side1 = Plane1.GetSide(point);
             var side2 = Plane2.GetSide(point);

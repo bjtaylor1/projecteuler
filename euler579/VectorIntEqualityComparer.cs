@@ -8,11 +8,11 @@ using System.Windows.Media.Media3D;
 
 namespace euler579
 {
-    public class VectorIntEqualityComparer : IEqualityComparer<Vector3D>
+    public class VectorIntEqualityComparer : IEqualityComparer<VectorInt>
     {
         public static VectorIntEqualityComparer Instance { get; } = new VectorIntEqualityComparer();
 
-        public bool Equals(Vector3D l, Vector3D r)
+        public bool Equals(VectorInt l, VectorInt r)
         {
             var equal = Math.Abs(l.X - r.X) < 1e-9 && 
                 Math.Abs(l.Y - r.Y) < 1e-9 && 
@@ -20,7 +20,7 @@ namespace euler579
             return equal;
         }
 
-        public int GetHashCode(Vector3D obj)
+        public int GetHashCode(VectorInt obj)
         {
             unchecked
             {

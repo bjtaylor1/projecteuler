@@ -237,19 +237,11 @@ namespace euler579
 
 
 
-        public static bool IsIntegral(Vector3D v)
+        public static bool IsIntegral(VectorInt v)
         {
-            var isIntegral = IsIntegral(v.X) &&
-                             IsIntegral(v.Y) &&
-                             IsIntegral(v.Z);
+            var isIntegral = Numerics.IsIntegral(v.X) && Numerics.IsIntegral(v.Y) && Numerics.IsIntegral(v.Z);
             return isIntegral;
         }
-
-        public static bool IsIntegral(double d)
-        {
-            return Math.Abs(d - Math.Round(d, 0)) < 1e-9;
-        }
-
     }
 
     public static class PointsCalculatorFast

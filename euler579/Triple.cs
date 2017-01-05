@@ -47,7 +47,7 @@ namespace euler579
             Sides = sides;
             Square = square;
             Dimensions = Sides.Count(s => s > 0);
-            Vector = new Vector3D(Sides[0], Sides[1], Sides[2]);
+            Vector = new VectorInt(Sides[0], Sides[1], Sides[2]);
 
             IsPrimitive = CalcIsPrimitive();
         }
@@ -58,7 +58,7 @@ namespace euler579
             var nonZeroSides = Sides.Where(s => s != 0).ToArray();
             for (int f = 2; f <= (int)Math.Ceiling((double)Sides.Max()); f++)
             {
-                if (nonZeroSides.All(s => Program.IsIntegral((double) s/f)))
+                if (nonZeroSides.All(s => Numerics.IsIntegral((double) s/f)))
                     return false;
             }
             return true;
@@ -82,7 +82,7 @@ namespace euler579
             return isMultiple;
         }
 
-        public Vector3D Vector { get;  }
+        public VectorInt Vector { get;  }
 
         public int[] Sides { get; }
         public int Square { get; }
@@ -115,17 +115,17 @@ namespace euler579
             return basicCube;
         }
 
-        private static Cube[] GetCubeFromVector(int n, Vector3D vector)
+        private static Cube[] GetCubeFromVector(int n, VectorInt vector)
         {
             var cubes = new List<Cube>();
-            var o = new Vector3D(0, 0, 0);
+            var o = new VectorInt(0, 0, 0);
             var vs = VectorVariantFinder.FindAllVariantsAtRightAnglesTo(vector);
             var bs = vs.Where(v => Math.Abs(v.LengthSquared - vector.LengthSquared) < 1e-9
-                                   && Math.Abs(Math.Abs(Vector3D.AngleBetween(v, vector)) - 90) < 1e-9);
+                                   && Math.Abs(Math.Abs(VectorInt.AngleBetween(v, vector)) - 90) < 1e-9);
             foreach (var b in bs)
             {
-                var c = Vector3D.CrossProduct(vector, b);
-                c *= (vector.Length/c.Length);
+                var c = VectorInt.CrossProduct(vector, b);
+                c *= (double)vector.Length/c.Length;
                 Cube cube;
                 if (Cube.TryMakeCubeFrom(o, vector, b, c, out cube) && !cubes.Contains(cube))
                 {

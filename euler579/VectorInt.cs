@@ -20,13 +20,29 @@ namespace euler579
             _x = x;
             _y = y;
             _z = z;
+
+        }
+
+        public int LengthSquared
+        {
+            get
+            {
+                return _x* _x +_y * _y + _z * _z;
+            }
+        }
+
+        public int Length
+        {
+            get
+            {
+                var sqrt = Math.Sqrt(LengthSquared);
+                if(!Numerics.IsIntegral(sqrt)) throw new InvalidOperationException("Length is not integral");
+                return (int) sqrt;
+            }
         }
 
         public static VectorInt CrossProduct(VectorInt vector1, VectorInt vector2)
         {
-            Vector3D v1;
-            Vector3D v2;
-            
             VectorInt result;
             result._x = vector1._y * vector2._z - vector1._z * vector2._y;
             result._y = vector1._z * vector2._x - vector1._x * vector2._z;
@@ -58,16 +74,22 @@ namespace euler579
             return new VectorInt(-vector._x, -vector._y, -vector._z);
         }
 
-        public static Vector3D operator -(VectorInt vector1, VectorInt vector2)
+        public static VectorInt operator -(VectorInt vector1, VectorInt vector2)
         {
-            return new Vector3D(vector1._x - vector2._x, vector1._y - vector2._y, vector1._z - vector2._z);
+            return new VectorInt(vector1._x - vector2._x, vector1._y - vector2._y, vector1._z - vector2._z);
         }
 
-        public static Vector3D operator +(VectorInt vector1, VectorInt vector2)
+        public static VectorInt operator +(VectorInt vector1, VectorInt vector2)
         {
-            return new Vector3D(vector1._x + vector2._x, vector1._y + vector2._y, vector1._z + vector2._z);
+            return new VectorInt(vector1._x + vector2._x, vector1._y + vector2._y, vector1._z + vector2._z);
         }
 
-
+        public static VectorInt operator *(VectorInt vector1, double d)
+        {
+            var newX = Numerics.ToIntSafe(vector1._x * d);
+            var newY = Numerics.ToIntSafe(vector1._y * d);
+            var newZ = Numerics.ToIntSafe(vector1._z * d);
+            return new VectorInt(newX, newY, newZ);
+        }
     }
 }

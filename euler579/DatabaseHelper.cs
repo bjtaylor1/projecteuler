@@ -19,9 +19,9 @@ namespace euler579
             sqlConnection.Open();
         }
 
-        public Vector3D[] GetAllPrimitivesOfSameSquare(Vector3D vector)
+        public VectorInt[] GetAllPrimitivesOfSameSquare(VectorInt vector)
         {
-            var vectors = new List<Vector3D>();
+            var vectors = new List<VectorInt>();
             using (var cmd = new SqlCommand("select A,B,C from primitivetriples where [square] = @square", sqlConnection))
             {
                 cmd.Parameters.AddWithValue("@square", vector.Length);
@@ -32,7 +32,7 @@ namespace euler579
                         var a = (int) rs["A"];
                         var b = (int) rs["B"];
                         var c = (int) rs["C"];
-                        var v = new Vector3D(a,b,c);
+                        var v = new VectorInt(a,b,c);
                         if (!vector.Equals(v)) vectors.Add(v);
                     }
                 }

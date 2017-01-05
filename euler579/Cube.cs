@@ -9,7 +9,7 @@ namespace euler579
     public class Cube : IEquatable<Cube>
     {
         public int NumDimensions { get; }
-        public Vector3D[] Definitions { get; }
+        public VectorInt[] Definitions { get; }
         public ulong LatticePointsInside { get { return latticePoints.Value.Item1; } }
         public ulong LatticePointsSurface { get { return latticePoints.Value.Item2; } }
 
@@ -24,32 +24,32 @@ namespace euler579
 
         public bool Regular
         {
-            get { return Program.IsIntegral(Math.Pow(LatticePoints, 1.0/3)); }
+            get { return Numerics.IsIntegral(Math.Pow(LatticePoints, 1.0/3)); }
         }
 
-        public Vector3D[] Vertices { get;  }
-        public Vector3D[] OrderedVertices { get; }
-        public Vector3D A { get { return Definitions[0]; } }
+        public VectorInt[] Vertices { get;  }
+        public VectorInt[] OrderedVertices { get; }
+        public VectorInt A { get { return Definitions[0]; } }
 
-        public Vector3D UniqueA
+        public VectorInt UniqueA
         {
             get { return uniqueA.Value; }
         }
 
-        public Vector3D B { get { return Definitions[1]; } }
-        public Vector3D C { get { return Definitions[2]; } }
-        public Vector3D O { get { return Vertices[0]; } }
+        public VectorInt B { get { return Definitions[1]; } }
+        public VectorInt C { get { return Definitions[2]; } }
+        public VectorInt O { get { return Vertices[0]; } }
 
-        private static readonly Vector3D xAxis = new Vector3D(1, 0, 0);
-        private static readonly Vector3D yAxis = new Vector3D(0, 1, 0);
-        private static readonly Vector3D zAxis = new Vector3D(0, 0, 1);
-        private static readonly Vector3D[] axes = {xAxis, yAxis, zAxis};
+        private static readonly VectorInt xAxis = new VectorInt(1, 0, 0);
+        private static readonly VectorInt yAxis = new VectorInt(0, 1, 0);
+        private static readonly VectorInt zAxis = new VectorInt(0, 0, 1);
+        private static readonly VectorInt[] axes = {xAxis, yAxis, zAxis};
         private Lazy<Tuple<ulong, ulong>> latticePoints;
-        private Lazy<Vector3D> uniqueA;
-        public Vector3D MinBounds { get; }
-        public Vector3D MaxBounds { get; }
-        private static readonly Vector3D ORIGIN = new Vector3D(0, 0, 0);
-        private List<Tuple<Vector3D, string[]>> pointsByFace;
+        private Lazy<VectorInt> uniqueA;
+        public VectorInt MinBounds { get; }
+        public VectorInt MaxBounds { get; }
+        private static readonly VectorInt ORIGIN = new VectorInt(0, 0, 0);
+        private List<Tuple<VectorInt, string[]>> pointsByFace;
         private Plane firstNonParallelFace;
         private Plane front;
         private Plane back;
@@ -60,26 +60,26 @@ namespace euler579
         private PlanePair[] oppositeFaces;
         private Plane[] allFaces;
 
-        public Cube(Vector3D[] vertices, Vector3D[] definitions = null)
+        public Cube(VectorInt[] vertices, VectorInt[] definitions = null)
         {
-            MinBounds = new Vector3D(vertices.Min(v => v.X), vertices.Min(v => v.Y), vertices.Min(v => v.Z));
+            MinBounds = new VectorInt(vertices.Min(v => v.X), vertices.Min(v => v.Y), vertices.Min(v => v.Z));
             if (!Equals(MinBounds, ORIGIN))
             {
                 vertices = vertices.Select(v => v - MinBounds).ToArray();
                 MinBounds = ORIGIN;
             }
-            pointsByFace = new List<Tuple<Vector3D, string[]>>();
-            MaxBounds = new Vector3D(vertices.Max(v => v.X), vertices.Max(v => v.Y), vertices.Max(v => v.Z));
+            pointsByFace = new List<Tuple<VectorInt, string[]>>();
+            MaxBounds = new VectorInt(vertices.Max(v => v.X), vertices.Max(v => v.Y), vertices.Max(v => v.Z));
             if (definitions == null) definitions = vertices.Skip(1).Take(3).Select(v => v - vertices[0]).ToArray();
             Definitions = definitions;
             if (vertices.Length != 8) throw new InvalidOperationException("Sanity check failed.");
             OrderedVertices = vertices.OrderBy(v => v.X).ThenBy(v => v.Y).ThenBy(v => v.Z).ToArray();
             Vertices = vertices.ToArray();
             latticePoints = new Lazy<Tuple<ulong, ulong>>(CalculateLatticePoints);
-            uniqueA = new Lazy<Vector3D>(CalculateUniqueA);
-            Width = (int)Math.Abs(Math.Round(MinBounds.X, 0) - (int)Math.Round(MaxBounds.X, 0));
-            Height = (int)Math.Abs(Math.Round(MinBounds.Y, 0) - (int)Math.Round(MaxBounds.Y, 0));
-            Depth = (int)Math.Abs(Math.Round(MinBounds.Z, 0) - (int)Math.Round(MaxBounds.Z, 0));
+            uniqueA = new Lazy<VectorInt>(CalculateUniqueA);
+            Width = Math.Abs(MinBounds.X- MaxBounds.X);
+            Height = Math.Abs(MinBounds.Y- MaxBounds.Y);
+            Depth = Math.Abs(MinBounds.Z- MaxBounds.Z);
             Dimensions = new[] {Width, Height, Depth};
             var numAxesParallel = axes.Count(a => definitions.Any(d => IsParallelToAxis(d,a)));
             NumDimensions = 3 - numAxesParallel;
@@ -121,11 +121,11 @@ namespace euler579
         public int? RepeatabilityCombinations { get; set; }
         public Cube[] Variants { get; set; }
 
-        private Vector3D CalculateUniqueA()
+        private VectorInt CalculateUniqueA()
         {
             var points = new[] {A.X, A.Y, A.Z}.Select(Math.Abs).ToArray();
             Array.Sort(points);
-            var result = new Vector3D(points[0], points[1], points[2]);
+            var result = new VectorInt(points[0], points[1], points[2]);
             return result;
         }
 
@@ -174,13 +174,13 @@ namespace euler579
             ulong surface = 0;
             pointsByFace.Clear();
             if(MinBounds.X < 0 || MinBounds.Y < 0 || MinBounds.Z < 0) throw new InvalidOperationException("Should be aligned");
-            for (int x = 0; x <= (int)Math.Ceiling(MaxBounds.X); x++)
+            for (int x = 0; x <= MaxBounds.X; x++)
             {
-                for (int y = 0; y <= (int)Math.Ceiling(MaxBounds.Y); y++)
+                for (int y = 0; y <= MaxBounds.Y; y++)
                 {
-                    for(int z= 0; z <= (int)Math.Ceiling(MaxBounds.Z); z++)
+                    for(int z= 0; z <= MaxBounds.Z; z++)
                     {
-                        var v = new Vector3D(x,y,z);
+                        var v = new VectorInt(x,y,z);
                         if (oppositeFaces.All(pp => pp.IsBetweenOrOn(v)))
                         {
                             var facesOn = allFaces.Where(p => p.GetSide(v) == 0).ToArray();
@@ -192,7 +192,7 @@ namespace euler579
                             {
                                 inside++;
                             }
-                            pointsByFace.Add(new Tuple<Vector3D, string[]>(v, facesOn.Select(f => f.ToString()).OrderBy(fn => fn).ToArray()));
+                            pointsByFace.Add(new Tuple<VectorInt, string[]>(v, facesOn.Select(f => f.ToString()).OrderBy(fn => fn).ToArray()));
                         }
                     }
                 }
@@ -201,9 +201,9 @@ namespace euler579
         }
 
 
-        private static bool IsParallelToAxis(Vector3D vector3D, Vector3D axis)
+        private static bool IsParallelToAxis(VectorInt VectorInt, VectorInt axis)
         {
-            var angle = Vector3D.AngleBetween(vector3D, axis);
+            var angle = VectorInt.AngleBetween(VectorInt, axis);
             var result = (int) Math.Round(Math.Abs(angle), 0)%180 == 0;
             return result;
         }
@@ -248,7 +248,7 @@ namespace euler579
             return !Equals(left, right);
         }
 
-        public static bool TryMakeCubeFrom(Vector3D origin, Vector3D a, Vector3D b, Vector3D c, out Cube cube)
+        public static bool TryMakeCubeFrom(VectorInt origin, VectorInt a, VectorInt b, VectorInt c, out Cube cube)
         {
             
             var points = new[]

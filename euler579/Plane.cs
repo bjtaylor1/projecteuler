@@ -5,8 +5,8 @@ namespace euler579
 {
     class Plane
     {
-        public Vector3D V1 { get; set; }
-        public Vector3D V2 { get; set; }
+        public VectorInt V1 { get; set; }
+        public VectorInt V2 { get; set; }
         private readonly string name;
         public int A { get; }
         public int B { get; }
@@ -18,7 +18,7 @@ namespace euler579
             return $"{name}";
         }
 
-        public Plane (Vector3D origin, Vector3D v1, Vector3D v2, string name)
+        public Plane (VectorInt origin, VectorInt v1, VectorInt v2, string name)
         {
             this.name = name;
 
@@ -26,15 +26,14 @@ namespace euler579
             var pointA = origin;
             var pointB = origin + v1;
             var pointC = origin + v2;
-            A = ((int)Math.Round(pointB.Y) - (int)Math.Round(pointA.Y))*((int)Math.Round(pointC.Z) - (int)Math.Round(pointA.Z)) - ((int)Math.Round(pointC.Y) - (int)Math.Round(pointA.Y))*((int)Math.Round(pointB.Z) - (int)Math.Round(pointA.Z));
-            B = ((int)Math.Round(pointB.Z) - (int)Math.Round(pointA.Z))*((int)Math.Round(pointC.X) - (int)Math.Round(pointA.X)) - ((int)Math.Round(pointC.Z) - (int)Math.Round(pointA.Z))*((int)Math.Round(pointB.X) - (int)Math.Round(pointA.X));
-            C = ((int)Math.Round(pointB.X) - (int)Math.Round(pointA.X))*((int)Math.Round(pointC.Y) - (int)Math.Round(pointA.Y)) - ((int)Math.Round(pointC.X) - (int)Math.Round(pointA.X))*((int)Math.Round(pointB.Y) - (int)Math.Round(pointA.Y));
-            D = -(A* (int)Math.Round(pointA.X) + B* (int)Math.Round(pointA.Y) + C* (int)Math.Round(pointA.Z));
-
+            A = (pointB.Y - pointA.Y)*(pointC.Z - pointA.Z) - (pointC.Y - pointA.Y)*(pointB.Z - pointA.Z);
+            B = (pointB.Z - pointA.Z)*(pointC.X - pointA.X) - (pointC.Z - pointA.Z)*(pointB.X - pointA.X);
+            C = (pointB.X - pointA.X)*(pointC.Y - pointA.Y) - (pointC.X - pointA.X)*(pointB.Y - pointA.Y);
+            D = -(A* pointA.X + B* pointA.Y + C* pointA.Z);
         }
 
         // sing portion of http://forums.codeguru.com/showthread.php?378277-Distance-between-plane-and-a-point
-        public int GetSide(Vector3D p)
+        public int GetSide(VectorInt p)
         {
             var dist = A*p.X + B*p.Y + C*p.Z + D;
             
