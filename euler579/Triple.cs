@@ -132,7 +132,7 @@ namespace euler579
                     cubes.Add(cube);
                 }
             }
-            if(!cubes.Any()) throw new InvalidOperationException($"No cubes found for vector {vector}");
+            if(!cubes.Any())  throw new InvalidOperationException($"No cubes found for vector {vector}");
             cubes.RemoveAll(cube => !cube.Dimensions.All(d => d <= n));
             return cubes.Distinct().ToArray();
 

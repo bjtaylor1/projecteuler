@@ -105,7 +105,7 @@ namespace euler579
         {
             var allDefinitionPoint = Definitions.Select(v =>
             {
-                var ints = new[] {(int) Math.Abs(v.X), (int)Math.Abs(v.Y), (int) Math.Abs(v.Z)};
+                var ints = new[] {(int) Math.Round(Math.Abs(v.X)), (int)Math.Round(Math.Abs(v.Y)), (int) Math.Round(Math.Abs(v.Z))};
                 Array.Sort(ints);
                 return ints;
             }).ToArray();
