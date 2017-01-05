@@ -21,22 +21,12 @@ namespace euler579
         {
             try
             {
-                //Console.Out.WriteLine(Numerics.GetHighestPrimeFactor(35));
-                //                var c = new Triple(1, 2, 2).GetCube(50);
-                //                var latticePoints = c.LatticePoints;
-                //                LogManager.GetCurrentClassLogger().Info($"{string.Join(", ", c.Vertices.Select(v => v.ToString()))} {latticePoints}");
+//                FindLatticePoints(5000);
 
-                FindLatticePoints(5000);
-                //CalculateResult(5000);
-                //                FindTripleDuplicates();
-                //var cube0 = new Triple(new[] {1,2,2}).GetCube(50);
-                //            var c1 = new Triple(new[] {1,4,8}).GetCube(50);
-                //            var c2 = new Triple(new[] {4,4, 7}).GetCube(50);
-                //            var cubes = c1.Variants.Concat(c1.Variants).Distinct().ToArray();
+                var triple = new Triple(23,24,36);
+                var c = triple.GetCube(5000);
+                var duplicateDefinitionPoints = c.GetDuplicateDefinitionPoints();
 
-
-                //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-                //CalculateResult(50);
             }
             finally { DatabaseHelper.Instance.Dispose(); }
         }

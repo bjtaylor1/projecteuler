@@ -30,17 +30,7 @@ namespace euler579
             B = ((int)Math.Round(pointB.Z) - (int)Math.Round(pointA.Z))*((int)Math.Round(pointC.X) - (int)Math.Round(pointA.X)) - ((int)Math.Round(pointC.Z) - (int)Math.Round(pointA.Z))*((int)Math.Round(pointB.X) - (int)Math.Round(pointA.X));
             C = ((int)Math.Round(pointB.X) - (int)Math.Round(pointA.X))*((int)Math.Round(pointC.Y) - (int)Math.Round(pointA.Y)) - ((int)Math.Round(pointC.X) - (int)Math.Round(pointA.X))*((int)Math.Round(pointB.Y) - (int)Math.Round(pointA.Y));
             D = -(A* (int)Math.Round(pointA.X) + B* (int)Math.Round(pointA.Y) + C* (int)Math.Round(pointA.Z));
-            
-            //this is wrong!:
-            /*Origin = origin;
-            V1 = v1;
-            V2 = v2;
-            this.name = name;
-            var normal = Vector3D.CrossProduct(v1, v2);
-            A  = normal.X;
-            B = normal.Y;
-            C = normal.Z;
-            D = -Vector3D.DotProduct(origin, normal);*/
+
         }
 
         // sing portion of http://forums.codeguru.com/showthread.php?378277-Distance-between-plane-and-a-point
