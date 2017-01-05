@@ -21,54 +21,14 @@ namespace euler579
         {
             try
             {
-
-                new Triple(23, 24, 36).GetCube(5000).GetDuplicateDefinitionPoints();
-                //FindLatticePoints(5000);
+                Console.Out.WriteLine(GetPattern(new Triple(35,38,70).GetCube(5000)));
+                FindLatticePoints(5000);
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
                 //CalculateResult(50);
             }
             finally { DatabaseHelper.Instance.Dispose(); }
-        }
-
-        private static void FindTripleDuplicates()
-        {
-            using (var output = File.OpenWrite("primitivetripleduplicates.csv"))
-            using (var file = File.OpenRead("primitivetriplessorted.csv"))
-            {
-                using (var sr = new StreamReader(file))
-                using (var sw = new StreamWriter(output))
-
-                {
-                    string line;
-                    int count = 0;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        Console.Write($"\r{count}, {(double)(count++) / 853831:0.000%}");
-
-                        var ints = line.Split(',').Select(int.Parse).ToArray();
-                        var baseTripleSides = ints.Take(3).ToArray();
-                        var tripleSquare = ints.Last();
-                        var triple = new Triple(baseTripleSides, tripleSquare);
-                        var cube = triple.GetCube(5000);
-                        var duplicateTriples = cube.GetDuplicateDefinitionPoints()
-                            .Select(ps => new Triple(ps))
-                            .Where(t => t.IsPrimitive)
-                            .ToArray();
-                        //if (duplicateTriples.Length > 1) throw new InvalidOperationException("Did not expect to find more than one duplicate");
-                        foreach (var duplicateTriple in duplicateTriples)
-                        {
-                            if (duplicateTriple.IsPrimitive)
-                            {
-                                var outputLine = string.Join(",", triple.Sides.Select(s => s.ToString())) + "," + string.Join(",", duplicateTriple.Sides.Select(s => s.ToString()));
-                                sw.WriteLine(outputLine);
-                            }
-                        }
-
-                    }
-                }
-            }
         }
 
         private static void FindLatticePoints(int n)
@@ -105,7 +65,7 @@ namespace euler579
             if (triple.Square <= n && triple.IsPrimitive)
             {
                 var baseCube = triple.GetCube(n);
-                if (baseCube != null)
+                if (baseCube != null && GetPattern(baseCube).StartsWith("D"))
                 {
                     var latticePoints = baseCube.LatticePoints;
                     var cbf = baseCube.GetCountsByFace(); //points on non-parallel face
@@ -146,11 +106,24 @@ namespace euler579
 
         private static string GetPattern(Cube c)
         {
+            var maxHsf = c.Definitions.Select(GetMinHsf).Max();
+            if (maxHsf > 1) return "D" + maxHsf;
+
             var n = (ulong)c.A.Length;
             var n2 = n * n;
             if (c.LatticePointsSurface == 8 + 2 * (n - 1) * (n + 1) + 4 * (n - 1)) return "A";
             else if (c.LatticePointsSurface == 8 + 6 * (n - 1)) return "B";
             else return "unknown";
+        }
+
+
+
+        private static ulong GetMinHsf(Vector3D v)
+        {
+            var hsfAll = Numerics.GetHighestSquareFactorOfAll(
+                new[] {(ulong) Math.Abs(Math.Round(v.X)), (ulong) Math.Abs(Math.Round(v.Y)), (ulong) Math.Abs(Math.Round(v.Z))}
+                    .Where(h => h > 0).ToArray());
+            return hsfAll;
         }
 
         private static void FindTriples()

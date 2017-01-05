@@ -20,10 +20,24 @@ namespace euler579
 
         public static ulong GetHighestSquareFactor(ulong n)
         {
-            var factors = GetFactors(n);
-            var squareFactors = factors.Where(f => squares2d.Contains(f)).ToArray();
+            var squareFactors = GetSquareFactors(n);
             var highestSquareFactor = squareFactors.Max();
             return highestSquareFactor;
+        }
+
+        private static ulong[] GetSquareFactors(ulong n)
+        {
+            var factors = GetFactors(n);
+            var squareFactors = factors.Where(f => squares2d.Contains(f)).ToArray();
+            return squareFactors;
+        }
+
+        public static ulong GetHighestSquareFactorOfAll(ulong[] n)
+        {
+            var hsfs = n.Select(GetSquareFactors).ToArray();
+            var allHsfs = hsfs.SelectMany(i => i).Where(i => hsfs.All(h => h.Contains(i)));
+            var hsfAll = allHsfs.Max();
+            return hsfAll;
         }
 
         public static string IntegralFactor(ulong n, ulong d)
