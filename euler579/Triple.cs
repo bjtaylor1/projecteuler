@@ -58,7 +58,7 @@ namespace euler579
             var nonZeroSides = Sides.Where(s => s != 0).ToArray();
             for (int f = 2; f <= (int)Math.Ceiling((double)Sides.Max()); f++)
             {
-                if (nonZeroSides.All(s => Program.IsIntegral((double) s/f)))
+                if (nonZeroSides.All(s => Numerics.IsIntegral((double) s/f)))
                     return false;
             }
             return true;

@@ -14,7 +14,7 @@ namespace euler579
         {
             var factors = new List<ulong>();
             for (ulong f = 1; f <= i; f++)
-                if (Program.IsIntegral((double)i / f)) factors.Add(f);
+                if (IsIntegral((double)i / f)) factors.Add(f);
             return factors.ToArray();
         }
 
@@ -43,8 +43,13 @@ namespace euler579
         public static string IntegralFactor(ulong n, ulong d)
         {
             double f = (double) n/d;
-            if (Program.IsIntegral(f)) return ((int) f).ToString();
+            if (IsIntegral(f)) return ((int) f).ToString();
             else return "?";
+        }
+
+        public static bool IsIntegral(double d)
+        {
+            return Math.Abs(d - Math.Round(d, 0)) < 1e-9;
         }
     }
 }

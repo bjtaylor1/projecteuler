@@ -24,7 +24,7 @@ namespace euler579
 
         public bool Regular
         {
-            get { return Program.IsIntegral(Math.Pow(LatticePoints, 1.0/3)); }
+            get { return Numerics.IsIntegral(Math.Pow(LatticePoints, 1.0/3)); }
         }
 
         public Vector3D[] Vertices { get;  }
