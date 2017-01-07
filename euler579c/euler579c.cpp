@@ -6,7 +6,7 @@
 
 int main()
 {
-	solver s(5000);
+	solver s(10);
 	s.solve();
 }
 
