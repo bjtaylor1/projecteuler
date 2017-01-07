@@ -21,8 +21,10 @@ namespace euler579
         {
             try
             {
-                Console.Out.WriteLine(GetPattern(new Triple(35,38,70).GetCube(5000)));
-                FindLatticePoints(5000);
+                int count = 0;
+                //WriteCombinationsInfoLine(5000, "1,70,182,195", ref count);
+
+                WriteCombinationsInfoForFile(5000, "primitivetriplessorted.csv");
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
@@ -31,9 +33,10 @@ namespace euler579
             finally { DatabaseHelper.Instance.Dispose(); }
         }
 
-        private static void FindLatticePoints(int n)
+
+        private static void WriteCombinationsInfoForFile(int n, string fileName)
         {
-            using (var file = File.OpenRead("primitivetriplessorted.csv"))
+            using (var file = File.OpenRead(fileName))
             {
                 using (var sr = new StreamReader(file))
 
@@ -44,78 +47,52 @@ namespace euler579
 
                     while ((line = sr.ReadLine()) != null)
                     {
-                        Console.Write($"\r{(double)(count++) / 853831:0.000%}");
-                        var ints = line.Split(',').Select(int.Parse).ToArray();
-                        if (!DatabaseHelper.Instance.IsDone(ints))
-                        {
-                            var insideFormulaMatches = true;
-                            if (OutputCubeInfoForTriple(n, ints, false, ref insideFormulaMatches)) break;
-                        } //else LogManager.GetCurrentClassLogger().Warn($"Done: {string.Join(",", ints.Select(i => i.ToString()))}");
+                        if (WriteCombinationsInfoLine(n, line, ref count)) break;
                     }
                 }
             }
         }
 
+        private static bool WriteCombinationsInfoLine(int n, string line, ref int count)
+        {
+            Console.Write($"\r{(double) (count++)/853831:0.000%}");
+            var ints = line.Split(',').Select(Int32.Parse).ToArray();
+            if (!DatabaseHelper.Instance.IsDone(ints))
+            {
+                if (OutputCubeInfoForTriple(n, ints, false)) return true;
+            } //else LogManager.GetCurrentClassLogger().Warn($"Done: {string.Join(",", ints.Select(i => i.ToString()))}");
+            return false;
+        }
 
-        private static bool OutputCubeInfoForTriple(int n, int[] ints, bool isDuplicate, ref bool insideFormulaMatches)
+
+        private static bool OutputCubeInfoForTriple(int n, int[] ints, bool isDuplicate)
         {
             var baseTripleSides = ints.Take(3).ToArray();
             var triple = new Triple(baseTripleSides);
-            insideFormulaMatches = true;
-            if (triple.Square <= n && triple.IsPrimitive)
+            if (triple.Square <= n)
             {
                 var baseCube = triple.GetCube(n);
-                if (baseCube != null && GetPattern(baseCube).StartsWith("D"))
+                if (baseCube != null)
                 {
-                    var latticePoints = baseCube.LatticePoints;
-                    var cbf = baseCube.GetCountsByFace(); //points on non-parallel face
-                    var pointsOnEdges = baseCube.GetPointsOnEdges();
-                    var pattern = GetPattern(baseCube);
-
-                    var equation = $"{triple.Square * triple.Square * triple.Square} x + {triple.Square * triple.Square} y = {triple.Square} z + 1 t == {baseCube.LatticePointsInside}";
-
-
-
+                    LogManager.GetCurrentClassLogger().Info($"{baseCube} Side {baseCube.A.Length}, Combinations: {baseCube.GetCombinations()}");
+                    foreach (var variant in baseCube.Variants)
+                    {
+                        LogManager.GetCurrentClassLogger().Trace($"   {variant}");
+                    }
                     DatabaseHelper.Instance.SetDone(baseTripleSides);
                     if (!isDuplicate)
                     {
                         foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
                         {
-                            OutputCubeInfoForTriple(n, duplicate, true, ref insideFormulaMatches);
                             DatabaseHelper.Instance.SetDone(duplicate);
                         }
                     }
 
-                    var pointsInsideSlow = baseCube.LatticePointsInside;
-                    var pointsInsideFast = PointsCalculatorFast.GetSurfacePoints(baseCube);
-                    var factor = Numerics.IntegralFactor(pointsInsideSlow - pointsInsideFast, (ulong)triple.Square - 1);
-                    var logLevel = pointsInsideFast == pointsInsideSlow ? LogLevel.Info : LogLevel.Warn;
-                    if (pointsInsideFast != pointsInsideSlow|| !insideFormulaMatches/* for duplicates*/)
-                    {
-                        var diff = pointsInsideSlow - pointsInsideFast;
-                        var logger = pattern + (isDuplicate ? "(dup)" : "") + (!insideFormulaMatches ? "(orig)" : "");
-                        LogManager.GetLogger(logger).Log(logLevel, $"{baseCube.A.Length}: {baseCube} {diff}: {factor}");
-                        LogManager.GetLogger(logger).Log(logLevel, $"Side: {triple.Square}, Cube: {baseCube}, CountsByFace: {cbf.ToCsvString("/")}   {cbf.Sum()}+{pointsOnEdges}+8={cbf.Sum() + pointsOnEdges + 8}, LatticePoints: {baseCube.LatticePointsSurface - 8}+8+{baseCube.LatticePointsInside}={latticePoints}   {equation}");
-                        insideFormulaMatches = false;
-                    }
                 }
                 return false;
             }
             else return true;
         }
-
-        private static string GetPattern(Cube c)
-        {
-            var maxHsf = c.Definitions.Select(GetMinHsf).Max();
-            if (maxHsf > 1) return "D" + maxHsf;
-
-            var n = (ulong)c.A.Length;
-            var n2 = n * n;
-            if (c.LatticePointsSurface == 8 + 2 * (n - 1) * (n + 1) + 4 * (n - 1)) return "A";
-            else if (c.LatticePointsSurface == 8 + 6 * (n - 1)) return "B";
-            else return "unknown";
-        }
-
 
 
         private static ulong GetMinHsf(Vector3D v)
@@ -135,7 +112,7 @@ namespace euler579
                 {
                     if (triple.Square > n) throw new InvalidOperationException("too big.");
                     // ReSharper disable once AccessToDisposedClosure
-                    sw.WriteLine($"{string.Join(",", triple.Sides.Select(i => i.ToString()))},{triple.Square}");
+                    sw.WriteLine($"{String.Join(",", triple.Sides.Select(i => i.ToString()))},{triple.Square}");
                 });
             }
         }
@@ -156,7 +133,7 @@ namespace euler579
                     while ((line = sr.ReadLine()) != null)
                     {
                         Console.Write($"\r{(double)(count++) / 853831:0.000%}");
-                        var ints = line.Split(',').Select(int.Parse).ToArray();
+                        var ints = line.Split(',').Select(Int32.Parse).ToArray();
                         if (!DatabaseHelper.Instance.IsDone(ints))
                         {
 
@@ -188,7 +165,7 @@ namespace euler579
                                         }).ToArray();
                                         var totalContribution = contributions.Sum(c => (long)(c.Total % (ulong)1e9));
                                         Console.Out.WriteLine();
-                                        LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} : {string.Join(",", contributions.Select(c => c.ToString()))})");
+                                        LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} : {String.Join(",", contributions.Select(c => c.ToString()))})");
                                         result += totalContribution;
                                         if (result > 1e9) result -= (long)1e9;
 

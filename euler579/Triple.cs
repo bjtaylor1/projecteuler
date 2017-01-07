@@ -81,7 +81,7 @@ namespace euler579
             bool isMultiple = Math.Abs(multiples.Max() - multiples.Min()) < 2e-9;
             return isMultiple;
         }
-
+        
         public Vector3D Vector { get;  }
 
         public int[] Sides { get; }
@@ -92,8 +92,10 @@ namespace euler579
             return $"{string.Join(",", Sides.Select(s => s.ToString()))} => {Square}";
         }
 
+
         public Cube GetCube(int n)
         {
+            
             var possibleBasicCubes = GetCubeFromVector(n, Vector).ToArray();
             var basicCube = possibleBasicCubes.FirstOrDefault(); //might not be any if too big
 
