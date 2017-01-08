@@ -211,7 +211,14 @@ namespace euler579
         public override string ToString()
         {
             return $"A = {A} B = {B} C = {C}";
-//            return String.Join("   ", OrderedVertices.Select(o => $"{{{o.X:0},{o.Y:0},{o.Z:0}}}"));
+        }
+
+        public Vector3D[] GetOrderedDefinitions()
+        {
+            var defs = Definitions.Select(d => d.X < 0 ? d*-1 : d)
+                .OrderBy(d => d.X).ThenBy(d => d.Y).ThenBy(d => d.Z)
+                .ToArray();
+            return defs;
         }
 
         public bool Equals(Cube other)

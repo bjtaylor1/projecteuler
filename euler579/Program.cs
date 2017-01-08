@@ -21,6 +21,7 @@ namespace euler579
         {
             try
             {
+                Console.Out.WriteLine(new Vector3D(-4,-4,9) * -1);
                 int count = 0;
                 //WriteCombinationsInfoLine(5000, "1,70,182,195", ref count);
 
@@ -149,11 +150,11 @@ namespace euler579
                                     var baseCube = triple.GetCube(n);
                                     if (baseCube != null)
                                     {
-                                        var allCubes = new List<Cube> { baseCube };
-                                        var maxFactor = (int)((double)n / triple.Square);
+                                        var allCubes = new List<Cube> {baseCube};
+                                        var maxFactor = (int) ((double) n/triple.Square);
                                         for (int factor = 2; factor <= maxFactor; factor++)
                                         {
-                                            var factoredTriple = new Triple(triple.Sides.Select(i => i * factor).ToArray(), triple.Square * factor);
+                                            var factoredTriple = new Triple(triple.Sides.Select(i => i*factor).ToArray(), triple.Square*factor);
                                             var factoredCube = factoredTriple.GetCube(n);
                                             if (factoredCube != null) allCubes.Add(factoredCube);
                                             else break;
@@ -163,11 +164,12 @@ namespace euler579
                                             var contribution = new Contribution(c.LatticePoints, c.GetRepeatability(n), c.GetCombinations());
                                             return contribution;
                                         }).ToArray();
-                                        var totalContribution = contributions.Sum(c => (long)(c.Total % (ulong)1e9));
+                                        var totalContribution = contributions.Sum(c => (long) (c.Total%(ulong) 1e9));
                                         Console.Out.WriteLine();
-                                        LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} : {String.Join(",", contributions.Select(c => c.ToString()))})");
+                                        OutputCubeInfoForTriple(n, baseTripleSides, false);
+                                        //LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} : {String.Join(",", contributions.Select(c => c.ToString()))})");
                                         result += totalContribution;
-                                        if (result > 1e9) result -= (long)1e9;
+                                        if (result > 1e9) result -= (long) 1e9;
 
                                         DatabaseHelper.Instance.SetDone(baseTripleSides);
                                         foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
@@ -179,6 +181,7 @@ namespace euler579
                             }
                             else break;
                         }
+                        else LogManager.GetCurrentClassLogger().Trace($"Skipping duplicate {ints.ToCsvString()}");
                     }
                 }
             }

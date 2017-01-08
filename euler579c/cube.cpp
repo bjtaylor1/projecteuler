@@ -14,3 +14,8 @@ bool operator<(const cube & lhs, const cube & rhs)
 	if (it_l != lhs.uvn.end() || it_r != rhs.uvn.end()) throw exception("A cube has more than 3 vectors");
 	return false;
 }
+
+cube::cube(vector3d & U, vector3d & V, vector3d & N) : uvn({U,V,N})
+{
+
+}

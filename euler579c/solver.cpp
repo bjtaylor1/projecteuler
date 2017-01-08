@@ -14,7 +14,10 @@ void solver::process_mnpq(const mnpq& item)
 		set<vector3d> vectors = alt.get_abcd().get_vectors();
 		for (set<vector3d>::const_iterator v = vectors.begin(); v != vectors.end(); v++)
 		{
-
+			if (v->is_orthogonal_to(rootVector))
+			{
+				
+			}
 		}
 
 	};
