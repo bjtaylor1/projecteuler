@@ -24,11 +24,11 @@ namespace euler579
                 int count = 0;
                 //WriteCombinationsInfoLine(5000, "1,70,182,195", ref count);
 
-                WriteCombinationsInfoForFile(5000, "primitivetriplessorted.csv");
+                //WriteCombinationsInfoForFile(5000, "primitivetriplessorted.csv");
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-                //CalculateResult(50);
+                CalculateResult(50);
             }
             finally { DatabaseHelper.Instance.Dispose(); }
         }

@@ -3,6 +3,7 @@
 #define MNPQ_CLASS
 
 #include "cube.h"
+#include "abcd.h"
 
 using namespace std;
 
@@ -16,6 +17,8 @@ public:
 	//it doesn't really need to store them, only to count them - but 
 	//useful for debugging, unique-izing the count, and it will be thrown away anyway
 	void add_cube(const cube& cube);
+	abcd get_abcd() const;
+	vector<long> as_vector() const;
 };
 
 #endif

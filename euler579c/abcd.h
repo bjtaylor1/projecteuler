@@ -9,7 +9,8 @@ class abcd
 public:
 	long a, b, c, d;
 	abcd(long A, long B, long C, long D) : a(A), b(B), c(C), d(D) {}
-	vector<vector3d> get_vectors() const;
+	set<vector3d> get_vectors() const;
+	vector3d get_root_vector() const;
 };
 
 #endif

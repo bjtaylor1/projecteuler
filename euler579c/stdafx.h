@@ -4,6 +4,7 @@
 //
 
 #pragma once
+#define _USE_MATH_DEFINES
 
 #include "targetver.h"
 
@@ -11,5 +12,7 @@
 #include <tchar.h>
 #include <vector>
 #include <set>
+#include <math.h>
 #include <ctgmath>
 #include <iostream>
+#include <algorithm>

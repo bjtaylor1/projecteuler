@@ -1,9 +1,24 @@
 #include "stdafx.h"
+#include "mnpq.h"
 #include "solver.h"
 
-void solver::process_mnpq(const mnpq& mnpq)
+void solver::process_mnpq(const mnpq& item)
 {
-	
+	abcd sln = item.get_abcd();
+	vector3d rootVector = sln.get_root_vector();
+	vector<long> perm = item.as_vector();
+	sort(perm.begin(), perm.end());
+	while (next_permutation(perm.begin(), perm.end()))
+	{
+		mnpq alt(*perm.begin(), *perm.begin() + 1, *perm.begin() + 2, *perm.begin() + 3);
+		set<vector3d> vectors = alt.get_abcd().get_vectors();
+		for (set<vector3d>::const_iterator v = vectors.begin(); v != vectors.end(); v++)
+		{
+
+		}
+
+	};
+
 }
 
 void solver::solve()

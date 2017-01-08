@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="abcd.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="macros.h" />
     <ClInclude Include="mnpq.h" />
     <ClInclude Include="solver.h" />
     <ClInclude Include="stdafx.h" />
