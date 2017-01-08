@@ -11,7 +11,7 @@ public:
 	long maxSide;
 	solver(long _maxSide) : maxSide(_maxSide) {}
 	void solve();
-	void process_mnpq(const mnpq& mnpq);
+	void process_mnpq(mnpq& mnpq);
 };
 
 

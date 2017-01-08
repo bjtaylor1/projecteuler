@@ -2,26 +2,35 @@
 #include "mnpq.h"
 #include "solver.h"
 
-void solver::process_mnpq(const mnpq& item)
+void solver::process_mnpq(mnpq& item)
 {
-	abcd sln = item.get_abcd();
-	vector3d rootVector = sln.get_root_vector();
 	vector<long> perm = item.as_vector();
 	sort(perm.begin(), perm.end());
+	set<vector3d> allVectors;
 	while (next_permutation(perm.begin(), perm.end()))
 	{
-		mnpq alt(*perm.begin(), *perm.begin() + 1, *perm.begin() + 2, *perm.begin() + 3);
-		set<vector3d> vectors = alt.get_abcd().get_vectors();
-		for (set<vector3d>::const_iterator v = vectors.begin(); v != vectors.end(); v++)
-		{
-			if (v->is_orthogonal_to(rootVector))
-			{
-				
-			}
-		}
-
+		mnpq alt(*(perm.begin()), *(perm.begin() + 1), *(perm.begin() + 2), *(perm.begin() + 3));
+		set<vector3d> abcdvectors = alt.get_abcd().get_vectors();
+		allVectors.insert(abcdvectors.begin(), abcdvectors.end());
 	};
 
+	for (set<vector3d>::const_iterator u = allVectors.begin(); u != allVectors.end(); u++)
+	{
+		for (set<vector3d>::const_iterator v = allVectors.begin(); v != allVectors.end(); v++)
+		{
+			if (u != v && v->is_orthogonal_to(*u))
+			{
+				vector3d n = u->cross_product(*v);
+				cube c(*v, *u, n);
+				item.add_cube(c);
+			}
+		}
+	}
+	
+	for (set<cube>::const_iterator it = item.cubes.begin(); it != item.cubes.end(); it++)
+	{
+		cout << *it << endl;
+	}
 }
 
 void solver::solve()

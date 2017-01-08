@@ -10,12 +10,13 @@ class cube
 public:
 	set<vector3d> uvn;
 	set<vertex> vertices;
-	cube(vector3d& U, vector3d& V, vector3d& N);
+	cube(const vector3d& U, const vector3d& V, const vector3d& N);
 
 private:
 	void add_vertex(vector<vertex>& vertices, long& minx, long& miny, long& minz, const vertex& vertex);
 };
 
 bool operator <(const cube& lhs, const cube& rhs);
+ostream& operator<<(ostream& os, const cube& cube);
 
 #endif

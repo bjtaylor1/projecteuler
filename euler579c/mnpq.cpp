@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "mnpq.h"
 
-void mnpq::add_cube(const cube& cube)
+pair<set<cube>::iterator, bool> mnpq::add_cube(const cube& cube)
 {
-	cubes.insert(cube);
+	return cubes.insert(cube);
 }
 
 abcd mnpq::get_abcd() const

@@ -14,11 +14,3 @@ set<vector3d> abcd::get_vectors() const
 
 	return vectors;
 }
-
-vector3d abcd::get_root_vector() const
-{
-	vector<long> numbers({ a,b,c });
-	sort(numbers.begin(), numbers.end());
-	vector3d v(*numbers.begin(), *(numbers.begin() + 1), *(numbers.begin() + 2));
-	return v;
-}

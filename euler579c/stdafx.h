@@ -16,3 +16,4 @@
 #include <ctgmath>
 #include <iostream>
 #include <algorithm>
+#include <numeric>

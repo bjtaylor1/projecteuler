@@ -22,3 +22,9 @@ vertex operator-(const vertex& lhs, const vertex& rhs)
 {
 	return vertex(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 }
+
+ostream& operator<<(ostream& os, const vertex & vertex)
+{
+	os << vertex.x << "," << vertex.y << "," << vertex.z;
+	return os;
+}

@@ -16,7 +16,7 @@ public:
 	set<cube> cubes;
 	//it doesn't really need to store them, only to count them - but 
 	//useful for debugging, unique-izing the count, and it will be thrown away anyway
-	void add_cube(const cube& cube);
+	pair<set<cube>::iterator, bool> add_cube(const cube& cube);
 	abcd get_abcd() const;
 	vector<long> as_vector() const;
 };

@@ -21,6 +21,7 @@ namespace euler579
         {
             try
             {
+                new Triple(2, 5, 14).GetCube(50);
                 Console.Out.WriteLine(new Vector3D(-4,-4,9) * -1);
                 int count = 0;
                 //WriteCombinationsInfoLine(5000, "1,70,182,195", ref count);
