@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "vertex.h"
 
+using namespace std;
+
 bool operator<(const vertex & lhs, const vertex & rhs)
 {
 	if (lhs.x != rhs.x) return lhs.x < rhs.x;

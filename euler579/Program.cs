@@ -19,18 +19,31 @@ namespace euler579
     {
         static void Main(string[] args)
         {
+            Console.WindowWidth = 150;
             try
             {
-                new Triple(2, 5, 14).GetCube(50);
-                Console.Out.WriteLine(new Vector3D(-4,-4,9) * -1);
-                int count = 0;
+                var cube = new Triple(2,3,6).GetCube(50);
+                Array.Sort(cube.Variants, (cube1, cube2) =>
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        var c = Vector3DComparer.Instance.Compare(cube1.OrderedVertices[i], cube2.OrderedVertices[i]);
+                        if (c != 0) return c;
+                    }
+                    return 0;
+                });
+                foreach (var variant in cube.Variants)
+                {
+                    Console.Out.WriteLine($"{variant.OrderedVertices.ToCsvString()}, {variant}");
+                }
+
                 //WriteCombinationsInfoLine(5000, "1,70,182,195", ref count);
 
                 //WriteCombinationsInfoForFile(5000, "primitivetriplessorted.csv");
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-                CalculateResult(50);
+                //CalculateResult(50);
             }
             finally { DatabaseHelper.Instance.Dispose(); }
         }

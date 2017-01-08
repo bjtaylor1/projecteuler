@@ -10,13 +10,8 @@ using namespace std;
 
 int main()
 {
-	cout << util::gcd(set<long>({ 4,8,12,2 })) << endl;
-	cout << util::gcd(set<long>({ 15,10,5})) << endl;
-	cout << util::gcd(set<long>({ 2,15,10})) << endl;
-
-	//solver s(10);
-	//s.process_mnpq(mnpq(1,1,2,3));
-
-	//s.solve();
+	solver s(5);
+	s.solve();
+	cout << "C(" << s.maxSide << ") = " << s.C << endl;
 }
 

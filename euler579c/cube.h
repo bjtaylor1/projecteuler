@@ -8,6 +8,7 @@ using namespace std;
 class cube
 {
 public:
+	unsigned long long width, height, depth;
 	set<vector3d> uvn;
 	set<vertex> vertices;
 	cube(const vector3d& U, const vector3d& V, const vector3d& N);

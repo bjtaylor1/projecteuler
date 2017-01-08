@@ -1,5 +1,12 @@
 #include "stdafx.h"
 #include "vector3d.h"
+#include "util.h"
+
+long vector3d::gcd() const
+{
+	return util::gcd(set<long>({ x, y, z }));
+}
+
 
 vertex operator+(const vertex& lhs, const vector3d& rhs)
 {

@@ -32,7 +32,7 @@ ostream & operator<<(ostream & os, const cube & cube)
 	return os;
 }
 
-cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,V,N})
+cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,V,N}), width(0), height(0), depth(0)
 {
 	long minx = 0, miny = 0, minz = 0;
 	vector<vertex> tempvertices;
@@ -49,7 +49,11 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,
 	vertex minBounds(minx, miny, minz);
 	for (vector<vertex>::const_iterator it = tempvertices.begin(); it != tempvertices.end(); it++)
 	{
-		vertices.insert((*it) - minBounds);
+		vertex v = (*it) - minBounds;
+		width = max(width, (unsigned long long)v.x);
+		height = max(height, (unsigned long long)v.y);
+		depth = max(depth, (unsigned long long)v.z);
+		vertices.insert(v);
 	}
 
 	if (vertices.size() != 8) throw exception("A cube has less than 8 (distinct) vertices");

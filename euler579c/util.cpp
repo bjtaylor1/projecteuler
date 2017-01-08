@@ -21,7 +21,7 @@ long util::gcd(set<long>::iterator first, set<long>::iterator last)
 {
 	long l1 = *first;
 	if (++first == last) return l1;
-	else return gcd_l(l1, gcd(first, last));
+	else return gcd_l(abs(l1), abs(gcd(first, last)));
 }
 
 long util::gcd(const set<long> s)

@@ -16,6 +16,8 @@ public:
 	bool is_orthogonal_to(const vector3d&) const;
 	long dot_product(const vector3d&) const;
 	vector3d cross_product(const vector3d&) const;
+	long gcd() const;
+
 };
 
 vertex operator+(const vertex&, const vector3d&);
