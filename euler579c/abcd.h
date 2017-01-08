@@ -12,4 +12,5 @@ public:
 	set<vector3d> get_vectors() const;
 };
 
+ostream& operator<<(ostream&, const abcd&);
 #endif

@@ -31,13 +31,10 @@ void solver::process_mnpq(mnpq& item)
 		}
 	}
 	
-	//for (set<cube>::const_iterator it = item.cubes.begin(); it != item.cubes.end(); it++)
-	//{
-	//	cout << *it << endl;
-	//}
 
 	
 	unsigned long long combinations = item.cubes.size();
+	long thisCxr = 0;
 	if (combinations > 0) //might be zero for primitive ones e.g. from 0,0,0,3.
 	{
 		unsigned long long width = item.cubes.begin()->width,
@@ -50,9 +47,13 @@ void solver::process_mnpq(mnpq& item)
 				(maxSide + 1 - t * width) *
 				(maxSide + 1 - t * height) *
 				(maxSide + 1 - t * depth);
-			C += (repeatability * combinations);
+			thisCxr += (repeatability * combinations);
 		}
+
+		cout << item.get_abcd() << ", CxR = " << thisCxr << endl;
+
 	}
+	C += thisCxr;
 
 }
 
@@ -66,12 +67,14 @@ void solver::solve()
 			long pmax = sqrt(maxSide - m*m - n*n);
 			for (long p = n; p <= pmax; p++)
 			{
-				long qStart = max(1L, p + ((m + n + p) % 2)); //the total must be odd (otherwise it won't be primitive) - so q might as well go up in twos
 				long qmax = sqrt(maxSide - m*m - n*n - p*p);
-				for (long q = qStart; q <= qmax; q += 2)
+				for (long q = p; q <= qmax; q++)
 				{
-					mnpq it(m, n, p, q);
-					process_mnpq(it);
+					if (((m + n + p + q) % 2) == 1)
+					{
+						mnpq it(m, n, p, q);
+						process_mnpq(it);
+					}
 				}
 			}
 		}

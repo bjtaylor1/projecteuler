@@ -10,7 +10,7 @@ using namespace std;
 
 int main()
 {
-	solver s(5);
+	solver s(50);
 	s.solve();
 	cout << "C(" << s.maxSide << ") = " << s.C << endl;
 }

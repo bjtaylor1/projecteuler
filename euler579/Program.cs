@@ -22,20 +22,6 @@ namespace euler579
             Console.WindowWidth = 150;
             try
             {
-                var cube = new Triple(2,3,6).GetCube(50);
-                Array.Sort(cube.Variants, (cube1, cube2) =>
-                {
-                    for (int i = 0; i < 8; i++)
-                    {
-                        var c = Vector3DComparer.Instance.Compare(cube1.OrderedVertices[i], cube2.OrderedVertices[i]);
-                        if (c != 0) return c;
-                    }
-                    return 0;
-                });
-                foreach (var variant in cube.Variants)
-                {
-                    Console.Out.WriteLine($"{variant.OrderedVertices.ToCsvString()}, {variant}");
-                }
 
                 //WriteCombinationsInfoLine(5000, "1,70,182,195", ref count);
 
@@ -43,7 +29,7 @@ namespace euler579
 
 
                 //var allVariants = cube1.Variants.Concat(cube2.Variants).Distinct().ToArray();
-                //CalculateResult(50);
+                CalculateResult(50);
             }
             finally { DatabaseHelper.Instance.Dispose(); }
         }
@@ -74,13 +60,13 @@ namespace euler579
             var ints = line.Split(',').Select(Int32.Parse).ToArray();
             if (!DatabaseHelper.Instance.IsDone(ints))
             {
-                if (OutputCubeInfoForTriple(n, ints, false)) return true;
+                if (OutputCubeInfoForTriple(n, ints, false, null)) return true;
             } //else LogManager.GetCurrentClassLogger().Warn($"Done: {string.Join(",", ints.Select(i => i.ToString()))}");
             return false;
         }
 
 
-        private static bool OutputCubeInfoForTriple(int n, int[] ints, bool isDuplicate)
+        private static bool OutputCubeInfoForTriple(int n, int[] ints, bool isDuplicate, long? combinationsRepeatability)
         {
             var baseTripleSides = ints.Take(3).ToArray();
             var triple = new Triple(baseTripleSides);
@@ -89,7 +75,7 @@ namespace euler579
                 var baseCube = triple.GetCube(n);
                 if (baseCube != null)
                 {
-                    LogManager.GetCurrentClassLogger().Info($"{baseCube} Side {baseCube.A.Length}, Combinations: {baseCube.GetCombinations()}");
+                    LogManager.GetCurrentClassLogger().Info($"{baseCube} Side {baseCube.A.Length}, Combinations: {baseCube.GetCombinations()}, CxR = {combinationsRepeatability}");
                     foreach (var variant in baseCube.Variants)
                     {
                         LogManager.GetCurrentClassLogger().Trace($"   {variant}");
@@ -135,8 +121,8 @@ namespace euler579
         private static void CalculateResult(int n) //correct
         {
 
-            long result = 0;
-
+            long resultS = 0;
+            long resultC = 0;
             using (var file = File.OpenRead("primitivetriplessorted.csv"))
             {
                 using (var sr = new StreamReader(file))
@@ -180,10 +166,12 @@ namespace euler579
                                         }).ToArray();
                                         var totalContribution = contributions.Sum(c => (long) (c.Total%(ulong) 1e9));
                                         Console.Out.WriteLine();
-                                        OutputCubeInfoForTriple(n, baseTripleSides, false);
                                         //LogManager.GetCurrentClassLogger().Debug($"{triple}: Bounds: {baseCube.MaxBounds}, Combs: {baseCube.GetCombinations()}: Multiples: {contributions.Length}, contributions: {totalContribution} : {String.Join(",", contributions.Select(c => c.ToString()))})");
-                                        result += totalContribution;
-                                        if (result > 1e9) result -= (long) 1e9;
+                                        resultS += totalContribution;
+                                        var combinationsRepeatability = contributions.Sum(c => (long) c.Combinations*(long) c.Repeatability);
+                                        resultC += combinationsRepeatability;
+                                        OutputCubeInfoForTriple(n, baseTripleSides, false, combinationsRepeatability);
+                                        if (resultS > 1e9) resultS -= (long) 1e9;
 
                                         DatabaseHelper.Instance.SetDone(baseTripleSides);
                                         foreach (var duplicate in baseCube.GetDuplicateDefinitionPoints())
@@ -200,7 +188,8 @@ namespace euler579
                 }
             }
 
-            LogManager.GetCurrentClassLogger().Info($"S({n}) = {result}");
+            LogManager.GetCurrentClassLogger().Info($"S({n}) = {resultS}");
+            LogManager.GetCurrentClassLogger().Info($"C({n}) = {resultC}");
         }
 
 

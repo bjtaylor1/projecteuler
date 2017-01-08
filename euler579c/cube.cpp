@@ -24,11 +24,12 @@ bool operator<(const cube & lhs, const cube & rhs)
 
 ostream & operator<<(ostream & os, const cube & cube)
 {
-	for (set<vertex>::const_iterator it = cube.vertices.begin();;)
+	for (set<vector3d>::const_iterator it = cube.uvn.begin();;)
 	{
 		cout << *it;
-		if ((++it) == cube.vertices.end()) break; else cout << "   ";
+		if ((++it) == cube.uvn.end()) break; else cout << "   ";
 	}
+	cout << ", side = " << cube.uvn.begin()->length;
 	return os;
 }
 
