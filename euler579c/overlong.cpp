@@ -71,6 +71,8 @@ long long overlong::safe_add(long long a, long long b)
 
 long long overlong::safe_multiply(long long a, long long b)
 {
+	if (b == 1) return a;
+	if (a == 1) return b;
 	if (!overlong::multiplication_is_safe(a, b))
 	{
 		stringstream s;
@@ -89,7 +91,7 @@ bool overlong::addition_is_safe(long long a, long long b)
 bool overlong::multiplication_is_safe(long long a, long long b)
 {
 	size_t a_bits = highestOneBitPosition(a), b_bits = highestOneBitPosition(b);
-	return (a_bits + b_bits <= 64);
+	return (a_bits + b_bits < 64);
 }
 
 size_t overlong::highestOneBitPosition(long long a)

@@ -154,12 +154,14 @@
     <ClInclude Include="solver.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="massiveinteger.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="vector3d.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abcd.cpp" />
+    <ClCompile Include="massiveinteger.cpp" />
     <ClCompile Include="overlong.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="euler579c.cpp" />
