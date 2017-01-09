@@ -13,8 +13,7 @@ int main(int argc, char** argv)
 	try {
 
 		if (argc > 1) {
-			long long n = 0;
-			stringstream(argv[1]) >> n;
+			long long n = stoi(argv[1]);
 			overlong::MAX = n >= 5000 ? 1e9 : 0;
 
 			solver s(n);

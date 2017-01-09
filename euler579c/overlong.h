@@ -13,7 +13,7 @@ public:
 	overlong(long long Val) : val(Val) {}
 
 
-	overlong& operator++(int)
+	overlong operator++(int)
 	{
 		return overlong(val++);
 	}

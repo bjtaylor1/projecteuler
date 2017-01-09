@@ -9,7 +9,9 @@
 #include "targetver.h"
 
 #include <stdio.h>
+#ifdef _WIN32_WINNT
 #include <tchar.h>
+#endif
 #include <vector>
 #include <set>
 #include <math.h>
@@ -17,3 +19,5 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <sstream>
+

@@ -8,11 +8,11 @@ bool is_less(const cube& lhs, const cube& rhs)
 	set<vertex>::const_iterator it_l = lhs.vertices.begin(), it_r = rhs.vertices.begin();
 	for (long long l = 0; l < 8; l++)
 	{
-		if (it_l == lhs.vertices.end() || it_r == rhs.vertices.end()) throw exception("A cube has less than 8 (distinct) vertices");
+		if (it_l == lhs.vertices.end() || it_r == rhs.vertices.end()) throw runtime_error("A cube has less than 8 (distinct) vertices");
 		if ((*it_l) != (*it_r)) return (*it_l) < (*it_r);
 		++it_l; ++it_r;
 	}
-	if (it_l != lhs.vertices.end() || it_r != rhs.vertices.end()) throw exception("A cube has more than 8 vertices");
+	if (it_l != lhs.vertices.end() || it_r != rhs.vertices.end()) throw runtime_error("A cube has more than 8 vertices");
 	return false;
 }
 
@@ -57,7 +57,7 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,
 		vertices.insert(v);
 	}
 
-	if (vertices.size() != 8) throw exception("A cube has less than 8 (distinct) vertices");
+	if (vertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) vertices");
 }
 
 void cube::add_vertex(vector<vertex>& vertices, long long& minx, long long& miny, long long& minz, const vertex& vertex)

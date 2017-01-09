@@ -64,7 +64,7 @@ long long overlong::safe_add(long long a, long long b)
 	{
 		stringstream s;
 		s << "Tried to unsafely add " << a << " + " << b;
-		throw exception(s.str().c_str());
+		throw runtime_error(s.str().c_str());
 	}
 	return a+b;
 }
@@ -75,7 +75,7 @@ long long overlong::safe_multiply(long long a, long long b)
 	{
 		stringstream s;
 		s << "Tried to unsafely multiply " << a << " x " << b;
-		throw exception(s.str().c_str());
+		throw runtime_error(s.str().c_str());
 	}
 	return a*b;
 }

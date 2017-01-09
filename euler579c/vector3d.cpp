@@ -31,7 +31,7 @@ vector3d::vector3d(long long X, long long Y, long long Z) : vertex(X, Y, Z)
 		stringstream msg;
 		msg << "Vector length not integral for ";
 		msg << X << "," << Y << "," << Z;
-		throw exception(msg.str().c_str());
+		throw runtime_error(msg.str().c_str());
 	}
 }
 

@@ -14,7 +14,7 @@ long long util::gcd_l(long long a, long long b)
 			return a;
 		a %= b;
 	}
-	throw exception("gcd not found");
+	throw runtime_error("gcd not found");
 }
 
 long long util::gcd(set<long long>::iterator first, set<long long>::iterator last)
