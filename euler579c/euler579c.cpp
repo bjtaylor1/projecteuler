@@ -13,5 +13,6 @@ int main()
 	solver s(50);
 	s.solve();
 	cout << "C(" << s.maxSide << ") = " << s.C << endl;
+	cout << "S(" << s.maxSide << ") = " << s.S << endl;
 }
 

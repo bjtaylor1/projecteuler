@@ -3,6 +3,11 @@
 #include "solver.h"
 #include "util.h"
 
+biglong addgcd(biglong current, const vector3d& v)
+{
+	return current + v.gcd();
+}
+
 void solver::process_mnpq(mnpq& item)
 {
 	vector<long> perm = item.as_vector();
@@ -33,27 +38,37 @@ void solver::process_mnpq(mnpq& item)
 	
 
 	
-	unsigned long long combinations = item.cubes.size();
-	long thisCxr = 0;
+	biglong combinations = item.cubes.size();
+	biglong thisCxr = 0;
+	biglong thisS = 0;
 	if (combinations > 0) //might be zero for primitive ones e.g. from 0,0,0,3.
 	{
-		unsigned long long width = item.cubes.begin()->width,
-			height = item.cubes.begin()->height,
-			depth = item.cubes.begin()->depth;
-		unsigned long long tmax = maxSide / (max(width, max(height, depth)));
-		for (unsigned long long t = 1; t <= tmax; t++)
+		set<cube>::const_iterator cube = item.cubes.begin();
+		biglong width = cube->width,
+			height = cube->height,
+			depth = cube->depth;
+		biglong tmax = maxSide / (max(width, max(height, depth)));
+		biglong sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+
+		for (biglong t = 1; t <= tmax; t++)
 		{
-			unsigned long long repeatability =
+			biglong repeatability =
 				(maxSide + 1 - t * width) *
 				(maxSide + 1 - t * height) *
 				(maxSide + 1 - t * depth);
 			thisCxr += (repeatability * combinations);
+			
+			biglong l = cube->uvn.begin()->length;
+			biglong ehp = (l*l*l)*(t*t*t) + l*(sumgcd) * (t*t) + (sumgcd)* t + 1; //from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
+			biglong contributionS = ehp * repeatability * combinations;
+			if (M > 0) contributionS %= M;
+			thisS += contributionS;
+			if (M > 0) thisS %= M;
 		}
-
-		cout << item.get_abcd() << ", CxR = " << thisCxr << endl;
-
 	}
 	C += thisCxr;
+	S += thisS;
+	if(M>0) S %= M;
 
 }
 
