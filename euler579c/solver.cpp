@@ -57,7 +57,8 @@ void solver::process_mnpq(mnpq& item)
 				(maxSide + 1 - t * height) *
 				(maxSide + 1 - t * depth);
 			thisCxr += (repeatability * combinations);
-			
+			if (M > 0) thisCxr %= M;
+
 			bigulong l = cube->uvn.begin()->length;
 			bigulong ehp = (l*l*l)*(t*t*t) + l*(sumgcd) * (t*t) + (sumgcd)* t + 1; //from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
 			bigulong contributionS = ehp * repeatability * combinations;
@@ -68,7 +69,11 @@ void solver::process_mnpq(mnpq& item)
 	}
 	C += thisCxr;
 	S += thisS;
-	if(M>0) S %= M;
+	if (M > 0)
+	{
+		S %= M;
+		C %= M;
+	}
 
 }
 
