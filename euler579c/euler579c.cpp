@@ -8,11 +8,20 @@
 using namespace std;
 
 
-int main()
+int main(int argc, char** argv)
 {
-	solver s(50);
-	s.solve();
-	cout << "C(" << s.maxSide << ") = " << s.C << endl;
-	cout << "S(" << s.maxSide << ") = " << s.S << endl;
+	try {
+		if (argc > 1) {
+			biglong n = 0;
+			stringstream(argv[1]) >> n;
+			solver s(n);
+			s.solve();
+			cout << "C(" << s.maxSide << ") = " << s.C << endl;
+			cout << "S(" << s.maxSide << ") = " << s.S << endl;
+		}
+	}
+	catch (exception e) {
+		cout << e.what() << endl;
+	}
 }
 

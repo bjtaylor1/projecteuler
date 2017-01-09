@@ -10,17 +10,17 @@ using namespace std;
 class vector3d : public vertex
 {
 public:
-	long length;
-	vector3d(long X, long Y, long Z);
+	biglong length;
+	vector3d(biglong X, biglong Y, biglong Z);
 
 	bool is_orthogonal_to(const vector3d&) const;
-	long dot_product(const vector3d&) const;
+	biglong dot_product(const vector3d&) const;
 	vector3d cross_product(const vector3d&) const;
-	long gcd() const;
+	biglong gcd() const;
 
 };
 
 vertex operator+(const vertex&, const vector3d&);
-vector3d operator/(const vector3d&, long);
+vector3d operator/(const vector3d&, biglong);
 
 #endif

@@ -3,14 +3,14 @@
 #include "solver.h"
 #include "util.h"
 
-biglong addgcd(biglong current, const vector3d& v)
+bigulong addgcd(bigulong current, const vector3d& v)
 {
 	return current + v.gcd();
 }
 
 void solver::process_mnpq(mnpq& item)
 {
-	vector<long> perm = item.as_vector();
+	vector<biglong> perm = item.as_vector();
 	sort(perm.begin(), perm.end());
 	set<vector3d> allVectors;
 	do {
@@ -26,7 +26,7 @@ void solver::process_mnpq(mnpq& item)
 			if (u != v && v->is_orthogonal_to(*u))
 			{
 				vector3d n = u->cross_product(*v);
-				long gcd = util::gcd(set<long>({u->gcd(), v->gcd(), n.gcd()}));
+				biglong gcd = util::gcd(set<biglong>({u->gcd(), v->gcd(), n.gcd()}));
 				if (gcd == 1)
 				{
 					cube c(*v, *u, n);
@@ -38,29 +38,29 @@ void solver::process_mnpq(mnpq& item)
 	
 
 	
-	biglong combinations = item.cubes.size();
-	biglong thisCxr = 0;
-	biglong thisS = 0;
+	bigulong combinations = item.cubes.size();
+	bigulong thisCxr = 0;
+	bigulong thisS = 0;
 	if (combinations > 0) //might be zero for primitive ones e.g. from 0,0,0,3.
 	{
 		set<cube>::const_iterator cube = item.cubes.begin();
-		biglong width = cube->width,
+		bigulong width = cube->width,
 			height = cube->height,
 			depth = cube->depth;
-		biglong tmax = maxSide / (max(width, max(height, depth)));
-		biglong sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+		bigulong tmax = maxSide / (max(width, max(height, depth)));
+		bigulong sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 
-		for (biglong t = 1; t <= tmax; t++)
+		for (bigulong t = 1; t <= tmax; t++)
 		{
-			biglong repeatability =
+			bigulong repeatability =
 				(maxSide + 1 - t * width) *
 				(maxSide + 1 - t * height) *
 				(maxSide + 1 - t * depth);
 			thisCxr += (repeatability * combinations);
 			
-			biglong l = cube->uvn.begin()->length;
-			biglong ehp = (l*l*l)*(t*t*t) + l*(sumgcd) * (t*t) + (sumgcd)* t + 1; //from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-			biglong contributionS = ehp * repeatability * combinations;
+			bigulong l = cube->uvn.begin()->length;
+			bigulong ehp = (l*l*l)*(t*t*t) + l*(sumgcd) * (t*t) + (sumgcd)* t + 1; //from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
+			bigulong contributionS = ehp * repeatability * combinations;
 			if (M > 0) contributionS %= M;
 			thisS += contributionS;
 			if (M > 0) thisS %= M;
@@ -74,16 +74,16 @@ void solver::process_mnpq(mnpq& item)
 
 void solver::solve()
 {
-	for (long m = 0; m <= sqrt(maxSide); m++)
+	for (biglong m = 0; m <= sqrt(maxSide); m++)
 	{
-		long nmax = sqrt(maxSide - m*m);
-		for (long n = m; n <= nmax; n++)
+		biglong nmax = sqrt(maxSide - m*m);
+		for (biglong n = m; n <= nmax; n++)
 		{
-			long pmax = sqrt(maxSide - m*m - n*n);
-			for (long p = n; p <= pmax; p++)
+			biglong pmax = sqrt(maxSide - m*m - n*n);
+			for (biglong p = n; p <= pmax; p++)
 			{
-				long qmax = sqrt(maxSide - m*m - n*n - p*p);
-				for (long q = p; q <= qmax; q++)
+				biglong qmax = sqrt(maxSide - m*m - n*n - p*p);
+				for (biglong q = p; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)
 					{
