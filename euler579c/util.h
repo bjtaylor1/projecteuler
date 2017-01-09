@@ -9,9 +9,12 @@ using namespace std;
 class util
 {
 public:
-	static biglong gcd_l(biglong, biglong);
-	static biglong gcd(const set<biglong>);
-	static biglong gcd(set<biglong>::iterator begin, set<biglong>::iterator end);
+	static long gcd_l(long, long);
+	static long gcd(const set<long>);
+	static long gcd(set<long>::iterator begin, set<long>::iterator end);
+
+
+
 };
 
 #endif

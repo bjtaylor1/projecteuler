@@ -3,7 +3,7 @@
 
 using namespace std;
 
-biglong util::gcd_l(biglong a, biglong b)
+long util::gcd_l(long a, long b)
 {
 	for (;;)
 	{
@@ -17,14 +17,15 @@ biglong util::gcd_l(biglong a, biglong b)
 	throw exception("gcd not found");
 }
 
-biglong util::gcd(set<biglong>::iterator first, set<biglong>::iterator last)
+long util::gcd(set<long>::iterator first, set<long>::iterator last)
 {
-	biglong l1 = *first;
+	long l1 = *first;
 	if (++first == last) return l1;
 	else return gcd_l(abs(l1), abs(gcd(first, last)));
 }
 
-biglong util::gcd(const set<biglong> s)
+long util::gcd(const set<long> s)
 {
 	return gcd(s.begin(), s.end());
 }
+

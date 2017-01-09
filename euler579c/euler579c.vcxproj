@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="abcd.h" />
+    <ClInclude Include="overlong.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="macros.h" />
     <ClInclude Include="mnpq.h" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abcd.cpp" />
+    <ClCompile Include="overlong.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="euler579c.cpp" />
     <ClCompile Include="mnpq.cpp" />

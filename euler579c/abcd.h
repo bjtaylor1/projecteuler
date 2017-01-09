@@ -7,8 +7,8 @@ using namespace std;
 class abcd
 {
 public:
-	biglong a, b, c, d;
-	abcd(biglong A, biglong B, biglong C, biglong D) : a(A), b(B), c(C), d(D) {}
+	unsigned long a, b, c, d;
+	abcd(unsigned long A, unsigned long B, unsigned long C, unsigned long D) : a(A), b(B), c(C), d(D) {}
 	set<vector3d> get_vectors() const;
 };
 

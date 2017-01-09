@@ -12,12 +12,12 @@ int main(int argc, char** argv)
 {
 	try {
 		if (argc > 1) {
-			biglong n = 0;
+			unsigned long n = 0;
 			stringstream(argv[1]) >> n;
 			solver s(n);
 			s.solve();
-			cout << "C(" << s.maxSide << ") = " << s.C << endl;
-			cout << "S(" << s.maxSide << ") = " << s.S << endl;
+			cout << "C(" << s.maxSide.val << ") = " << s.C << endl;
+			cout << "S(" << s.maxSide.val << ") = " << s.S << endl;
 		}
 	}
 	catch (exception e) {
