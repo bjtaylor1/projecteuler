@@ -2,9 +2,9 @@
 #include "vector3d.h"
 #include "util.h"
 
-long vector3d::gcd() const
+long long vector3d::gcd() const
 {
-	return util::gcd(set<long>({ x, y, z }));
+	return util::gcd(set<long long>({ x, y, z }));
 }
 
 
@@ -21,9 +21,9 @@ vector3d operator/(const vector3d& lhs, long f)
 	return vector3d(newx, newy, newz);
 }
 
-vector3d::vector3d(long X, long Y, long Z) : vertex(X, Y, Z)
+vector3d::vector3d(long long X, long long Y, long long Z) : vertex(X, Y, Z)
 {
-	unsigned long sumSquares = (X*X + Y*Y + Z*Z);
+	long long sumSquares = (X*X + Y*Y + Z*Z);
 	length = my_round(sqrt(sumSquares));
 	
 	if (length*length != sumSquares)
@@ -43,16 +43,16 @@ bool vector3d::is_orthogonal_to(const vector3d& rhs) const
 	return is_orth;
 }
 
-unsigned long vector3d::dot_product(const vector3d& rhs) const
+long long vector3d::dot_product(const vector3d& rhs) const
 {
 	return x*rhs.x + y*rhs.y + z*rhs.z;
 }
 
 vector3d vector3d::cross_product(const vector3d& rhs) const
 {
-	unsigned long newx = y * rhs.z - z * rhs.y;
-	unsigned long newy = z * rhs.x - x * rhs.z;
-	unsigned long newz = x * rhs.y - y * rhs.x;
+	long long newx = y * rhs.z - z * rhs.y;
+	long long newy = z * rhs.x - x * rhs.z;
+	long long newz = x * rhs.y - y * rhs.x;
 
 	vector3d n(newx, newy, newz);
 	n = n / (n.length / rhs.length);

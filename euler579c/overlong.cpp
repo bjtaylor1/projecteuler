@@ -3,7 +3,7 @@
 
 using namespace std;
 
-unsigned long overlong::MAX = 0;
+long long overlong::MAX = 0;
 
 overlong operator*(const overlong& a, const overlong& b)
 {
@@ -23,7 +23,7 @@ overlong operator -(const overlong& a, const overlong& b)
 }
 overlong operator += (overlong& a, const overlong& b)
 {
-	unsigned long long valA, valB;
+	long long valA, valB;
 	if (overlong::MAX > 0)
 	{
 		valA = a.val % overlong::MAX;
@@ -34,7 +34,7 @@ overlong operator += (overlong& a, const overlong& b)
 		valA = a.val;
 		valB = b.val;
 	}
-	unsigned long long newval = valA + valB;
+	long long newval = valA + valB;
 	if (overlong::MAX > 0)
 	{
 		newval %= overlong::MAX;
@@ -58,7 +58,7 @@ ostream & operator<<(ostream& os, const overlong & l)
 }
 
 
-unsigned long overlong::safe_add(unsigned long long a, unsigned long long b)
+long long overlong::safe_add(long long a, long long b)
 {
 	if (!overlong::addition_is_safe(a, b))
 	{
@@ -69,7 +69,7 @@ unsigned long overlong::safe_add(unsigned long long a, unsigned long long b)
 	return a+b;
 }
 
-unsigned long overlong::safe_multiply(unsigned long long a, unsigned long long b)
+long long overlong::safe_multiply(long long a, long long b)
 {
 	if (!overlong::multiplication_is_safe(a, b))
 	{
@@ -80,19 +80,19 @@ unsigned long overlong::safe_multiply(unsigned long long a, unsigned long long b
 	return a*b;
 }
 
-bool overlong::addition_is_safe(unsigned long long a, unsigned long long b)
+bool overlong::addition_is_safe(long long a, long long b)
 {
 	size_t a_bits = highestOneBitPosition(a), b_bits = highestOneBitPosition(b);
 	return (a_bits<64 && b_bits<64);
 }
 
-bool overlong::multiplication_is_safe(unsigned long long a, unsigned long long b)
+bool overlong::multiplication_is_safe(long long a, long long b)
 {
 	size_t a_bits = highestOneBitPosition(a), b_bits = highestOneBitPosition(b);
 	return (a_bits + b_bits <= 64);
 }
 
-size_t overlong::highestOneBitPosition(unsigned long long a)
+size_t overlong::highestOneBitPosition(long long a)
 {
 	size_t bits = 0;
 	while (a != 0)

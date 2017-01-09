@@ -8,14 +8,14 @@ pair<set<cube>::iterator, bool> mnpq::add_cube(const cube& cube)
 
 abcd mnpq::get_abcd() const
 {
-	unsigned long a = 2 * m*p + 2 * n*q;
-	unsigned long b = 2 * n*p - 2 * m*q;
-	unsigned long c = (p*p) + (q*q) - (n*n + m*m);
-	unsigned long d = (p*p) + (q*q) + (n*n + m*m);
+	long long a = 2 * m*p + 2 * n*q;
+	long long b = 2 * n*p - 2 * m*q;
+	long long c = (p*p) + (q*q) - (n*n + m*m);
+	long long d = (p*p) + (q*q) + (n*n + m*m);
 	return abcd(a, b, c, d);
 }
 
-vector<unsigned long> mnpq::as_vector() const
+vector<long long> mnpq::as_vector() const
 {
-	return vector<unsigned long>({ m,n,p,q });
+	return vector<long long>({ m,n,p,q });
 }

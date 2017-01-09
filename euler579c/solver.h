@@ -12,9 +12,9 @@ class solver
 {
 public:
 	overlong C, S;
-	unsigned long M;
+	long long M;
 	overlong maxSide;
-	solver(unsigned long _maxSide) : maxSide(_maxSide), C(0), S(0) { }
+	solver(long long _maxSide) : maxSide(_maxSide), C(0), S(0) { }
 	void solve();
 	void process_mnpq(mnpq& mnpq);
 };

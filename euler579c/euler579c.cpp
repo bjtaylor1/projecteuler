@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 	try {
 
 		if (argc > 1) {
-			unsigned long n = 0;
+			long long n = 0;
 			stringstream(argv[1]) >> n;
 			overlong::MAX = n >= 5000 ? 1e9 : 0;
 

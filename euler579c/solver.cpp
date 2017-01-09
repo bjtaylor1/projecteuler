@@ -4,14 +4,14 @@
 #include "util.h"
 #include "overlong.h"
 
-unsigned long addgcd(unsigned long current, const vector3d& v)
+long long addgcd(long long current, const vector3d& v)
 {
 	return current + v.gcd();
 }
 
 void solver::process_mnpq(mnpq& item)
 {
-	vector<unsigned long> perm = item.as_vector();
+	vector<long long> perm = item.as_vector();
 	sort(perm.begin(), perm.end());
 	set<vector3d> allVectors;
 	do {
@@ -27,7 +27,7 @@ void solver::process_mnpq(mnpq& item)
 			if (u != v && v->is_orthogonal_to(*u))
 			{
 				vector3d n = u->cross_product(*v);
-				unsigned long gcd = util::gcd(set<long>({u->gcd(), v->gcd(), n.gcd()}));
+				long long gcd = util::gcd(set<long long>({u->gcd(), v->gcd(), n.gcd()}));
 				if (gcd == 1)
 				{
 					cube c(*v, *u, n);
@@ -39,7 +39,7 @@ void solver::process_mnpq(mnpq& item)
 	
 
 	
-	unsigned long combinations = item.cubes.size();
+	long long combinations = item.cubes.size();
 	overlong thisCxr = 0;
 	overlong thisS = 0;
 	if (combinations > 0) //might be zero for primitive ones e.g. from 0,0,0,3.
@@ -73,16 +73,16 @@ void solver::process_mnpq(mnpq& item)
 
 void solver::solve()
 {
-	for (unsigned long m = 0; m <= sqrt(maxSide.val); m++)
+	for (long long m = 0; m <= sqrt(maxSide.val); m++)
 	{
-		unsigned long nmax = sqrt(maxSide.val - m*m);
-		for (unsigned long n = m; n <= nmax; n++)
+		long long nmax = sqrt(maxSide.val - m*m);
+		for (long long n = m; n <= nmax; n++)
 		{
-			unsigned long pmax = sqrt(maxSide.val - m*m - n*n);
-			for (unsigned long p = n; p <= pmax; p++)
+			long long pmax = sqrt(maxSide.val - m*m - n*n);
+			for (long long p = n; p <= pmax; p++)
 			{
-				unsigned long qmax = sqrt(maxSide.val - m*m - n*n - p*p);
-				for (unsigned long q = p; q <= qmax; q++)
+				long long qmax = sqrt(maxSide.val - m*m - n*n - p*p);
+				for (long long q = p; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)
 					{

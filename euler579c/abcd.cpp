@@ -3,7 +3,7 @@
 
 set<vector3d> abcd::get_vectors() const
 {
-	vector<unsigned long> numbers({ a,b,c });
+	vector<long long> numbers({ a,b,c });
 	sort(numbers.begin(), numbers.end());
 	set<vector3d> vectors;
 	do

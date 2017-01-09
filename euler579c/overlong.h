@@ -7,10 +7,10 @@ using namespace std;
 class overlong
 {
 public:
-	static unsigned long MAX;
+	static long long MAX;
 
-	unsigned long long val;
-	overlong(unsigned long long Val) : val(Val) {}
+	long long val;
+	overlong(long long Val) : val(Val) {}
 
 
 	overlong& operator++(int)
@@ -18,11 +18,11 @@ public:
 		return overlong(val++);
 	}
 
-	static unsigned long safe_add(unsigned long long a, unsigned long long b);
-	static unsigned long safe_multiply(unsigned long long n, unsigned long long f);
-	static bool multiplication_is_safe(unsigned long long n, unsigned long long f);
-	static bool addition_is_safe(unsigned long long a, unsigned long long b);
-	static size_t highestOneBitPosition(unsigned long long a);
+	static long long safe_add(long long a, long long b);
+	static long long safe_multiply(long long n, long long f);
+	static bool multiplication_is_safe(long long n, long long f);
+	static bool addition_is_safe(long long a, long long b);
+	static size_t highestOneBitPosition(long long a);
 
 };
 
