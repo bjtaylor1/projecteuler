@@ -4,6 +4,8 @@
 #include "util.h"
 #include "overlong.h"
 
+long long itcount = 0;
+
 long long addgcd(long long current, const vector3d& v)
 {
 	return current + v.gcd();
@@ -11,6 +13,10 @@ long long addgcd(long long current, const vector3d& v)
 
 void solver::process_mnpq(mnpq& item)
 {
+	//if(itcount++ % 10 == 0)
+	{
+		cout << item.get_abcd() << endl;
+	}
 	vector<long long> perm = item.as_vector();
 	sort(perm.begin(), perm.end());
 	set<vector3d> allVectors;
