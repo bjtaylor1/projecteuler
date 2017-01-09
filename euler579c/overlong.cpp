@@ -21,7 +21,7 @@ overlong operator -(const overlong& a, const overlong& b)
 {
 	return a.val - b.val;
 }
-overlong operator += (const overlong& a, const overlong& b)
+overlong operator += (overlong& a, const overlong& b)
 {
 	unsigned long long valA, valB;
 	if (overlong::MAX > 0)
@@ -34,12 +34,13 @@ overlong operator += (const overlong& a, const overlong& b)
 		valA = a.val;
 		valB = b.val;
 	}
-	unsigned long long val = valA + valB;
+	unsigned long long newval = valA + valB;
 	if (overlong::MAX > 0)
 	{
-		val %= overlong::MAX;
+		newval %= overlong::MAX;
 	}
-	return overlong(val);
+	a.val = newval;
+	return a;
 }
 bool operator<=(const overlong& a, const overlong& b)
 {
@@ -50,8 +51,14 @@ bool operator<(const overlong& a, const overlong& b)
 	return a.val < b.val;
 }
 
+ostream & operator<<(ostream& os, const overlong & l)
+{
+	os << l.val;
+	return os;
+}
 
-unsigned long overlong::safe_add(unsigned long a, unsigned long b)
+
+unsigned long overlong::safe_add(unsigned long long a, unsigned long long b)
 {
 	if (!overlong::addition_is_safe(a, b))
 	{
@@ -62,7 +69,7 @@ unsigned long overlong::safe_add(unsigned long a, unsigned long b)
 	return a+b;
 }
 
-unsigned long overlong::safe_multiply(unsigned long a, unsigned long b)
+unsigned long overlong::safe_multiply(unsigned long long a, unsigned long long b)
 {
 	if (!overlong::multiplication_is_safe(a, b))
 	{
@@ -73,19 +80,19 @@ unsigned long overlong::safe_multiply(unsigned long a, unsigned long b)
 	return a*b;
 }
 
-bool overlong::addition_is_safe(unsigned long a, unsigned long  b)
+bool overlong::addition_is_safe(unsigned long long a, unsigned long long b)
 {
 	size_t a_bits = highestOneBitPosition(a), b_bits = highestOneBitPosition(b);
-	return (a_bits<32 && b_bits<32);
+	return (a_bits<64 && b_bits<64);
 }
 
-bool overlong::multiplication_is_safe(unsigned long a, unsigned long b)
+bool overlong::multiplication_is_safe(unsigned long long a, unsigned long long b)
 {
 	size_t a_bits = highestOneBitPosition(a), b_bits = highestOneBitPosition(b);
 	return (a_bits + b_bits <= 64);
 }
 
-size_t overlong::highestOneBitPosition(unsigned long a)
+size_t overlong::highestOneBitPosition(unsigned long long a)
 {
 	size_t bits = 0;
 	while (a != 0)

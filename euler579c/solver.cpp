@@ -69,12 +69,6 @@ void solver::process_mnpq(mnpq& item)
 	}
 	C += thisCxr;
 	S += thisS;
-	if (M > 0)
-	{
-		S %= M;
-		C %= M;
-	}
-
 }
 
 void solver::solve()
