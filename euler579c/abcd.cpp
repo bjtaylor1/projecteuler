@@ -17,6 +17,6 @@ set<vector3d> abcd::get_vectors() const
 
 ostream& operator<<(ostream& os, const abcd& item)
 {
-	os << item.a << "," << item.b << "," << item.c << ", side = " << item.d;
+	os << item.a << "," << item.b << "," << item.c << "," << item.d;
 	return os;
 }
