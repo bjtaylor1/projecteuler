@@ -79,11 +79,6 @@ void solver::process_mnpq(mnpq& item)
 	C += thisCxr;
 	S += thisS;
 
-	if (maxResultDigits > 0)
-	{
-		C.truncate(maxResultDigits);
-		S.truncate(maxResultDigits);
-	}
 }
 
 void solver::solve()
