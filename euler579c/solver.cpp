@@ -42,30 +42,28 @@ void solver::process_mnpq(mnpq& item)
 		}
 	}
 	
-
-	
-	long combinations = item.cubes.size();
+	long long combinations = item.cubes.size();
 	massiveinteger thisCxr = 0;
 	massiveinteger thisS = 0;
 	if (combinations > 0) //might be zero for primitive ones e.g. from 0,0,0,3.
 	{
 		set<cube>::const_iterator cube = item.cubes.begin();
-		long width = cube->width,
+		long long width = cube->width,
 			height = cube->height,
 			depth = cube->depth;
-		long tmax = maxSide / (max(width, max(height, depth)));
-		long sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+		long long tmax = maxSide / (max(width, max(height, depth)));
+		long long sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 
-		for (long t = 1; t <= tmax; t++)
+		for (long long t = 1; t <= tmax; t++)
 		{
 			long long repeatability =
-				(maxSide + 1 - t * width) *
-				(maxSide + 1 - t * height) *
-				(maxSide + 1 - t * depth);
+				(maxSide + 1LL - t * width) *
+				(maxSide + 1LL - t * height) *
+				(maxSide + 1LL - t * depth);
 
 			thisCxr += massiveinteger(repeatability) * massiveinteger(combinations);
 
-			long l = cube->uvn.begin()->length;
+			long long l = cube->uvn.begin()->length;
 			massiveinteger ehp = massiveinteger(l*l*l) * massiveinteger(t*t*t) 
 				+ massiveinteger(l*(sumgcd)) * massiveinteger(t*t) + massiveinteger((sumgcd)* t + 1);
 				//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
@@ -103,7 +101,16 @@ void solver::solve()
 					if (((m + n + p + q) % 2) == 1)
 					{
 						mnpq it(m, n, p, q);
-						process_mnpq(it);
+						try
+						{
+							process_mnpq(it);
+						}
+						catch (exception e)
+						{
+							stringstream ss;
+							ss << e.what() << " while processing " << it;
+							throw runtime_error(ss.str().c_str());
+						}
 					}
 				}
 			}

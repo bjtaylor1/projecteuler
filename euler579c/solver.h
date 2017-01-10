@@ -12,8 +12,8 @@ class solver
 public:
 	massiveinteger C, S;
 	long long M;
-	long maxSide, maxResultDigits;
-	solver(long _maxSide, long _maxResultDigits) : maxSide(_maxSide), maxResultDigits(_maxResultDigits), C(0), S(0) { }
+	long long maxSide, maxResultDigits;
+	solver(long long _maxSide, long long _maxResultDigits) : maxSide(_maxSide), maxResultDigits(_maxResultDigits), C(0), S(0) { }
 	void solve();
 	void process_mnpq(mnpq& mnpq);
 };

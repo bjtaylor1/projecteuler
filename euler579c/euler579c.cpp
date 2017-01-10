@@ -24,7 +24,6 @@ int main(int argc, char** argv)
 			long long n = stoi(argv[1]);
 			
 			solver s(n, n >= 5000 ? 9 : 12);
-			
 			s.solve();
 			cout << "C(" << s.maxSide << ") = " << s.C << endl;
 			cout << "S(" << s.maxSide << ") = " << s.S << endl;

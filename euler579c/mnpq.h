@@ -21,4 +21,6 @@ public:
 	vector<long long> as_vector() const;
 };
 
+ostream& operator <<(ostream& os, const mnpq& item);
+
 #endif
