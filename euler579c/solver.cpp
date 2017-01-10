@@ -71,13 +71,19 @@ void solver::process_mnpq(mnpq& item)
 				//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
 			massiveinteger contributionS = ehp * massiveinteger(repeatability) * massiveinteger(combinations);
 
+			if (itcount == 1) cout << thisS << " + " << contributionS << " = ";
+
 			thisS += contributionS;
+			if (itcount == 1) cout << thisS << endl;
+			
 		}
 	}
 
 
 	C += thisCxr;
+	cout << S << " + " << thisS << " = ";
 	S += thisS;
+	cout << S << endl;
 
 }
 
