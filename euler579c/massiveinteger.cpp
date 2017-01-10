@@ -10,6 +10,12 @@ ostream & operator<<(ostream & os, const massiveinteger& m1)
 	return os;
 }
 
+massiveinteger operator +=(massiveinteger& m1, const massiveinteger& m2)
+{
+	m1 = m1 + m2;
+	return m1;
+}
+
 massiveinteger operator+(const massiveinteger & m1, const massiveinteger & m2)
 {
 	vector<int> result;
@@ -21,7 +27,7 @@ massiveinteger operator+(const massiveinteger & m1, const massiveinteger & m2)
 		long d1 = end1 ? 0 : *it1;
 		long d2 = end2 ? 0 : *it2;
 		long tot = d1 + d2 + remainder;
-		if (tot == 0) carryon = false;
+		if (tot == 0 && end1 && end2) carryon = false;
 		else
 		{
 			int item = tot % 10;
@@ -33,3 +39,20 @@ massiveinteger operator+(const massiveinteger & m1, const massiveinteger & m2)
 	}
 	return massiveinteger(result);
 }
+
+massiveinteger operator*(const massiveinteger & m1, const massiveinteger & m2)
+{
+	massiveinteger total;
+	vector<int> current = m1.digits;
+	for (vector<int>::const_iterator it = m2.digits.begin(); it != m2.digits.end(); it++)
+	{
+		massiveinteger currentval(current);
+		for (int i = 0; i < *it; i++)
+		{
+			total += currentval;
+		}
+		current.insert(current.begin(), 0);
+	}
+	return total;
+}
+

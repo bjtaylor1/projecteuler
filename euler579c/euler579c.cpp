@@ -8,11 +8,12 @@
 
 using namespace std;
 
-void testmassiveint(int i, int j)
+void testmassiveint(unsigned long long i, unsigned long long j)
 {
 	massiveinteger mi(i), mj(j);
-	cout << mi << " + " << mj << " == " << (mi + mj) << endl;
+	cout << mi << " + " << mj << " == " << (mi + mj) << " == " << (i+j) << endl;
 
+	cout << mi << " x " << mj << " == " << (mi * mj) << " == " << (i*j) << endl;
 }
 
 int main(int argc, char** argv)
@@ -23,7 +24,10 @@ int main(int argc, char** argv)
 			long long n = stoi(argv[1]);
 			overlong::MAX = n >= 5000 ? 1e9 : 0;
 
-			testmassiveint(99, 999);
+			testmassiveint(10001, 1003);
+			testmassiveint(101, 12);
+			testmassiveint(123, 2346487);
+			testmassiveint(409265432165, 65465464321);
 
 
 			//solver s(n);

@@ -19,10 +19,13 @@ public:
 			n = (n - rem) / 10;
 		} while (n > 0);
 	}
+
 };
 
 ostream& operator<<(ostream& os, const massiveinteger& m1);
 
 massiveinteger operator +(const massiveinteger& m1, const massiveinteger& m2);
+massiveinteger operator +=(massiveinteger& m1, const massiveinteger& m2);
+massiveinteger operator *(const massiveinteger& m1, const massiveinteger& m2);
 
 #endif
