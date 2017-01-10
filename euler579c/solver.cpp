@@ -56,9 +56,9 @@ void solver::process_mnpq(mnpq& item)
 		for (long long t = 1; t <= tmax; t++)
 		{
 			long long repeatability =
-				(maxSide + 1 - t * width) *
-				(maxSide + 1 - t * height) *
-				(maxSide + 1 - t * depth);
+				(maxSide + 1LL - t * width) *
+				(maxSide + 1LL - t * height) *
+				(maxSide + 1LL - t * depth);
 
 			thisCxr += massiveinteger(repeatability) * massiveinteger(combinations);
 
