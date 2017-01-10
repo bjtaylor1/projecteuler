@@ -48,9 +48,6 @@
     <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="overlong.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="massiveinteger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -81,9 +78,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="overlong.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="massiveinteger.cpp">

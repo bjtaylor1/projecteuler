@@ -2,7 +2,7 @@
 #include "mnpq.h"
 #include "solver.h"
 #include "util.h"
-#include "overlong.h"
+#include "massiveinteger.h"
 
 long long itcount = 0;
 
@@ -13,10 +13,6 @@ long long addgcd(long long current, const vector3d& v)
 
 void solver::process_mnpq(mnpq& item)
 {
-	//if(itcount++ % 10 == 0)
-	{
-		cout << item.get_abcd() << endl;
-	}
 	vector<long long> perm = item.as_vector();
 	sort(perm.begin(), perm.end());
 	set<vector3d> allVectors;
@@ -45,49 +41,59 @@ void solver::process_mnpq(mnpq& item)
 	
 
 	
-	long long combinations = item.cubes.size();
-	overlong thisCxr = 0;
-	overlong thisS = 0;
+	long combinations = item.cubes.size();
+	massiveinteger thisCxr = 0;
+	massiveinteger thisS = 0;
 	if (combinations > 0) //might be zero for primitive ones e.g. from 0,0,0,3.
 	{
 		set<cube>::const_iterator cube = item.cubes.begin();
-		overlong width = cube->width,
+		long width = cube->width,
 			height = cube->height,
 			depth = cube->depth;
-		overlong tmax = maxSide / (max(width, max(height, depth)));
-		overlong sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+		long tmax = maxSide / (max(width, max(height, depth)));
+		long sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 
-		for (overlong t = 1; t <= tmax; t++)
+		for (long t = 1; t <= tmax; t++)
 		{
-			overlong repeatability =
-				overlong(maxSide + 1 - t * width) *
-				overlong(maxSide + 1 - t * height) *
-				overlong(maxSide + 1 - t * depth);
-			thisCxr += repeatability * combinations;
+			long long repeatability =
+				(maxSide + 1 - t * width) *
+				(maxSide + 1 - t * height) *
+				(maxSide + 1 - t * depth);
 
-			overlong l = cube->uvn.begin()->length;
-			overlong ehp = (l*l*l)*(t*t*t) + l*(sumgcd) * (t*t) + (sumgcd)* t + 1; //from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-			overlong contributionS = ehp * repeatability * combinations;
+			thisCxr += massiveinteger(repeatability) * massiveinteger(combinations);
+
+			long l = cube->uvn.begin()->length;
+			massiveinteger ehp = massiveinteger(l*l*l) * massiveinteger(t*t*t) 
+				+ massiveinteger(l*(sumgcd)) * massiveinteger(t*t) + massiveinteger((sumgcd)* t + 1);
+				//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
+			massiveinteger contributionS = ehp * massiveinteger(repeatability) * massiveinteger(combinations);
 
 			thisS += contributionS;
-
 		}
 	}
+
+
 	C += thisCxr;
 	S += thisS;
+
+	if (maxResultDigits > 0)
+	{
+		C.truncate(maxResultDigits);
+		S.truncate(maxResultDigits);
+	}
 }
 
 void solver::solve()
 {
-	for (long long m = 0; m <= sqrt(maxSide.val); m++)
+	for (long long m = 0; m <= sqrt(maxSide); m++)
 	{
-		long long nmax = sqrt(maxSide.val - m*m);
+		long long nmax = sqrt(maxSide - m*m);
 		for (long long n = m; n <= nmax; n++)
 		{
-			long long pmax = sqrt(maxSide.val - m*m - n*n);
+			long long pmax = sqrt(maxSide - m*m - n*n);
 			for (long long p = n; p <= pmax; p++)
 			{
-				long long qmax = sqrt(maxSide.val - m*m - n*n - p*p);
+				long long qmax = sqrt(maxSide - m*m - n*n - p*p);
 				for (long long q = p; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)

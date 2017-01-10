@@ -20,6 +20,8 @@ public:
 		} while (n > 0);
 	}
 
+	void truncate(long n);
+
 };
 
 ostream& operator<<(ostream& os, const massiveinteger& m1);

@@ -22,19 +22,17 @@ int main(int argc, char** argv)
 
 		if (argc > 1) {
 			long long n = stoi(argv[1]);
-			overlong::MAX = n >= 5000 ? 1e9 : 0;
+			
+			massiveinteger x = massiveinteger(1234) * 2;
+			cout << x << endl;
+			x.truncate(2);
+			cout << x << endl;
 
-			testmassiveint(10001, 1003);
-			testmassiveint(101, 12);
-			testmassiveint(123, 2346487);
-			testmassiveint(409265432165, 65465464321);
-
-
-			//solver s(n);
-			//
-			//s.solve();
-			//cout << "C(" << s.maxSide.val << ") = " << s.C << endl;
-			//cout << "S(" << s.maxSide.val << ") = " << s.S << endl;
+			solver s(n, n >= 5000 ? 9 : 12);
+			
+			s.solve();
+			cout << "C(" << s.maxSide << ") = " << s.C << endl;
+			cout << "S(" << s.maxSide << ") = " << s.S << endl;
 		}
 	}
 	catch (exception e) {

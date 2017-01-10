@@ -56,3 +56,10 @@ massiveinteger operator*(const massiveinteger & m1, const massiveinteger & m2)
 	return total;
 }
 
+void massiveinteger::truncate(long n)
+{
+	if (digits.size() >= n)
+	{
+		digits.erase(digits.begin() + n, digits.end());
+	}
+}
