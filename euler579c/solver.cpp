@@ -24,6 +24,8 @@ void solver::process_mnpq(mnpq& item)
 		allVectors.insert(abcdvectors.begin(), abcdvectors.end());
 	} while (next_permutation(perm.begin(), perm.end()));
 
+	bool someOversize = false, someNotOversize = false;
+
 	for (set<vector3d>::const_iterator u = allVectors.begin(); u != allVectors.end(); u++)
 	{
 		for (set<vector3d>::const_iterator v = allVectors.begin(); v != allVectors.end(); v++)
@@ -35,58 +37,44 @@ void solver::process_mnpq(mnpq& item)
 				if (gcd == 1)
 				{
 					cube c(*v, *u, n);
+					if (c.oversize) someOversize = true; else someNotOversize = true;
 					item.add_cube(c);
 				}
 			}
 		}
 	}
+
 	
-	long long combinations = item.cubes.size();
+
 	BIGINT thisCxr = 0;
 	BIGINT thisS = 0;
-	if (combinations == 0) //might be zero for primitive ones e.g. from 0,0,0,3.
+	for(set<cube>::const_iterator cube = item.cubes.begin(); cube != item.cubes.end(); cube++)
 	{
-		//check a,b,c,d contains at least two zeros
-		if (item.get_abcd().get_count_zero() < 2)
+		if (!cube->oversize)
 		{
-			//is it non-primitive?
-			set<vector3d> vectors = item.get_abcd().get_vectors();
-			for (set<vector3d>::const_iterator it = vectors.begin(); it != vectors.end(); it++)
+			long long width = cube->width,
+				height = cube->height,
+				depth = cube->depth;
+			long long tmax = maxSide / (max(width, max(height, depth)));
+			long long sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+
+			for (long long t = 1; t <= tmax; t++)
 			{
-				if(it->gcd() == 1)
-				{
-					stringstream ss;
-					ss << "Failed to get any combinations for " << item;
-					throw runtime_error(ss.str().c_str());
-				}
-			}
-		}
-	}
-	else
-	{
-		set<cube>::const_iterator cube = item.cubes.begin();
-		long long width = cube->width,
-			height = cube->height,
-			depth = cube->depth;
-		long long tmax = maxSide / (max(width, max(height, depth)));
-		long long sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+				long long repeatability =
+					(maxSide + 1LL - t * width) *
+					(maxSide + 1LL - t * height) *
+					(maxSide + 1LL - t * depth);
 
-		for (long long t = 1; t <= tmax; t++)
-		{
-			long long repeatability =
-				(maxSide + 1LL - t * width) *
-				(maxSide + 1LL - t * height) *
-				(maxSide + 1LL - t * depth);
+				thisCxr = thisCxr + BIGINT(repeatability);
 
-			thisCxr  = thisCxr + (BIGINT(repeatability) * BIGINT(combinations));
-
-			long long l = cube->uvn.begin()->length;
-			BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t) 
-				+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
+				long long l = cube->uvn.begin()->length;
+				BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
+					+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
 				//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-			BIGINT contributionS = ehp * BIGINT(repeatability) * BIGINT(combinations);
+				BIGINT contributionS = ehp * BIGINT(repeatability);
 
-			thisS = thisS + contributionS;
+				thisS = thisS + contributionS;
+			}
 		}
 	}
 

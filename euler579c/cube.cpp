@@ -3,6 +3,8 @@
 
 using namespace std;
 
+long long cube::maxSize = 0;
+
 bool is_less(const cube& lhs, const cube& rhs)
 {
 	set<vertex>::const_iterator it_l = lhs.vertices.begin(), it_r = rhs.vertices.begin();
@@ -33,7 +35,7 @@ ostream & operator<<(ostream & os, const cube & cube)
 	return os;
 }
 
-cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,V,N}), width(0), height(0), depth(0)
+cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,V,N}), width(0), height(0), depth(0), oversize(false)
 {
 	long long minx = 0, miny = 0, minz = 0;
 	vector<vertex> tempvertices;
@@ -56,6 +58,8 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,
 		depth = max(depth, (long long)v.z);
 		vertices.insert(v);
 	}
+	
+	oversize = (width > maxSize) || (height > maxSize) || (depth > maxSize);
 
 	if (vertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) vertices");
 }

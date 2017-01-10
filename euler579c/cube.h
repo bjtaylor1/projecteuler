@@ -8,6 +8,8 @@ using namespace std;
 class cube
 {
 public:
+	static long long maxSize;
+	bool oversize;
 	long long width, height, depth;
 	set<vector3d> uvn;
 	set<vertex> vertices;

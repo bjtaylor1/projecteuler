@@ -22,8 +22,10 @@ int main(int argc, char** argv)
 
 		if (argc > 1) {
 			long long n = stoi(argv[1]);
-			
+			cube::maxSize = n;
+
 			solver s(n, n >= 5000 ? 9 : 12);
+
 			s.solve();
 			cout << "C(" << s.maxSide << ") = " << s.C << endl;
 			cout << "S(" << s.maxSide << ") = " << s.S << endl;
