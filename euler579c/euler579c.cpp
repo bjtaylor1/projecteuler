@@ -23,11 +23,6 @@ int main(int argc, char** argv)
 		if (argc > 1) {
 			long long n = stoi(argv[1]);
 			
-			massiveinteger x = massiveinteger(1234) * 2;
-			cout << x << endl;
-			x.truncate(2);
-			cout << x << endl;
-
 			solver s(n, n >= 5000 ? 9 : 12);
 			
 			s.solve();
