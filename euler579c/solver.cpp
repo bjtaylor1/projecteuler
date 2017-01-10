@@ -13,7 +13,8 @@ long long addgcd(long long current, const vector3d& v)
 
 void solver::process_mnpq(mnpq& item)
 {
-	if((++itcount % 1000) == 0) cout << item.get_abcd() << "," << itcount << "," << C << "," << S << endl;
+	if((++itcount < 1000)) cout << item.get_abcd() << "," << itcount << "," << C << "," << S << endl;
+	else throw runtime_error("stop.");
 
 	vector<long long> perm = item.as_vector();
 	sort(perm.begin(), perm.end());
