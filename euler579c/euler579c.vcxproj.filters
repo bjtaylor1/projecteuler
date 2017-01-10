@@ -51,6 +51,9 @@
     <ClInclude Include="massiveinteger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BigInteger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="massiveinteger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BigInteger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

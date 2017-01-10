@@ -10,6 +10,7 @@ public:
 	long long a, b, c, d;
 	abcd(long long A, long long B, long long C, long long D) : a(A), b(B), c(C), d(D) {}
 	set<vector3d> get_vectors() const;
+	long long get_count_zero() const;
 };
 
 ostream& operator<<(ostream&, const abcd&);

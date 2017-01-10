@@ -2,7 +2,7 @@
 #include "mnpq.h"
 #include "solver.h"
 #include "util.h"
-#include "massiveinteger.h"
+#include "macros.h"
 
 long long itcount = 0;
 
@@ -42,9 +42,27 @@ void solver::process_mnpq(mnpq& item)
 	}
 	
 	long long combinations = item.cubes.size();
-	massiveinteger thisCxr = 0;
-	massiveinteger thisS = 0;
-	if (combinations > 0) //might be zero for primitive ones e.g. from 0,0,0,3.
+	BIGINT thisCxr = 0;
+	BIGINT thisS = 0;
+	if (combinations == 0) //might be zero for primitive ones e.g. from 0,0,0,3.
+	{
+		//check a,b,c,d contains at least two zeros
+		if (item.get_abcd().get_count_zero() < 2)
+		{
+			//is it non-primitive?
+			set<vector3d> vectors = item.get_abcd().get_vectors();
+			for (set<vector3d>::const_iterator it = vectors.begin(); it != vectors.end(); it++)
+			{
+				if(it->gcd() == 1)
+				{
+					stringstream ss;
+					ss << "Failed to get any combinations for " << item;
+					throw runtime_error(ss.str().c_str());
+				}
+			}
+		}
+	}
+	else
 	{
 		set<cube>::const_iterator cube = item.cubes.begin();
 		long long width = cube->width,
@@ -60,21 +78,21 @@ void solver::process_mnpq(mnpq& item)
 				(maxSide + 1LL - t * height) *
 				(maxSide + 1LL - t * depth);
 
-			thisCxr += massiveinteger(repeatability) * massiveinteger(combinations);
+			thisCxr  = thisCxr + (BIGINT(repeatability) * BIGINT(combinations));
 
 			long long l = cube->uvn.begin()->length;
-			massiveinteger ehp = massiveinteger(l*l*l) * massiveinteger(t*t*t) 
-				+ massiveinteger(l*(sumgcd)) * massiveinteger(t*t) + massiveinteger((sumgcd)* t + 1);
+			BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t) 
+				+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
 				//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-			massiveinteger contributionS = ehp * massiveinteger(repeatability) * massiveinteger(combinations);
+			BIGINT contributionS = ehp * BIGINT(repeatability) * BIGINT(combinations);
 
-			thisS += contributionS;
+			thisS = thisS + contributionS;
 		}
 	}
 
 
-	C += thisCxr;
-	S += thisS;
+	C  = C + thisCxr;
+	S = S + thisS;
 
 	if (maxResultDigits > 0 && ((itcount % 10) == 0))
 	{

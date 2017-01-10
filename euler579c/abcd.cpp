@@ -15,6 +15,16 @@ set<vector3d> abcd::get_vectors() const
 	return vectors;
 }
 
+long long abcd::get_count_zero() const
+{
+	long long countzero = 0;
+	if (a == 0) countzero++;
+	if (b == 0) countzero++;
+	if (c == 0) countzero++;
+	if (d == 0) countzero++;
+	return countzero;
+}
+
 ostream& operator<<(ostream& os, const abcd& item)
 {
 	os << item.a << "," << item.b << "," << item.c << ", side = " << item.d;

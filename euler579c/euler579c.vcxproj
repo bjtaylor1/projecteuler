@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="abcd.h" />
+    <ClInclude Include="BigInteger.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="macros.h" />
     <ClInclude Include="mnpq.h" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="abcd.cpp" />
+    <ClCompile Include="BigInteger.cpp" />
     <ClCompile Include="massiveinteger.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="euler579c.cpp" />
