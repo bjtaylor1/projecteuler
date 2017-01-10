@@ -99,7 +99,16 @@ void solver::solve()
 					if (((m + n + p + q) % 2) == 1)
 					{
 						mnpq it(m, n, p, q);
-						process_mnpq(it);
+						try
+						{
+							process_mnpq(it);
+						}
+						catch (exception e)
+						{
+							stringstream ss;
+							ss << e.what() << " while processing " << it;
+							throw runtime_error(ss.str().c_str());
+						}
 					}
 				}
 			}
