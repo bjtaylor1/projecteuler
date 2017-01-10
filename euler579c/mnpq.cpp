@@ -19,3 +19,9 @@ vector<long long> mnpq::as_vector() const
 {
 	return vector<long long>({ m,n,p,q });
 }
+
+ostream& operator<<(ostream& os, const mnpq& item)
+{
+	os << "(m,n,p,q)=(" << item.m << "," << item.n << "," << item.p << "," << item.q << ")";
+	return os;
+}

@@ -11,8 +11,14 @@ public:
 	vector<int> digits;
 	massiveinteger() : massiveinteger(vector<int>({ 0 })) {}
 	massiveinteger(const vector<int>& Digits) : digits(Digits) {}
-	massiveinteger(unsigned long long n)
+	massiveinteger(long long n)
 	{
+		if (n < 0)
+		{
+			stringstream ss;
+			ss << "massiveinteger was initialized with " << n;
+			throw runtime_error(ss.str().c_str());
+		}
 		do {
 			long rem = n % 10;
 			digits.push_back(rem);
