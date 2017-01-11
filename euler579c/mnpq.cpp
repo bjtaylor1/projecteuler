@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "mnpq.h"
 
-pair<set<cube>::iterator, bool> mnpq::add_cube(const cube& cube)
-{
-	return cubes.insert(cube);
-}
-
 abcd mnpq::get_abcd() const
 {
 	long long a = 2 * m*p + 2 * n*q;

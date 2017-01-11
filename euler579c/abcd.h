@@ -1,6 +1,7 @@
 #pragma once
 #ifndef CLASS_ABCD
 #include "vector3d.h"
+#include "vectortriple.h"
 
 using namespace std;
 

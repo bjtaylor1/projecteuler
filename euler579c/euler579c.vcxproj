@@ -157,6 +157,7 @@
     <ClInclude Include="massiveinteger.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="vector3d.h" />
+    <ClInclude Include="vectortriple.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>

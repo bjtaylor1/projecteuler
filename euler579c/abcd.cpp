@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "abcd.h"
+#include "mnpq.h"
 
 set<vector3d> abcd::get_vectors() const
 {
