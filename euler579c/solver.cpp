@@ -22,7 +22,7 @@ void solver::process_mnpq(mnpq& item)
 		allVectors.insert(abcdvectors.begin(), abcdvectors.end());
 	} while (next_permutation(perm.begin(), perm.end()));
 
-	bool someOversize = false, someNotOversize = false;
+	int countOversize = 0, countNotOversize = 0;
 
 	set<cube> cubes;
 	for (set<vector3d>::const_iterator u = allVectors.begin(); u != allVectors.end(); u++)
@@ -38,19 +38,17 @@ void solver::process_mnpq(mnpq& item)
 					cube c(*v, *u, n);
 					if (c.oversize)
 					{
-						someOversize = true;
+						countOversize++;
 					}
 					else
 					{
-						someNotOversize = true;
+						countNotOversize++;
 						cubes.insert(c);
 					}
 				}
 			}
 		}
 	}
-
-	
 
 	BIGINT thisCxr = 0;
 	BIGINT thisS = 0;
