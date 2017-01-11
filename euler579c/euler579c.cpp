@@ -21,13 +21,13 @@ int main(int argc, char** argv)
 	try {
 
 		if (argc > 1) {
-			long long n = stoi(argv[1]);
-			cube::maxSize = n;
+			long long N = stoi(argv[1]);
+			cube::maxSize = N;
 
-			solver s(n, n >= 5000 ? 9 : 12);
-
+			solver s(N, N > 50 ? 9 : 12);
 			s.solve();
-			cout << "C(" << s.maxSide << ") = " << s.C << endl;
+			
+			//cout << "C(" << s.maxSide << ") = " << s.C << endl;
 			cout << "S(" << s.maxSide << ") = " << s.S << endl;
 		}
 	}

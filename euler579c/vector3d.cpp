@@ -7,6 +7,13 @@ long long vector3d::gcd() const
 	return util::gcd(set<long long>({ x, y, z }));
 }
 
+vector<int> vector3d::get_key() const
+{
+	vector<int> keys({ (int)abs(x), (int)abs(y), (int)abs(z) });
+	sort(keys.begin(), keys.end());
+	return keys;
+}
+
 
 vertex operator+(const vertex& lhs, const vector3d& rhs)
 {

@@ -15,6 +15,9 @@ public:
 	solver(long long _maxSide, long long _maxResultDigits) : maxSide(_maxSide), maxResultDigits(_maxResultDigits), C(0), S(0) { }
 	void solve();
 	void process_mnpq(mnpq& mnpq);
+
+	set<vector<int>> keys;
+	set<vector<int>> oversizeNonOversize;
 };
 
 
