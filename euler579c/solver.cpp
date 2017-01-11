@@ -13,8 +13,6 @@ long long addgcd(long long current, const vector3d& v)
 
 void solver::process_mnpq(mnpq& item)
 {
-	if((itcount++ % 1000) == 0) cout << item.get_abcd() << endl;
-
 	vector<long long> perm = item.as_vector();
 	sort(perm.begin(), perm.end());
 	set<vector3d> allVectors;
@@ -26,6 +24,7 @@ void solver::process_mnpq(mnpq& item)
 
 	bool someOversize = false, someNotOversize = false;
 
+	set<cube> cubes;
 	for (set<vector3d>::const_iterator u = allVectors.begin(); u != allVectors.end(); u++)
 	{
 		for (set<vector3d>::const_iterator v = allVectors.begin(); v != allVectors.end(); v++)
@@ -37,8 +36,15 @@ void solver::process_mnpq(mnpq& item)
 				if (gcd == 1)
 				{
 					cube c(*v, *u, n);
-					if (c.oversize) someOversize = true; else someNotOversize = true;
-					item.add_cube(c);
+					if (c.oversize)
+					{
+						someOversize = true;
+					}
+					else
+					{
+						someNotOversize = true;
+						cubes.insert(c);
+					}
 				}
 			}
 		}
@@ -48,7 +54,7 @@ void solver::process_mnpq(mnpq& item)
 
 	BIGINT thisCxr = 0;
 	BIGINT thisS = 0;
-	for(set<cube>::const_iterator cube = item.cubes.begin(); cube != item.cubes.end(); cube++)
+	for(set<cube>::const_iterator cube = cubes.begin(); cube != cubes.end(); cube++)
 	{
 		if (!cube->oversize)
 		{
