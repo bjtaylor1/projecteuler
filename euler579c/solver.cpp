@@ -168,13 +168,13 @@ void solver::solve()
 
 	for (long long m = 0; m <= sqrt(maxSide); m++)
 	{
-		long long nmax = sqrt(maxSide - m*m);
+		long long nmax = ceil(sqrt(maxSide - m*m)) + 1.0;
 		for (long long n = 0; n <= nmax; n++)
 		{
-			long long pmax = sqrt(maxSide - m*m - n*n);
+			long long pmax = ceil(sqrt(maxSide - m*m - n*n)) + 1.0;
 			for (long long p = 0; p <= pmax; p++)
 			{
-				long long qmax = sqrt(maxSide - m*m - n*n - p*p);
+				long long qmax = ceil(sqrt(maxSide - m*m - n*n - p*p)) + 1.0;
 				for (long long q = 0; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)
