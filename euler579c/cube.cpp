@@ -7,6 +7,10 @@ long long cube::maxSize = 0;
 
 bool is_less(const cube& lhs, const cube& rhs)
 {
+	if (lhs.width != rhs.width) return lhs.width < rhs.width;
+	if (lhs.depth != rhs.depth) return lhs.depth < rhs.depth;
+	if (lhs.height != rhs.height) return lhs.height < rhs.height;
+
 	set<vertex>::const_iterator it_l = lhs.vertices.begin(), it_r = rhs.vertices.begin();
 	for (long long l = 0; l < 8; l++)
 	{
@@ -28,7 +32,7 @@ bool compare_x(const vertex& v1, const vertex& v2) { return v1.x < v2.x; }
 bool compare_y(const vertex& v1, const vertex& v2) { return v1.y < v2.y; }
 bool compare_z(const vertex& v1, const vertex& v2) { return v1.z < v2.z; }
 
-cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : width(0), height(0), depth(0), oversize(false)
+cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : width(0), height(0), depth(0)
 {
 	long minx = 0, miny = 0, minz = 0;
 	vertex O(0, 0, 0);
