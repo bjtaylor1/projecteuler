@@ -4,6 +4,7 @@
 #include "util.h"
 #include "macros.h"
 #include "vectortriple.h"
+#include "blockingqueue.h"
 
 long long itcount = 0;
 
@@ -12,10 +13,12 @@ long long addgcd(long long current, const vector3d& v)
 	return current + v.gcd();
 }
 
-BIGINT solver::C(0), solver::S(0);
-long long solver::M, solver::maxSide, solver::maxResultDigits;
+BIGINT /*solver::C(0),*/ solver::S(0);
+long long solver::M = 0, solver::maxSide = 0, solver::maxResultDigits = 0, solver::numThreads = 0;
 set<cube> solver::cubes_done;
-set<int> solver::cubeCounts;
+
+blockingqueue<mnpq> mnpq_queue(10000);
+mutex m_data;
 
 vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 {
@@ -41,6 +44,8 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 	throw runtime_error("No triple found!");
 }
 
+
+
 void solver::process_mnpq(const mnpq& item)
 {
 	abcd baseAbcd = item.get_abcd();
@@ -51,8 +56,6 @@ void solver::process_mnpq(const mnpq& item)
 
 	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c, baseAbcd.d })) == 1)
 	{
-		if ((itcount++ % 1000) == 0) cout << baseAbcd << endl;
-
 		set<cube> cubes;
 		set<abcd> abcds = get_permutations(baseAbcd);
 		for (set<abcd>::const_iterator abcd = abcds.begin(); abcd != abcds.end(); abcd++)
@@ -67,7 +70,12 @@ void solver::process_mnpq(const mnpq& item)
 				int order[] = { 0,1,2 };
 				do {
 					cube c(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order);
-					if (cubes_done.insert(c).second)
+					bool done;
+					{
+						lock_guard<mutex> lm(m_data);
+						done = cubes_done.insert(c).second;
+					}
+					if (done)
 					{
 						cubes.insert(c);
 					}
@@ -75,8 +83,6 @@ void solver::process_mnpq(const mnpq& item)
 			}
 
 		}
-		if (cubeCounts.insert(cubes.size()).second)
-			cout << cubes.size() << endl;
 
 		BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
@@ -108,23 +114,55 @@ void solver::process_mnpq(const mnpq& item)
 			}
 		}
 
-
-		C = C + thisCxr;
-		S = S + thisS;
-
-		if (maxResultDigits > 0 && ((itcount % 10) == 0))
 		{
-			C.truncate(maxResultDigits);
-			S.truncate(maxResultDigits);
+			lock_guard<mutex> lm(m_data);
+			//C = C + thisCxr;
+			S = S + thisS;
+			if (maxResultDigits > 0 && ((itcount % 10) == 0))
+			{
+				//C.truncate(maxResultDigits);
+				S.truncate(maxResultDigits);
+			}
 		}
+
 	}
 }
 
-typedef void(*threadfunc)(const mnpq&);
+void processor()
+{
+	try
+	{
+		while (true)
+		{
+			mnpq item = mnpq_queue.pop();
+			try
+			{
+				solver::process_mnpq(item);
+			}
+			catch (runtime_error e)
+			{
+				stringstream ss;
+				ss << e.what() << " while processing " << item;
+				cout << ss.str() << endl;
+				exit(1);
+			}
+		}
+	}
+	catch (queuefinished)
+	{
+		//queue finished
+	}
+
+}
 
 void solver::solve()
 {
-	threadfunc tf = &solver::process_mnpq;
+	vector<thread> threads;
+	for (int i = 0; i < numThreads; i++)
+	{
+		threads.push_back(thread(processor));
+	}
+
 	for (long long m = 0; m <= sqrt(maxSide); m++)
 	{
 		long long nmax = sqrt(maxSide - m*m);
@@ -139,20 +177,15 @@ void solver::solve()
 					if (((m + n + p + q) % 2) == 1)
 					{
 						mnpq it(m, n, p, q);
-						try
-						{
-							thread t(process_mnpq, it);
-//							process_mnpq(it);
-						}
-						catch (exception e)
-						{
-							stringstream ss;
-							ss << e.what() << " while processing " << it;
-							throw runtime_error(ss.str().c_str());
-						}
+						mnpq_queue.push(it);
 					}
 				}
 			}
 		}
+	}
+	mnpq_queue.set_finished();
+	for (vector<thread>::iterator thread = threads.begin(); thread != threads.end(); thread++)
+	{
+		thread->join();
 	}
 }

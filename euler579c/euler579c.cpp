@@ -20,17 +20,18 @@ int main(int argc, char** argv)
 {
 	try {
 
-		if (argc > 1) {
+		if (argc > 2) {
 
-			cout << (sizeof(cube)) << endl;
+			long long n = stoi(argv[1]),
+				numThreads = stoi(argv[2]);
 
-			long long n = stoi(argv[1]);
 			cube::maxSize = n;
 			solver::maxSide = n;
 			solver::M = n >= 5000 ? 9 : 12;
+			solver::numThreads = numThreads;
 
 			solver::solve();
-			cout << "C(" << solver::maxSide << ") = " << solver::C << endl;
+			//cout << "C(" << solver::maxSide << ") = " << solver::C << endl;
 			cout << "S(" << solver::maxSide << ") = " << solver::S << endl;
 		}
 	}

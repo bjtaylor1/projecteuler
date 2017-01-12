@@ -34,6 +34,7 @@ public:
 					q.push(item);
 					return;
 				}
+				else cout << ".";
 			}
 			this_thread::sleep_for(chrono::milliseconds(10));
 		}
@@ -45,13 +46,13 @@ public:
 		{
 			{
 				lock_guard<mutex> lm(m);
-				if (finished) throw queuefinished();
 				if (!q.empty())
 				{
 					T item = q.front();
 					q.pop();
 					return item;
 				}
+				else if (finished) throw queuefinished();
 			}
 			this_thread::sleep_for(chrono::milliseconds(10));
 		}

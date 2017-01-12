@@ -9,15 +9,12 @@ using namespace std;
 class solver
 {
 public:
-	static BIGINT C, S;
-	static long long M;
-	static long long maxSide, maxResultDigits;
+	static BIGINT /*C, */ S;
+	static long long maxSide, maxResultDigits, M, numThreads;
 
 	static void solve();
 	
-	static set<vector<int>> keys;
 	static set<cube> cubes_done;
-	static set<int> cubeCounts;
 
 	static void process_mnpq(const mnpq& mnpq);
 };
