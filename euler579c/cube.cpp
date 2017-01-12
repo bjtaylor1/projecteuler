@@ -24,22 +24,11 @@ bool operator<(const cube & lhs, const cube & rhs)
 	return isless;
 }
 
-ostream & operator<<(ostream & os, const cube & cube)
-{
-	for (set<vector3d>::const_iterator it = cube.uvn.begin();;)
-	{
-		cout << *it;
-		if ((++it) == cube.uvn.end()) break; else cout << "   ";
-	}
-	cout << ", side = " << cube.uvn.begin()->length;
-	return os;
-}
-
 bool compare_x(const vertex& v1, const vertex& v2) { return v1.x < v2.x; }
 bool compare_y(const vertex& v1, const vertex& v2) { return v1.y < v2.y; }
 bool compare_z(const vertex& v1, const vertex& v2) { return v1.z < v2.z; }
 
-cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : uvn({U,V,N}), width(0), height(0), depth(0), oversize(false)
+cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : width(0), height(0), depth(0), oversize(false)
 {
 	long minx = 0, miny = 0, minz = 0;
 	vertex O(0, 0, 0);
@@ -88,7 +77,11 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flip
 	height = max_element(vertices.begin(), vertices.end(), compare_y)->y;
 	depth =  max_element(vertices.begin(), vertices.end(), compare_z)->z;
 
-	oversize = (width > maxSize) || (height > maxSize) || (depth > maxSize);
-
 	if (vertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) vertices");
+}
+
+bool cube::is_oversize() const
+{
+	return (width > maxSize) || (height > maxSize) || (depth > maxSize);
+
 }

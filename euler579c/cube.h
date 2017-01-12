@@ -10,15 +10,13 @@ class cube
 public:
 	static long long maxSize;
 	bool oversize;
-	long long width, height, depth;
-	set<vector3d> uvn;
+	int width, height, depth;
 	set<vertex> vertices;
 	cube(const vector3d& U, const vector3d& V, const vector3d& N, bool flipX, bool flipY, bool flipZ, int* order);
-
+	bool is_oversize() const;
 	
 };
 
 bool operator <(const cube& lhs, const cube& rhs);
-ostream& operator<<(ostream& os, const cube& cube);
 
 #endif

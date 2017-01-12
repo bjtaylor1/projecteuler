@@ -39,6 +39,10 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 void solver::process_mnpq(mnpq& item)
 {
 	abcd baseAbcd = item.get_abcd();
+	vectortriple baseTriple = get_triple(baseAbcd, item);
+
+	long sumgcd = baseTriple.u.gcd() + baseTriple.v.gcd() + baseTriple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+	long long l = baseTriple.u.length;
 
 	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c, baseAbcd.d })) == 1)
 	{
@@ -79,7 +83,6 @@ void solver::process_mnpq(mnpq& item)
 					height = cube->height,
 					depth = cube->depth;
 				long long tmax = maxSide / (max(width, max(height, depth)));
-				long long sumgcd = accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 
 				for (long long t = 1; t <= tmax; t++)
 				{
@@ -90,7 +93,6 @@ void solver::process_mnpq(mnpq& item)
 
 					thisCxr = thisCxr + BIGINT(repeatability);
 
-					long long l = cube->uvn.begin()->length;
 					BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
 						+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
 					//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
