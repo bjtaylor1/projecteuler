@@ -166,7 +166,7 @@ void solver::solve()
 		threads.push_back(thread(processor));
 	}
 
-	for (long long m = 0; m <= sqrt(maxSide); m++)
+	for (long long m = 0; m <= ceil(sqrt(maxSide)) + 1.0; m++)
 	{
 		long long nmax = ceil(sqrt(maxSide - m*m)) + 1.0;
 		for (long long n = 0; n <= nmax; n++)
