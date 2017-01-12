@@ -91,7 +91,7 @@ void solver::process_mnpq(const mnpq& item)
 		BIGINT thisS = 0;
 		for (set<cube>::const_iterator cube = cubes.begin(); cube != cubes.end(); cube++)
 		{
-			if (!cube->oversize)
+			if (!cube->is_oversize())
 			{
 				long long width = cube->width,
 					height = cube->height,
