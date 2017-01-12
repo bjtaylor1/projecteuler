@@ -6,6 +6,8 @@
 
 using namespace std;
 
+class queuefinished : exception {};
+
 template<class T>
 class blockingqueue
 {
@@ -20,11 +22,6 @@ public:
 	{
 		lock_guard<mutex> l(m);
 		finished = true;
-	}
-	bool is_finished()
-	{
-		lock_guard<mutex> l(m);
-		return finished;
 	}
 	void push(T item)
 	{
@@ -48,6 +45,7 @@ public:
 		{
 			{
 				lock_guard<mutex> lm(m);
+				if (finished) throw queuefinished();
 				if (!q.empty())
 				{
 					T item = q.front();
@@ -64,22 +62,29 @@ blockingqueue<int> q(6);
 
 void process()
 {
-	while (!q.is_finished())
+	try
 	{
-		this_thread::sleep_for(0.5s);
-		int i = q.pop();
+		while (true)
+		{
+			this_thread::sleep_for(0.5s);
+			int i = q.pop();
+			stringstream ss;
+			ss << "Processing " << i << " on thread " << this_thread::get_id() << endl;
+			cout << ss.str();
+		}
+	}
+	catch (queuefinished)
+	{
 		stringstream ss;
-		ss << "Processing " << i << " on thread " << this_thread::get_id() << endl;
+		ss << "Thread " << this_thread::get_id() << " exiting - queue is finished." << endl;
 		cout << ss.str();
 	}
-	stringstream ss;
-	ss << "Thread " << this_thread::get_id() << " exiting - queue is finished." << endl;
 }
 
 int main()
 {
 	vector<thread> threads;
-	for (int i = 0; i < 1; i++) threads.push_back(thread(process));
+	for (int i = 0; i < 4; i++) threads.push_back(thread(process));
 
 	for (int i = 0; i < 30; i++)
 	{

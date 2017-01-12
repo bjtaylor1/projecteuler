@@ -12,6 +12,11 @@ long long addgcd(long long current, const vector3d& v)
 	return current + v.gcd();
 }
 
+BIGINT solver::C(0), solver::S(0);
+long long solver::M, solver::maxSide, solver::maxResultDigits;
+set<cube> solver::cubes_done;
+set<int> solver::cubeCounts;
+
 vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 {
 	vector<vectortriple> triples;
