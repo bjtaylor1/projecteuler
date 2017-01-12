@@ -4,23 +4,15 @@
 //
 
 #pragma once
-#define _USE_MATH_DEFINES
 
 #include "targetver.h"
 
 #include <stdio.h>
-#ifdef _WIN32_WINNT
 #include <tchar.h>
-#endif
-#include <vector>
-#include <set>
-#include <math.h>
-#include <ctgmath>
-#include <iostream>
-#include <algorithm>
-#include <numeric>
-#include <sstream>
-#include <thread>
-#include <atomic>
 #include <queue>
+#include <thread>
+#include <condition_variable>
 #include <mutex>
+#include <queue>
+#include <iostream>
+#include <sstream>

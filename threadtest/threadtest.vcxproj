@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E3065AE3-8D20-4EA1-8B77-C0C98D60A9B9}</ProjectGuid>
+    <ProjectGuid>{FFBA7B58-01FD-457E-820B-7EC11EFE7AB5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>euler579c</RootNamespace>
+    <RootNamespace>threadtest</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -133,7 +133,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,38 +145,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="abcd.h" />
-    <ClInclude Include="BigInteger.h" />
-    <ClInclude Include="cube.h" />
-    <ClInclude Include="macros.h" />
-    <ClInclude Include="mnpq.h" />
-    <ClInclude Include="processor_queue.h" />
-    <ClInclude Include="solver.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="massiveinteger.h" />
-    <ClInclude Include="util.h" />
-    <ClInclude Include="vector3d.h" />
-    <ClInclude Include="vectortriple.h" />
-    <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="abcd.cpp" />
-    <ClCompile Include="BigInteger.cpp" />
-    <ClCompile Include="massiveinteger.cpp" />
-    <ClCompile Include="cube.cpp" />
-    <ClCompile Include="euler579c.cpp" />
-    <ClCompile Include="mnpq.cpp" />
-    <ClCompile Include="solver.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="util.cpp" />
-    <ClCompile Include="vector3d.cpp" />
-    <ClCompile Include="vertex.cpp" />
+    <ClCompile Include="threadtest.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,7 +36,7 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 	throw runtime_error("No triple found!");
 }
 
-void solver::process_mnpq(mnpq& item)
+void solver::process_mnpq(const mnpq& item)
 {
 	abcd baseAbcd = item.get_abcd();
 	vectortriple baseTriple = get_triple(baseAbcd, item);
@@ -115,8 +115,11 @@ void solver::process_mnpq(mnpq& item)
 	}
 }
 
+typedef void(*threadfunc)(const mnpq&);
+
 void solver::solve()
 {
+	threadfunc tf = &solver::process_mnpq;
 	for (long long m = 0; m <= sqrt(maxSide); m++)
 	{
 		long long nmax = sqrt(maxSide - m*m);
@@ -133,7 +136,8 @@ void solver::solve()
 						mnpq it(m, n, p, q);
 						try
 						{
-							process_mnpq(it);
+							thread t(process_mnpq, it);
+//							process_mnpq(it);
 						}
 						catch (exception e)
 						{

@@ -9,17 +9,20 @@ using namespace std;
 class solver
 {
 public:
-	BIGINT C, S;
-	long long M;
-	long long maxSide, maxResultDigits;
-	solver(long long _maxSide, long long _maxResultDigits) : maxSide(_maxSide), maxResultDigits(_maxResultDigits), C(0), S(0) { }
-	void solve();
-	void process_mnpq(mnpq& mnpq);
+	static BIGINT C, S;
+	static long long M;
+	static long long maxSide, maxResultDigits;
 
-	set<vector<int>> keys;
-	set<cube> cubes_done;
-	set<int> cubeCounts;
+	static void solve();
+	
+	static set<vector<int>> keys;
+	static set<cube> cubes_done;
+	static set<int> cubeCounts;
+
+	static void process_mnpq(const mnpq& mnpq);
 };
+
+
 
 
 #endif
