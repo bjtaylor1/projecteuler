@@ -7,7 +7,7 @@ HSRCS=$(filter-out $(TESTHSRCS),$(ALLHSRCS))
 ALLOBJS=$(ALLCPPSRCS:.cpp=.o)
 OBJS=$(CPPSRCS:.cpp=.o)
 
-LDFLAGS=
+LDFLAGS=-pthread
 
 CXXFLAGS=$(EXTRACXXFLAGS) -O4 -std=c++11 
 MAINBIN=bin/euler579c
