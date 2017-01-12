@@ -141,6 +141,7 @@ void processor()
 			}
 			catch (runtime_error e)
 			{
+				cout << "Exception: " << e.what() << endl;
 				stringstream ss;
 				ss << e.what() << " while processing " << item;
 				cout << ss.str() << endl;
