@@ -12,7 +12,6 @@ void testmassiveint(unsigned long long i, unsigned long long j)
 {
 	massiveinteger mi(i), mj(j);
 	cout << mi << " + " << mj << " == " << (mi + mj) << " == " << (i+j) << endl;
-
 	cout << mi << " x " << mj << " == " << (mi * mj) << " == " << (i*j) << endl;
 }
 
@@ -27,7 +26,7 @@ int main(int argc, char** argv)
 
 			cube::maxSize = n;
 			solver::maxSide = n;
-			solver::M = n >= 5000 ? 9 : 12;
+			solver::M = 9;// n >= 5000 ? 9 : 12;
 			solver::numThreads = numThreads;
 
 			solver::solve();
