@@ -62,9 +62,17 @@ void solver::process_mnpq(mnpq& item)
 				int order[] = { 0,1,2 };
 				do {
 					cube c(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order);
-					if (cubes_done.insert(c).second)
+					if (cubes.find(c) == cubes.end())
 					{
-						cubes.insert(c);
+						bool inserted;
+						{
+							lock_guard<mutex> lm(m_data);
+							inserted = cubes_done.insert(c).second;
+						}
+						if (inserted)
+						{
+							cubes.insert(c);
+						}
 					}
 				} while (next_permutation(order, order + 3));
 			}
