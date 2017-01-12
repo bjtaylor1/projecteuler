@@ -12,7 +12,7 @@ long long addgcd(long long current, const vector3d& v)
 	return current + v.gcd();
 }
 
-vector<vectortriple> get_triples(const abcd& baseAbcd, const mnpq& hint)
+vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 {
 	vector<vectortriple> triples;
 	set<vector3d> allVectors;
@@ -24,23 +24,16 @@ vector<vectortriple> get_triples(const abcd& baseAbcd, const mnpq& hint)
 		allVectors.insert(abcdvectors.begin(), abcdvectors.end());
 	} while (next_permutation(perm.begin(), perm.end()));
 
-	for (int m = 0; m < 8; m++)
+	vector3d u(baseAbcd.a, baseAbcd.b, baseAbcd.c);
+	for (set<vector3d>::const_iterator v = allVectors.begin(); v != allVectors.end(); v++)
 	{
-		int m0 = (m & 1) == 0 ? 1 : -1;
-		int m1 = (m & 2) == 0 ? 1 : -1;
-		int m2 = (m & 4) == 0 ? 1 : -1;
-		
-		vector3d u(baseAbcd.a * m0, baseAbcd.b * m1, baseAbcd.c * m2);
-		for (set<vector3d>::const_iterator v = allVectors.begin(); v != allVectors.end(); v++)
+		if (v->is_orthogonal_to(u))
 		{
-			if (v->is_orthogonal_to(u))
-			{
-				vector3d n = v->cross_product(u);
-				triples.push_back(vectortriple(u, *v, n));
-			}
+			vector3d n = v->cross_product(u);
+			return vectortriple(u, *v, n);
 		}
 	}
-	return triples;
+	throw runtime_error("No triple found!");
 }
 
 void solver::process_mnpq(mnpq& item)
@@ -50,25 +43,31 @@ void solver::process_mnpq(mnpq& item)
 	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c, baseAbcd.d })) == 1)
 	{
 		if ((itcount++ % 1000) == 0) cout << baseAbcd << endl;
-		
-		vector<vectortriple> triples = get_triples(baseAbcd, item);
 
 		set<cube> cubes;
-		for (vector<vectortriple>::const_iterator triple = triples.begin(); triple != triples.end(); triple++)
+		set<abcd> abcds = get_permutations(baseAbcd);
+		for (set<abcd>::const_iterator abcd = abcds.begin(); abcd != abcds.end(); abcd++)
 		{
-			int swapPos[] = { 0, 1, 2 };
-			do {
-				int uArray[] = { triple->u.x, triple->u.y, triple->u.z };
-				int vArray[] = { triple->v.x, triple->v.y, triple->v.z };
-				int nArray[] = { triple->n.x, triple->n.y, triple->n.z };
+			vectortriple triple = get_triple(*abcd, item);
 
-				vector3d u(uArray[swapPos[0]], uArray[swapPos[1]], uArray[swapPos[2]]);
-				vector3d v(vArray[swapPos[0]], vArray[swapPos[1]], vArray[swapPos[2]]);
-				vector3d n(nArray[swapPos[0]], nArray[swapPos[1]], nArray[swapPos[2]]);
-				cube c(u, v, n);
-				cubes.insert(c);
-			} while (next_permutation(swapPos, swapPos + 3));
+			for (int f = 0; f < 8; f++)
+			{
+				bool flipX = (f & 1) != 0,
+					flipY = (f & 2) != 0,
+					flipZ = (f & 4) != 0;
+				int order[] = { 0,1,2 };
+				do {
+					cube c(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order);
+					if (cubes_done.insert(c).second)
+					{
+						cubes.insert(c);
+					}
+				} while (next_permutation(order, order + 3));
+			}
+
 		}
+		if (cubeCounts.insert(cubes.size()).second)
+			cout << cubes.size() << endl;
 
 		BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
@@ -119,13 +118,13 @@ void solver::solve()
 	for (long long m = 0; m <= sqrt(maxSide); m++)
 	{
 		long long nmax = sqrt(maxSide - m*m);
-		for (long long n = m; n <= nmax; n++)
+		for (long long n = 0; n <= nmax; n++)
 		{
 			long long pmax = sqrt(maxSide - m*m - n*n);
-			for (long long p = n; p <= pmax; p++)
+			for (long long p = 0; p <= pmax; p++)
 			{
 				long long qmax = sqrt(maxSide - m*m - n*n - p*p);
-				for (long long q = p; q <= qmax; q++)
+				for (long long q = 0; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)
 					{

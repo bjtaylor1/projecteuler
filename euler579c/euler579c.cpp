@@ -21,6 +21,7 @@ int main(int argc, char** argv)
 	try {
 
 		if (argc > 1) {
+
 			long long n = stoi(argv[1]);
 			cube::maxSize = n;
 

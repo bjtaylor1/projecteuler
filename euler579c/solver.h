@@ -16,6 +16,9 @@ public:
 	void solve();
 	void process_mnpq(mnpq& mnpq);
 
+	set<vector<int>> keys;
+	set<cube> cubes_done;
+	set<int> cubeCounts;
 };
 
 

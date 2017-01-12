@@ -35,39 +35,60 @@ ostream & operator<<(ostream & os, const cube & cube)
 	return os;
 }
 
-cube::cube(const vector3d & U, const vector3d & V, const vector3d & N) : uvn({U,V,N}), width(0), height(0), depth(0), oversize(false)
-{
-	long long minx = 0, miny = 0, minz = 0;
-	vector<vertex> tempvertices;
-	vertex O(0, 0, 0);
-	add_vertex(tempvertices, minx, miny, minz, O); //origin
-	add_vertex(tempvertices, minx, miny, minz, U);
-	add_vertex(tempvertices, minx, miny, minz, V);
-	add_vertex(tempvertices, minx, miny, minz, N);
-	add_vertex(tempvertices, minx, miny, minz, U+V);
-	add_vertex(tempvertices, minx, miny, minz, U+N);
-	add_vertex(tempvertices, minx, miny, minz, V+N);
-	add_vertex(tempvertices, minx, miny, minz, U+V+N);
+bool compare_x(const vertex& v1, const vertex& v2) { return v1.x < v2.x; }
+bool compare_y(const vertex& v1, const vertex& v2) { return v1.y < v2.y; }
+bool compare_z(const vertex& v1, const vertex& v2) { return v1.z < v2.z; }
 
-	vertex minBounds(minx, miny, minz);
+cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : uvn({U,V,N}), width(0), height(0), depth(0), oversize(false)
+{
+	long minx = 0, miny = 0, minz = 0;
+	vertex O(0, 0, 0);
+	vector<vertex> tempvertices
+	{
+		O,
+		U,
+		V,
+		N,
+		U+V,
+		U+N,
+		V+N,
+		U+V+N
+	};
+
+	long minX = min_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
+	long minY = min_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
+	long minZ = min_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
+	for (vector<vertex>::iterator vert = tempvertices.begin(); vert != tempvertices.end(); vert++)
+	{
+		vert->x -= minX;
+		vert->y -= minY;
+		vert->z -= minZ;
+	}
+	long maxX = max_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
+	long maxY = max_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
+	long maxZ = max_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
 	for (vector<vertex>::const_iterator it = tempvertices.begin(); it != tempvertices.end(); it++)
 	{
-		vertex v = (*it) - minBounds;
-		width = max(width, (long long)v.x);
-		height = max(height, (long long)v.y);
-		depth = max(depth, (long long)v.z);
-		vertices.insert(v);
+		long xyz[] =
+		{
+			flipX ? maxX - it->x : it->x,
+			flipY ? maxY - it->y : it->y,
+			flipZ ? maxZ - it->z : it->z
+		};
+
+		vertices.insert(vertex(xyz[order[0]], xyz[order[1]], xyz[order[2]]));
 	}
+
+	long finalMinX = min_element(vertices.begin(), vertices.end(), compare_x)->x;
+	long finalMinY = min_element(vertices.begin(), vertices.end(), compare_y)->y;
+	long finalMinZ = min_element(vertices.begin(), vertices.end(), compare_z)->z;
+	if (finalMinX != 0 || finalMinY != 0 || finalMinZ != 0) throw runtime_error("Cube has been transformed wrongly!");
 	
+	width =  max_element(vertices.begin(), vertices.end(), compare_x)->x;
+	height = max_element(vertices.begin(), vertices.end(), compare_y)->y;
+	depth =  max_element(vertices.begin(), vertices.end(), compare_z)->z;
+
 	oversize = (width > maxSize) || (height > maxSize) || (depth > maxSize);
 
 	if (vertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) vertices");
-}
-
-void cube::add_vertex(vector<vertex>& vertices, long long& minx, long long& miny, long long& minz, const vertex& vertex)
-{
-	minx = min(minx, vertex.x);
-	miny = min(miny, vertex.y);
-	minz = min(minz, vertex.z);
-	vertices.push_back(vertex);
 }
