@@ -35,10 +35,11 @@ bool compare_z(const vertex& v1, const vertex& v2) { return v1.z < v2.z; }
 cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : width(0), height(0), depth(0)
 {
 	if (
-		(U.cross_product(V).to_abs() != N.to_abs()) ||
-		(V.cross_product(N).to_abs() != U.to_abs()) ||
-		(N.cross_product(U).to_abs() != V.to_abs())
+		(!U.is_orthogonal_to(V)) ||
+		(!V.is_orthogonal_to(N)) ||
+		(!N.is_orthogonal_to(U))
 		) throw runtime_error("Cube initialized with bad vectors!");
+
 
 	long minx = 0, miny = 0, minz = 0;
 	vertex O(0, 0, 0);

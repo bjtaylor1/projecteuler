@@ -42,7 +42,7 @@ vector3d::vector3d(long long X, long long Y, long long Z) : vertex(X, Y, Z)
 
 bool vector3d::is_orthogonal_to(const vector3d& rhs) const
 {
-	double angleRads = acos(((double)dot_product(rhs)) / (length * rhs.length));
+	double angleRads = abs(acos(((double)dot_product(rhs)) / (length * rhs.length)));
 	double angleDegs = angleRads * 180 / M_PI;
 	bool is_orth = abs(angleDegs - 90) < 1e-9;
 	return is_orth;

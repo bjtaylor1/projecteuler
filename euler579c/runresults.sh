@@ -1,3 +1,4 @@
+bin/euler579c 500 50
 bin/euler579c 1000 50
 bin/euler579c 1500 50
 bin/euler579c 2000 50
