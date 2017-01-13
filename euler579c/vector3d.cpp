@@ -7,6 +7,11 @@ long long vector3d::gcd() const
 	return util::gcd(set<long long>({ x, y, z }));
 }
 
+vector3d vector3d::to_abs() const
+{
+	return vector3d(abs(x), abs(y), abs(z));
+}
+
 
 vertex operator+(const vertex& lhs, const vector3d& rhs)
 {

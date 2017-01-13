@@ -26,13 +26,6 @@ long long abcd::get_count_zero() const
 	return countzero;
 }
 
-vector<int> abcd::get_key() const
-{
-	vector<int> key({ (int)abs(a), (int)abs(b), (int)abs(c) });
-	sort(key.begin(), key.end());
-	return key;
-}
-
 ostream& operator<<(ostream& os, const abcd& item)
 {
 	os << item.a << "," << item.b << "," << item.c << ", side = " << item.d;

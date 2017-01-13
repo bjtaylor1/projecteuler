@@ -18,6 +18,8 @@ public:
 	vector3d cross_product(const vector3d&) const;
 	long long gcd() const;
 
+	vector3d to_abs() const;
+
 };
 
 vertex operator+(const vertex&, const vector3d&);
