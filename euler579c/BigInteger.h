@@ -30,12 +30,14 @@ private:
 public:
 	/* Constructs a big integer representation of the integer given as an argument */
 	BigInteger(unsigned long long integer);
+	BigInteger(unsigned long long integer, long TotalTruncated);
 
 	/* Parses the string given as an argument looking for an integer.
 	 * Stops as soon as it finds a non-digit character.
 	 * Trailing zeros will eventually get removed.
 	 */
 	BigInteger(string integer);
+	BigInteger(string integer, long TotalTruncated);
 
 	/* Constructs a big integer representation of the integer given as an argument
 	 * and assigns it to the internal representation of the big integer.

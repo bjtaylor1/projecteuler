@@ -20,11 +20,13 @@
 
 using namespace std;
 
-BigInteger::BigInteger(unsigned long long integer) : totalTruncated(0) {
+BigInteger::BigInteger(unsigned long long integer) : BigInteger(integer, 0) {}
+BigInteger::BigInteger(unsigned long long integer, long TotalTruncated) : totalTruncated(TotalTruncated) {
 	setInteger(integer);
 }
 
-BigInteger::BigInteger(string integer): totalTruncated(0) {
+BigInteger::BigInteger(string integer) : BigInteger(integer, 0) {}
+BigInteger::BigInteger(string integer, long TotalTruncated): totalTruncated(TotalTruncated) {
 	for (long long i = 0; i < (long long)integer.size(); i++) {
 		if (!(integer[i] >= '0' && integer[i] <= '9')) throw runtime_error("Bad character in integer representation");
 		this->integer += integer[i];
@@ -94,7 +96,7 @@ BigInteger BigInteger::addInteger(const BigInteger& integer_to_add) const {
 
 	reverse(result.begin(), result.end());
 
-	return BigInteger(result.substr(getTrimIndex(result)));
+	return BigInteger(result.substr(getTrimIndex(result)), totalTruncated);
 }
 
 BigInteger BigInteger::addInteger(const string& integer_to_add) const {
@@ -154,7 +156,7 @@ BigInteger BigInteger::operator*(const BigInteger& integer) const {
 ostream& operator<<(ostream& in, BigInteger& integer) {
 	
 	in << integer.toString();
-	if (integer.totalTruncated > 0)
+	//if (integer.totalTruncated > 0)
 		in << " (e" << integer.totalTruncated << ")";
 
 	return in;
