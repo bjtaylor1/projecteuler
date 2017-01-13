@@ -97,7 +97,7 @@ void solver::process_mnpq(const mnpq& item)
 					height = cube->height,
 					depth = cube->depth;
 				long long tmax = maxSide / (max(width, max(height, depth)));
-
+				if (tmax <= 0) throw runtime_error("tmax <= 0");
 				for (long long t = 1; t <= tmax; t++)
 				{
 					long long repeatability =
