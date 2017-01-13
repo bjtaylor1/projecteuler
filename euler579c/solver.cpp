@@ -87,7 +87,7 @@ void solver::process_mnpq(const mnpq& item)
 
 		}
 
-		BIGINT thisCxr = 0;
+		//BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
 		for (set<cube>::const_iterator cube = cubes.begin(); cube != cubes.end(); cube++)
 		{
@@ -105,7 +105,9 @@ void solver::process_mnpq(const mnpq& item)
 						(maxSide + 1LL - t * height) *
 						(maxSide + 1LL - t * depth);
 
-					thisCxr = thisCxr + BIGINT(repeatability);
+					if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
+
+					//thisCxr = thisCxr + BIGINT(repeatability);
 
 					BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
 						+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
