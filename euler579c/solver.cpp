@@ -84,6 +84,7 @@ void solver::process_mnpq(mnpq& item)
 					height = cube->height,
 					depth = cube->depth;
 				long long tmax = maxSide / (max(width, max(height, depth)));
+				if (tmax <= 0) throw runtime_error("tmax <= 0");
 
 				for (long long t = 1; t <= tmax; t++)
 				{
@@ -91,6 +92,7 @@ void solver::process_mnpq(mnpq& item)
 						(maxSide + 1LL - t * width) *
 						(maxSide + 1LL - t * height) *
 						(maxSide + 1LL - t * depth);
+					if (repeatability <= 0) throw runtime_error("repeatability <= 0");
 
 					thisCxr = thisCxr + BIGINT(repeatability);
 

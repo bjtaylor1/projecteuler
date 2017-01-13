@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 			solver s(n, 9);
 
 			s.solve();
-			cout << "C(" << s.maxSide << ") = " << s.C << endl;
+			//cout << "C(" << s.maxSide << ") = " << s.C << endl;
 			cout << "S(" << s.maxSide << ") = " << s.S << endl;
 		}
 	}
