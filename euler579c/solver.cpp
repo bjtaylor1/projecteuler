@@ -46,8 +46,6 @@ void solver::process_mnpq(mnpq& item)
 
 	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c, baseAbcd.d })) == 1)
 	{
-		if ((itcount++ % 1000) == 0) cout << baseAbcd << endl;
-
 		set<cube> cubes;
 		set<abcd> abcds = get_permutations(baseAbcd);
 		for (set<abcd>::const_iterator abcd = abcds.begin(); abcd != abcds.end(); abcd++)
