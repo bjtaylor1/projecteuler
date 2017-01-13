@@ -18,7 +18,6 @@ public:
 
 	set<vector<int>> keys;
 	set<cube> cubes_done;
-	set<int> cubeCounts;
 };
 
 

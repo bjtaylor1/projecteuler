@@ -41,7 +41,7 @@ void solver::process_mnpq(mnpq& item)
 	abcd baseAbcd = item.get_abcd();
 	vectortriple baseTriple = get_triple(baseAbcd, item);
 
-	long sumgcd = baseTriple.u.gcd() + baseTriple.v.gcd() + baseTriple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+	long long sumgcd = baseTriple.u.gcd() + baseTriple.v.gcd() + baseTriple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 	long long l = baseTriple.u.length;
 
 	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c, baseAbcd.d })) == 1)
@@ -75,8 +75,6 @@ void solver::process_mnpq(mnpq& item)
 			}
 
 		}
-		if (cubeCounts.insert(cubes.size()).second)
-			cout << cubes.size() << endl;
 
 		BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
@@ -124,13 +122,13 @@ void solver::solve()
 {
 	for (long long m = 0; m <= sqrt(maxSide); m++)
 	{
-		long long nmax = sqrt(maxSide - m*m);
+		long long nmax = (long long)ceil(sqrt(maxSide - m*m));
 		for (long long n = 0; n <= nmax; n++)
 		{
-			long long pmax = sqrt(maxSide - m*m - n*n);
+			long long pmax = (long long)ceil(sqrt(maxSide - m*m - n*n));
 			for (long long p = 0; p <= pmax; p++)
 			{
-				long long qmax = sqrt(maxSide - m*m - n*n - p*p);
+				long long qmax = (long long)ceil(sqrt(maxSide - m*m - n*n - p*p));
 				for (long long q = 0; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)
