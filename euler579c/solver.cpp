@@ -64,11 +64,8 @@ void solver::process_mnpq(mnpq& item)
 					cube c(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order);
 					if (cubes.find(c) == cubes.end())
 					{
-						bool inserted;
-						{
-							lock_guard<mutex> lm(m_data);
-							inserted = cubes_done.insert(c).second;
-						}
+						bool inserted= cubes_done.insert(c).second;
+						
 						if (inserted)
 						{
 							cubes.insert(c);

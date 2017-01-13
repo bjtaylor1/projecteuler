@@ -1,0 +1,27 @@
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1000 50 
+S(1000) = 514854400153029663052
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1500 50 
+S(1500) = 13108154421361941502444
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 2000 50 
+S(2000) = 130502816365463674651446
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 2500 50 
+S(2500) = 776302227621062447752620
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 3000 50 
+S(3000) = 3333561712845798484514926
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 3500 50 
+S(3500) = 11430883055587160863733520
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 4000 50 
+S(4000) = 33243714594531625509823194
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 4500 50 
+S(4500) = 85248460389013056965839112
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 5000 50 
+S(5000) = 197948089025332881070116196
