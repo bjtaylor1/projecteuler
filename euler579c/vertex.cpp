@@ -25,6 +25,11 @@ vertex operator-(const vertex& lhs, const vertex& rhs)
 	return vertex(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 }
 
+vertex operator*(const vertex& v, long n)
+{
+	return vertex(v.x * n, v.y * n, v.z * n);
+}
+
 ostream& operator<<(ostream& os, const vertex & vertex)
 {
 	os << vertex.x << "," << vertex.y << "," << vertex.z;

@@ -28,11 +28,21 @@ bool operator<(const cube & lhs, const cube & rhs)
 	return isless;
 }
 
+cube operator*(const cube& c, long n)
+{
+	set<vertex> newVertices;
+	for (set<vertex>::const_iterator vertex = c.vertices.begin(); vertex != c.vertices.end(); vertex++)
+	{
+		newVertices.insert((*vertex) * n);
+	}
+	return cube(newVertices);
+}
+
 bool compare_x(const vertex& v1, const vertex& v2) { return v1.x < v2.x; }
 bool compare_y(const vertex& v1, const vertex& v2) { return v1.y < v2.y; }
 bool compare_z(const vertex& v1, const vertex& v2) { return v1.z < v2.z; }
 
-cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : width(0), height(0), depth(0)
+set<vertex> cube::get_vertices(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order)
 {
 	if (
 		(!U.is_orthogonal_to(V)) ||
@@ -67,6 +77,8 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flip
 	long maxX = max_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
 	long maxY = max_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
 	long maxZ = max_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
+
+	set<vertex> initVertices;
 	for (vector<vertex>::const_iterator it = tempvertices.begin(); it != tempvertices.end(); it++)
 	{
 		long xyz[] =
@@ -76,20 +88,25 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flip
 			flipZ ? maxZ - it->z : it->z
 		};
 
-		vertices.insert(vertex(xyz[order[0]], xyz[order[1]], xyz[order[2]]));
+		initVertices.insert(vertex(xyz[order[0]], xyz[order[1]], xyz[order[2]]));
 	}
-
-	long finalMinX = min_element(vertices.begin(), vertices.end(), compare_x)->x;
-	long finalMinY = min_element(vertices.begin(), vertices.end(), compare_y)->y;
-	long finalMinZ = min_element(vertices.begin(), vertices.end(), compare_z)->z;
-	if (finalMinX != 0 || finalMinY != 0 || finalMinZ != 0) throw runtime_error("Cube has been transformed wrongly!");
-	
-	width =  max_element(vertices.begin(), vertices.end(), compare_x)->x;
-	height = max_element(vertices.begin(), vertices.end(), compare_y)->y;
-	depth =  max_element(vertices.begin(), vertices.end(), compare_z)->z;
-
-	if (vertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) vertices");
+	return initVertices;
 }
+
+cube::cube(const set<vertex>& initVertices) : vertices(initVertices)
+{
+	long finalMinX = min_element(initVertices.begin(), initVertices.end(), compare_x)->x;
+	long finalMinY = min_element(initVertices.begin(), initVertices.end(), compare_y)->y;
+	long finalMinZ = min_element(initVertices.begin(), initVertices.end(), compare_z)->z;
+	if (finalMinX != 0 || finalMinY != 0 || finalMinZ != 0) throw runtime_error("Cube has been transformed wrongly!");
+
+	width = max_element(initVertices.begin(), initVertices.end(), compare_x)->x;
+	height = max_element(initVertices.begin(), initVertices.end(), compare_y)->y;
+	depth = max_element(initVertices.begin(), initVertices.end(), compare_z)->z;
+
+	if (initVertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) initVertices");
+}
+
 
 bool cube::is_oversize() const
 {

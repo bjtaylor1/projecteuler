@@ -69,7 +69,7 @@ void solver::process_mnpq(const mnpq& item)
 					flipZ = (f & 4) != 0;
 				int order[] = { 0,1,2 };
 				do {
-					cube c(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order);
+					cube c(cube::get_vertices(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order));
 					if (cubes.find(c) == cubes.end())
 					{
 						bool inserted;
@@ -89,21 +89,24 @@ void solver::process_mnpq(const mnpq& item)
 
 		//BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
-		for (set<cube>::const_iterator cube = cubes.begin(); cube != cubes.end(); cube++)
+		for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 		{
-			if (!cube->is_oversize())
+			if (!thecube->is_oversize())
 			{
-				long long width = cube->width,
-					height = cube->height,
-					depth = cube->depth;
+				long long width = thecube->width,
+					height = thecube->height,
+					depth = thecube->depth;
 				long long tmax = maxSide / (max(width, max(height, depth)));
 				if (tmax <= 0) throw runtime_error("tmax <= 0");
-				for (long long t = 1; t <= tmax; t++)
+				for (long t = 1; t <= tmax; t++)
 				{
+					cube cm = (*thecube) * t;
+					if (cm.is_oversize()) throw runtime_error("Cube multiplied is oversize!");
+
 					long long repeatability =
-						(maxSide + 1LL - t * width) *
-						(maxSide + 1LL - t * height) *
-						(maxSide + 1LL - t * depth);
+						(maxSide + 1LL - cm.width) *
+						(maxSide + 1LL - cm.height) *
+						(maxSide + 1LL - cm.depth);
 
 					if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
 
