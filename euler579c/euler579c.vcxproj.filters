@@ -51,9 +51,6 @@
     <ClInclude Include="massiveinteger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BigInteger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="vectortriple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -87,9 +84,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="massiveinteger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BigInteger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
