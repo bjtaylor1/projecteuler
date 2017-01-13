@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
 			cube::maxSize = n;
 			solver::maxSide = n;
-			solver::M = 9;// n >= 5000 ? 9 : 12;
+			solver::maxResultDigits = 9;// n >= 5000 ? 9 : 12;
 			solver::numThreads = numThreads;
 
 			solver::solve();

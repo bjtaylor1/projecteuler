@@ -10,7 +10,7 @@ class solver
 {
 public:
 	static BIGINT /*C, */ S;
-	static long long maxSide, maxResultDigits, M, numThreads;
+	static long long maxSide, maxResultDigits, numThreads;
 
 	static void solve();
 	

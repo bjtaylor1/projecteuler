@@ -14,7 +14,7 @@ long long addgcd(long long current, const vector3d& v)
 }
 
 BIGINT /*solver::C(0),*/ solver::S(0);
-long long solver::M = 0, solver::maxSide = 0, solver::maxResultDigits = 0, solver::numThreads = 0;
+long long solver::maxSide = 0, solver::maxResultDigits = 0, solver::numThreads = 0;
 set<cube> solver::cubes_done;
 
 blockingqueue<mnpq> mnpq_queue(10000);
