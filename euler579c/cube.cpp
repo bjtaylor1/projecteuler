@@ -34,7 +34,6 @@ bool compare_z(const vertex& v1, const vertex& v2) { return v1.z < v2.z; }
 
 cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order) : width(0), height(0), depth(0)
 {
-	long minx = 0, miny = 0, minz = 0;
 	vertex O(0, 0, 0);
 	vector<vertex> tempvertices
 	{
