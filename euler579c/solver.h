@@ -11,8 +11,9 @@ class solver
 public:
 	BIGINT C, S;
 	long long M;
-	long long maxSide, maxResultDigits;
-	solver(long long _maxSide, long long _maxResultDigits) : maxSide(_maxSide), maxResultDigits(_maxResultDigits), C(0), S(0) { }
+	long long maxSide;
+	size_t maxResultDigits;
+	solver(long long _maxSide, size_t _maxResultDigits) : maxSide(_maxSide), maxResultDigits(_maxResultDigits), C(0), S(0) { }
 	void solve();
 	void process_mnpq(mnpq& mnpq);
 

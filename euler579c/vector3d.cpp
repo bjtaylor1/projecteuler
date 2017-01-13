@@ -13,11 +13,11 @@ vertex operator+(const vertex& lhs, const vector3d& rhs)
 	return vertex(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 }
 
-vector3d operator/(const vector3d& lhs, long f)
+vector3d operator/(const vector3d& lhs, long long f)
 {
-	long newx = lhs.x / f;
-	long newy = lhs.y / f;
-	long newz = lhs.z / f;
+	long long newx = lhs.x / f;
+	long long newy = lhs.y / f;
+	long long newz = lhs.z / f;
 	return vector3d(newx, newy, newz);
 }
 

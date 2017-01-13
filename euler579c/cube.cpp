@@ -48,21 +48,21 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flip
 		U+V+N
 	};
 
-	long minX = min_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
-	long minY = min_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
-	long minZ = min_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
+	long long minX = min_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
+	long long minY = min_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
+	long long minZ = min_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
 	for (vector<vertex>::iterator vert = tempvertices.begin(); vert != tempvertices.end(); vert++)
 	{
 		vert->x -= minX;
 		vert->y -= minY;
 		vert->z -= minZ;
 	}
-	long maxX = max_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
-	long maxY = max_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
-	long maxZ = max_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
+	long long maxX = max_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
+	long long maxY = max_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
+	long long maxZ = max_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
 	for (vector<vertex>::const_iterator it = tempvertices.begin(); it != tempvertices.end(); it++)
 	{
-		long xyz[] =
+		long long xyz[] =
 		{
 			flipX ? maxX - it->x : it->x,
 			flipY ? maxY - it->y : it->y,
@@ -72,9 +72,9 @@ cube::cube(const vector3d & U, const vector3d & V, const vector3d & N, bool flip
 		vertices.insert(vertex(xyz[order[0]], xyz[order[1]], xyz[order[2]]));
 	}
 
-	long finalMinX = min_element(vertices.begin(), vertices.end(), compare_x)->x;
-	long finalMinY = min_element(vertices.begin(), vertices.end(), compare_y)->y;
-	long finalMinZ = min_element(vertices.begin(), vertices.end(), compare_z)->z;
+	long long finalMinX = min_element(vertices.begin(), vertices.end(), compare_x)->x;
+	long long finalMinY = min_element(vertices.begin(), vertices.end(), compare_y)->y;
+	long long finalMinZ = min_element(vertices.begin(), vertices.end(), compare_z)->z;
 	if (finalMinX != 0 || finalMinY != 0 || finalMinZ != 0) throw runtime_error("Cube has been transformed wrongly!");
 	
 	width =  max_element(vertices.begin(), vertices.end(), compare_x)->x;
