@@ -20,12 +20,13 @@
 
 using namespace std;
 
-BigInteger::BigInteger(unsigned long long integer) {
+BigInteger::BigInteger(unsigned long long integer) : totalTruncated(0) {
 	setInteger(integer);
 }
 
-BigInteger::BigInteger(string integer) {
-	for (long long i = 0; i < (long long)integer.size() && integer[i] >= '0' && integer[i] <= '9'; i++) {
+BigInteger::BigInteger(string integer): totalTruncated(0) {
+	for (long long i = 0; i < (long long)integer.size(); i++) {
+		if (!(integer[i] >= '0' && integer[i] <= '9')) throw runtime_error("Bad character in integer representation");
 		this->integer += integer[i];
 	}
 
@@ -66,7 +67,9 @@ string BigInteger::toString() const {
 
 void BigInteger::truncate(long n) {
 	if (integer.size() > n) {
-		integer.erase(0, integer.size() - n);
+		long toTruncate = integer.size() - n;
+		totalTruncated += toTruncate;
+		integer.erase(0, toTruncate);
 	}
 }
 
@@ -149,7 +152,10 @@ BigInteger BigInteger::operator*(const BigInteger& integer) const {
 }
 
 ostream& operator<<(ostream& in, BigInteger& integer) {
+	
 	in << integer.toString();
+	if (integer.totalTruncated > 0)
+		in << " (e" << integer.totalTruncated << ")";
 
 	return in;
 }

@@ -7,6 +7,6 @@
 
 #define my_round(dbl) ((long long)(dbl+0.5))
 
-typedef massiveinteger BIGINT;
+typedef BigInteger BIGINT;
 
 #endif

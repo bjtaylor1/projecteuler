@@ -25,6 +25,7 @@ using namespace std;
 
 class BigInteger {
 private:
+	long totalTruncated;
 	string integer;
 public:
 	/* Constructs a big integer representation of the integer given as an argument */
