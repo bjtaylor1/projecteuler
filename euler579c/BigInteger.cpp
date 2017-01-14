@@ -20,8 +20,13 @@
 
 using namespace std;
 
-BigInteger::BigInteger(unsigned long long integer) : BigInteger(integer, 0) {}
-BigInteger::BigInteger(unsigned long long integer, long TotalTruncated) : totalTruncated(TotalTruncated) {
+BigInteger::BigInteger(long long integer) : BigInteger(integer, 0) 
+{
+	if (integer < 0) throw runtime_error("BigInteger initialized with negative value - may have overflown!");
+}
+BigInteger::BigInteger(long long integer, long TotalTruncated) : totalTruncated(TotalTruncated)
+{
+	if (integer < 0) throw runtime_error("BigInteger initialized with negative value - may have overflown!");
 	setInteger(integer);
 }
 
@@ -39,7 +44,7 @@ BigInteger::BigInteger(string integer, long TotalTruncated): totalTruncated(Tota
 	}
 }
 
-void BigInteger::setInteger(unsigned long long integer) {
+void BigInteger::setInteger(long long integer) {
 	if (integer == 0) this->integer = "0";
 
 	while (integer) {

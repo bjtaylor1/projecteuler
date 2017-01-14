@@ -29,8 +29,8 @@ private:
 	string integer;
 public:
 	/* Constructs a big integer representation of the integer given as an argument */
-	BigInteger(unsigned long long integer);
-	BigInteger(unsigned long long integer, long TotalTruncated);
+	BigInteger(long long integer);
+	BigInteger(long long integer, long TotalTruncated);
 
 	/* Parses the string given as an argument looking for an integer.
 	 * Stops as soon as it finds a non-digit character.
@@ -42,7 +42,7 @@ public:
 	/* Constructs a big integer representation of the integer given as an argument
 	 * and assigns it to the internal representation of the big integer.
 	 */
-	void setInteger(unsigned long long integer);
+	void setInteger(long long integer);
 
 	/* Parses the string given as an argument looking for an integer and assigns it to
 	 * the internal representation of the big integer.

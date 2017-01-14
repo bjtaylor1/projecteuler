@@ -98,7 +98,7 @@ void solver::process_mnpq(const mnpq& item)
 					depth = thecube->depth;
 				long long tmax = maxSide / (max(width, max(height, depth)));
 				if (tmax <= 0) throw runtime_error("tmax <= 0");
-				for (long t = 1; t <= tmax; t++)
+				for (long long t = 1; t <= tmax; t++)
 				{
 					cube cm = (*thecube) * t;
 					if (cm.is_oversize()) throw runtime_error("Cube multiplied is oversize!");
