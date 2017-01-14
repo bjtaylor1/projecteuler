@@ -76,6 +76,9 @@ void solver::process_mnpq(mnpq& item)
 
 		BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
+		ofstream ofs;
+		ofs.open("single.txt", ios::trunc);
+		ofs << "t,repeatability,bigint_repeatability,contributionS,thisS" << endl;
 		for (set<cube>::const_iterator cube = cubes.begin(); cube != cubes.end(); cube++)
 		{
 			if (!cube->is_oversize())
@@ -94,7 +97,8 @@ void solver::process_mnpq(mnpq& item)
 						(maxSide + 1LL - t * depth);
 					if (repeatability <= 0) throw runtime_error("repeatability <= 0");
 
-					thisCxr = thisCxr + BIGINT(repeatability);
+					BIGINT bRepeatability = BIGINT(repeatability);
+					thisCxr = thisCxr + bRepeatability;
 
 					BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
 						+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
@@ -102,10 +106,13 @@ void solver::process_mnpq(mnpq& item)
 					BIGINT contributionS = ehp * BIGINT(repeatability);
 
 					thisS = thisS + contributionS;
+
+					ofs << t << "," << repeatability << "," << bRepeatability << "," << contributionS << "," << thisS << endl;
 				}
 			}
 		}
-
+		ofs.close();
+		exit(1);
 
 		C = C + thisCxr;
 		S = S + thisS;
