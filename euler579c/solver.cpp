@@ -74,7 +74,7 @@ void solver::process_mnpq(mnpq& item)
 
 		}
 
-		BIGINT thisCxr = 0;
+		//BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
 		for (set<cube>::const_iterator cube = cubes.begin(); cube != cubes.end(); cube++)
 		{
@@ -83,21 +83,22 @@ void solver::process_mnpq(mnpq& item)
 				long long width = cube->width,
 					height = cube->height,
 					depth = cube->depth;
-				long long tmax = maxSide / (max(width, max(height, depth)));
+				long long tmax = maxSide / ((long long)(max(width, max(height, depth))));
 				if (tmax <= 0) throw runtime_error("tmax <= 0");
 
 				for (long long t = 1; t <= tmax; t++)
 				{
 					long long repeatability =
-						(maxSide + 1LL - t * width) *
-						(maxSide + 1LL - t * height) *
-						(maxSide + 1LL - t * depth);
+						(maxSide + 1LL - (t * width)) *
+						(maxSide + 1LL - (t * height)) *
+						(maxSide + 1LL - (t * depth));
 					if (repeatability <= 0) throw runtime_error("repeatability <= 0");
 
-					thisCxr = thisCxr + BIGINT(repeatability);
+					//thisCxr = thisCxr + BIGINT(repeatability);
 
-					BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
-						+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
+					BIGINT ehp = (BIGINT(l*l*l) * BIGINT(t*t*t))
+						+ (BIGINT(l*(sumgcd)) * BIGINT(t*t))
+						+ BIGINT((sumgcd)* t + 1);
 					//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
 					BIGINT contributionS = ehp * BIGINT(repeatability);
 
@@ -107,10 +108,10 @@ void solver::process_mnpq(mnpq& item)
 		}
 
 
-		C = C + thisCxr;
+		//C = C + thisCxr;
 		S = S + thisS;
 
-		if (maxResultDigits > 0 && ((itcount % 10) == 0))
+		if (maxResultDigits > 0)
 		{
 			C.truncate(maxResultDigits);
 			S.truncate(maxResultDigits);
