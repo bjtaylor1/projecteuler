@@ -44,7 +44,7 @@ void solver::process_mnpq(mnpq& item)
 	long long sumgcd = baseTriple.u.gcd() + baseTriple.v.gcd() + baseTriple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 	long long l = baseTriple.u.length;
 
-	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c, baseAbcd.d })) == 1)
+	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c })) == 1)
 	{
 		set<cube> cubes;
 		set<abcd> abcds = get_permutations(baseAbcd);
@@ -60,15 +60,7 @@ void solver::process_mnpq(mnpq& item)
 				int order[] = { 0,1,2 };
 				do {
 					cube c(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order);
-					if (cubes.find(c) == cubes.end())
-					{
-						bool inserted= cubes_done.insert(c).second;
-						
-						if (inserted)
-						{
-							cubes.insert(c);
-						}
-					}
+					cubes.insert(c);
 				} while (next_permutation(order, order + 3));
 			}
 
@@ -78,7 +70,7 @@ void solver::process_mnpq(mnpq& item)
 		BIGINT thisS = 0;
 		for (set<cube>::const_iterator cube = cubes.begin(); cube != cubes.end(); cube++)
 		{
-			if (!cube->is_oversize())
+			if (!cube->is_oversize() && cubes_done.insert(*cube).second)
 			{
 				long long width = cube->width,
 					height = cube->height,
