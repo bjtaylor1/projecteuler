@@ -70,18 +70,7 @@ void solver::process_mnpq(const mnpq& item)
 				int order[] = { 0,1,2 };
 				do {
 					cube c(cube::get_vertices(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order));
-					if (cubes.find(c) == cubes.end())
-					{
-						bool inserted;
-						{
-							lock_guard<mutex> lm(m_data);
-							inserted = cubes_done.insert(c).second;
-						}
-						if (inserted)
-						{
-							cubes.insert(c);
-						}
-					}
+					cubes.insert(c);
 				} while (next_permutation(order, order + 3));
 			}
 
@@ -93,31 +82,39 @@ void solver::process_mnpq(const mnpq& item)
 		{
 			if (!thecube->is_oversize())
 			{
-				long long width = thecube->width,
-					height = thecube->height,
-					depth = thecube->depth;
-				long long tmax = maxSide / (max(width, max(height, depth)));
-				if (tmax <= 0) throw runtime_error("tmax <= 0");
-				for (long long t = 1; t <= tmax; t++)
+				bool inserted;
 				{
-					cube cm = (*thecube) * t;
-					if (cm.is_oversize()) throw runtime_error("Cube multiplied is oversize!");
+					lock_guard<mutex> lm(m_data);
+					inserted = cubes_done.insert(*thecube).second;
+				}
+				if (inserted)
+				{
+					long long width = thecube->width,
+						height = thecube->height,
+						depth = thecube->depth;
+					long long tmax = maxSide / (max(width, max(height, depth)));
+					if (tmax <= 0) throw runtime_error("tmax <= 0");
+					for (long long t = 1; t <= tmax; t++)
+					{
+						cube cm = (*thecube) * t;
+						if (cm.is_oversize()) throw runtime_error("Cube multiplied is oversize!");
 
-					long long repeatability =
-						(maxSide + 1LL - cm.width) *
-						(maxSide + 1LL - cm.height) *
-						(maxSide + 1LL - cm.depth);
+						long long repeatability =
+							(maxSide + 1LL - cm.width) *
+							(maxSide + 1LL - cm.height) *
+							(maxSide + 1LL - cm.depth);
 
-					if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
+						if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
 
-					//thisCxr = thisCxr + BIGINT(repeatability);
+						//thisCxr = thisCxr + BIGINT(repeatability);
 
-					BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
-						+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
-					//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-					BIGINT contributionS = ehp * BIGINT(repeatability);
+						BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
+							+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
+						//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
+						BIGINT contributionS = ehp * BIGINT(repeatability);
 
-					thisS = thisS + contributionS;
+						thisS = thisS + contributionS;
+					}
 				}
 			}
 		}
