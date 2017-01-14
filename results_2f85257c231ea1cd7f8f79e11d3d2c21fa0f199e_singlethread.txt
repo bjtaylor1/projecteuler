@@ -1,0 +1,38 @@
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 500
+S(500) = 370861928
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1000
+S(1000) = 029663052
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1500
+S(1500) = 941502444
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1550
+S(1550) = 352035479
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1600
+S(1600) = 369936818
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1650
+S(1650) = 360136885
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1700
+S(1700) = 233363406
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1750
+S(1750) = 165870947
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1800
+S(1800) = 817693234
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1850
+S(1850) = 150445617
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1900
+S(1900) = 865260352
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 1950
+S(1950) = 563033869
+
+C:\Users\ben.taylor\Documents\Projects\projecteuler>x64\release\euler579c 2000
+S(2000) = 674651446
