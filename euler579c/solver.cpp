@@ -88,11 +88,14 @@ void solver::process_mnpq(const mnpq& item)
 		}
 
 		//BIGINT thisCxr = 0;
+		bool anyFound = false;
 		BIGINT thisS = 0;
 		for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 		{
 			if (!thecube->is_oversize())
 			{
+				anyFound = true;
+
 				long long width = thecube->width,
 					height = thecube->height,
 					depth = thecube->depth;
@@ -122,8 +125,14 @@ void solver::process_mnpq(const mnpq& item)
 			}
 		}
 
+		if(anyFound)
 		{
 			lock_guard<mutex> lm(m_data);
+
+			ofstream ofs;
+			ofs.open("debug.txt", ios::app);
+			ofs << item << "," << S << "," << thisS;
+
 			//C = C + thisCxr;
 			S = S + thisS;
 			if (maxResultDigits > 0 && ((itcount % 10) == 0))
@@ -131,6 +140,9 @@ void solver::process_mnpq(const mnpq& item)
 				//C.truncate(maxResultDigits);
 				S.truncate(maxResultDigits);
 			}
+
+			ofs << "," << S << endl;
+			ofs.close();
 		}
 
 	}
@@ -165,6 +177,11 @@ void processor()
 
 void solver::solve()
 {
+	ofstream ofs;
+	ofs.open("debug.txt", ios::trunc);
+	ofs << "m,n,p,q,S_old,S_add,S_new" << endl;
+	ofs.close();
+	
 	vector<thread> threads;
 	for (int i = 0; i < numThreads; i++)
 	{
