@@ -39,13 +39,14 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 void solver::process_mnpq(mnpq& item)
 {
 	abcd baseAbcd = item.get_abcd();
-	vectortriple baseTriple = get_triple(baseAbcd, item);
-
-	long long sumgcd = baseTriple.u.gcd() + baseTriple.v.gcd() + baseTriple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
-	long long l = baseTriple.u.length;
 
 	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c })) == 1)
 	{
+		vectortriple baseTriple = get_triple(baseAbcd, item);
+
+		long long sumgcd = baseTriple.u.gcd() + baseTriple.v.gcd() + baseTriple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
+		long long l = baseTriple.u.length;
+
 		set<cube> cubes;
 		set<abcd> abcds = get_permutations(baseAbcd);
 		for (set<abcd>::const_iterator abcd = abcds.begin(); abcd != abcds.end(); abcd++)
