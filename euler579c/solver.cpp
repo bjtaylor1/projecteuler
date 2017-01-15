@@ -78,6 +78,9 @@ void solver::process_mnpq(const mnpq& item)
 
 		//BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
+		ofstream ofs;
+		ofs.open("s5_verbose_cpp.csv", ios::app);
+
 		for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 		{
 			if (!thecube->is_oversize())
@@ -94,12 +97,13 @@ void solver::process_mnpq(const mnpq& item)
 						depth = thecube->depth;
 					long long maxSize = max(width, max(height, depth));
 					long long tmax = maxSide / maxSize;
-					if (tmax * maxSize >= maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
+					if (tmax * maxSize > maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
 					if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
 
 					if (tmax <= 0) throw runtime_error("tmax <= 0");
 					for (long long t = 1; t <= tmax; t++)
 					{
+						
 						cube cm = (*thecube) * t;
 						if (cm.is_oversize()) throw runtime_error("Cube multiplied is oversize!");
 
@@ -117,7 +121,10 @@ void solver::process_mnpq(const mnpq& item)
 						//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
 						BIGINT contributionS = ehp * BIGINT(repeatability);
 
+						ofs << item << "," << t << "," << thisS << "," << contributionS << ",";
 						thisS = thisS + contributionS;
+						ofs << thisS << endl;
+
 					}
 				}
 			}

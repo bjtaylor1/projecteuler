@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -89,12 +90,14 @@ namespace euler579cs2
                             long repeatability = (N + 1L - thisCube.width*t)*
                                                  (N + 1L - thisCube.height*t)*
                                                  (N + 1L - thisCube.depth*t);
-                            if(repeatability <= 0) throw new InvalidOperationException("Repeatability <= 0");
+                            if (repeatability <= 0) throw new InvalidOperationException("Repeatability <= 0");
                             massiveinteger ehp = new massiveinteger(l*l*l)*new massiveinteger(t*t*t) +
                                                  new massiveinteger(l*sumgcd)*new massiveinteger(t*t) + new massiveinteger(sumgcd*t + 1);
                             massiveinteger contributionS = ehp*new massiveinteger(repeatability);
+                            var line = $"{item},{t},{thisS},{contributionS},";
                             thisS += contributionS;
-
+                            line += thisS;
+                            //File.AppendAllLines("s5_verbose_csh.csv", new [] {line});
                         }
                     }
                 }

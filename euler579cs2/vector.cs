@@ -6,7 +6,8 @@ namespace euler579cs2
     {
         public long gcd()
         {
-            return new[] {x, y, z}.gcd();
+            var result = new[] {x, y, z}.gcd();
+            return result;
         }
 
         public long length { get; }
