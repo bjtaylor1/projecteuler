@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "cube.h"
+#include "util.h"
 
 using namespace std;
 
@@ -26,16 +27,6 @@ bool operator<(const cube & lhs, const cube & rhs)
 {
 	bool isless = is_less(lhs, rhs);
 	return isless;
-}
-
-cube operator*(const cube& c, long n)
-{
-	set<vertex> newVertices;
-	for (set<vertex>::const_iterator vertex = c.vertices.begin(); vertex != c.vertices.end(); vertex++)
-	{
-		newVertices.insert((*vertex) * n);
-	}
-	return cube(newVertices);
 }
 
 bool compare_x(const vertex& v1, const vertex& v2) { return v1.x < v2.x; }
@@ -65,23 +56,23 @@ set<vertex> cube::get_vertices(const vector3d & U, const vector3d & V, const vec
 		U+V+N
 	};
 
-	long minX = min_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
-	long minY = min_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
-	long minZ = min_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
+	long long minX = min_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
+	long long minY = min_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
+	long long minZ = min_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
 	for (vector<vertex>::iterator vert = tempvertices.begin(); vert != tempvertices.end(); vert++)
 	{
 		vert->x -= minX;
 		vert->y -= minY;
 		vert->z -= minZ;
 	}
-	long maxX = max_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
-	long maxY = max_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
-	long maxZ = max_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
+	long long maxX = max_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
+	long long maxY = max_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
+	long long maxZ = max_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
 
 	set<vertex> initVertices;
 	for (vector<vertex>::const_iterator it = tempvertices.begin(); it != tempvertices.end(); it++)
 	{
-		long xyz[] =
+		long long xyz[] =
 		{
 			flipX ? maxX - it->x : it->x,
 			flipY ? maxY - it->y : it->y,
@@ -93,11 +84,11 @@ set<vertex> cube::get_vertices(const vector3d & U, const vector3d & V, const vec
 	return initVertices;
 }
 
-cube::cube(const set<vertex>& initVertices) : vertices(initVertices)
+cube::cube(const set<vertex>& initVertices, long long Sumgcd) : vertices(initVertices), sumgcd(Sumgcd)
 {
-	long finalMinX = min_element(initVertices.begin(), initVertices.end(), compare_x)->x;
-	long finalMinY = min_element(initVertices.begin(), initVertices.end(), compare_y)->y;
-	long finalMinZ = min_element(initVertices.begin(), initVertices.end(), compare_z)->z;
+	long long finalMinX = min_element(initVertices.begin(), initVertices.end(), compare_x)->x;
+	long long finalMinY = min_element(initVertices.begin(), initVertices.end(), compare_y)->y;
+	long long finalMinZ = min_element(initVertices.begin(), initVertices.end(), compare_z)->z;
 	if (finalMinX != 0 || finalMinY != 0 || finalMinZ != 0) throw runtime_error("Cube has been transformed wrongly!");
 
 	width = max_element(initVertices.begin(), initVertices.end(), compare_x)->x;
@@ -112,4 +103,13 @@ bool cube::is_oversize() const
 {
 	return (width > maxSize) || (height > maxSize) || (depth > maxSize);
 
+}
+
+ostream& operator<<(ostream& os, const cube& c)
+{
+	for (set<vertex>::const_iterator v = c.vertices.begin(); v != c.vertices.end(); v++)
+	{
+		cout << *v << "  ";
+	}
+	return os;
 }

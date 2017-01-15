@@ -26,7 +26,7 @@ public:
 		} while (n > 0);
 	}
 
-	void truncate(long n);
+	void truncate(size_t n);
 
 };
 

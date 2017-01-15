@@ -9,15 +9,16 @@ class cube
 {
 public:
 	static long long maxSize;
-	int width, height, depth;
+	long long width, height, depth;
+	long long sumgcd;
 	set<vertex> vertices;
 	static set<vertex> get_vertices(const vector3d& U, const vector3d& V, const vector3d& N, bool flipX, bool flipY, bool flipZ, int* order);
-	cube(const set<vertex>& Vertices);
+	cube(const set<vertex>& Vertices, long long Sumgcd);
 	bool is_oversize() const;
-	
 };
 
 bool operator <(const cube& lhs, const cube& rhs);
 cube operator*(const cube&, long);
+ostream& operator<<(ostream& os, const cube& c);
 
 #endif

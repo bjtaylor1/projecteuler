@@ -9,8 +9,8 @@ using namespace std;
 class vertex
 {
 public:
-	int x, y, z;
-	vertex(int X, int Y, int Z) : x(X), y(Y), z(Z) {}
+	long long x, y, z;
+	vertex(long long X, long long Y, long long Z) : x(X), y(Y), z(Z) {}
 	virtual ~vertex() {}
 };
 

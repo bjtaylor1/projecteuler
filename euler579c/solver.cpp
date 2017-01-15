@@ -14,7 +14,8 @@ long long addgcd(long long current, const vector3d& v)
 }
 
 BIGINT /*solver::C(0),*/ solver::S(0);
-long long solver::maxSide = 0, solver::maxResultDigits = 0, solver::numThreads = 0;
+long long solver::maxSide = 0, solver::numThreads = 0;
+size_t solver::maxResultDigits = 0;
 set<cube> solver::cubes_done;
 
 blockingqueue<mnpq> mnpq_queue(10000);
@@ -51,16 +52,16 @@ void solver::process_mnpq(const mnpq& item)
 	abcd baseAbcd = item.get_abcd();
 	vectortriple baseTriple = get_triple(baseAbcd, item);
 
-	long sumgcd = baseTriple.u.gcd() + baseTriple.v.gcd() + baseTriple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 	long long l = baseTriple.u.length;
 
-	if (util::gcd(set<long long>({ baseAbcd.a, baseAbcd.b, baseAbcd.c, baseAbcd.d })) == 1)
+	set<cube> cubes;
+	set<abcd> abcds = get_permutations(baseAbcd);
+	for (set<abcd>::const_iterator abcd = abcds.begin(); abcd != abcds.end(); abcd++)
 	{
-		set<cube> cubes;
-		set<abcd> abcds = get_permutations(baseAbcd);
-		for (set<abcd>::const_iterator abcd = abcds.begin(); abcd != abcds.end(); abcd++)
+		vectortriple triple = get_triple(*abcd, item);
+		if (triple.u.gcd() == 1 || triple.v.gcd() == 1 || triple.n.gcd() == 1)
 		{
-			vectortriple triple = get_triple(*abcd, item);
+			long long sumgcd = triple.u.gcd() + triple.v.gcd() + triple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
 
 			for (int f = 0; f < 8; f++)
 			{
@@ -69,78 +70,71 @@ void solver::process_mnpq(const mnpq& item)
 					flipZ = (f & 4) != 0;
 				int order[] = { 0,1,2 };
 				do {
-					cube c(cube::get_vertices(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order));
+					cube c(cube::get_vertices(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order), sumgcd);
 					cubes.insert(c);
 				} while (next_permutation(order, order + 3));
 			}
-
 		}
+	}
 
-		//BIGINT thisCxr = 0;
-		BIGINT thisS = 0;
-		ofstream ofs;
-		ofs.open("s5_verbose_cpp.csv", ios::app);
+	//BIGINT thisCxr = 0;
+	BIGINT thisS = 0;
 
-		for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
+	for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
+	{
+		if (!thecube->is_oversize())
 		{
-			if (!thecube->is_oversize())
+			bool inserted;
 			{
-				bool inserted;
+				lock_guard<mutex> lm(m_data);
+				inserted = cubes_done.insert(*thecube).second;
+			}
+			if (inserted)
+			{
+				long long width = thecube->width,
+					height = thecube->height,
+					depth = thecube->depth;
+				long long maxSize = max(width, max(height, depth));
+				long long tmax = maxSide / maxSize;
+				if (tmax * maxSize > maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
+				if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
+
+				if (tmax <= 0) throw runtime_error("tmax <= 0");
+				BIGINT thisContributionS;
+				for (long long t = 1; t <= tmax; t++)
 				{
-					lock_guard<mutex> lm(m_data);
-					inserted = cubes_done.insert(*thecube).second;
+					long long repeatability =
+						(maxSide + 1LL - thecube->width*t) *
+						(maxSide + 1LL - thecube->height*t) *
+						(maxSide + 1LL - thecube->depth*t);
+
+					if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
+
+					//thisCxr = thisCxr + BIGINT(repeatability);
+
+					BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
+						+ BIGINT(l*(thecube->sumgcd)) * BIGINT(t*t) + BIGINT((thecube->sumgcd)* t + 1);
+					//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
+					BIGINT contributionS = ehp * BIGINT(repeatability);
+
+					thisContributionS = thisContributionS + contributionS;
 				}
-				if (inserted)
-				{
-					long long width = thecube->width,
-						height = thecube->height,
-						depth = thecube->depth;
-					long long maxSize = max(width, max(height, depth));
-					long long tmax = maxSide / maxSize;
-					if (tmax * maxSize > maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
-					if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
+				thisS = thisS + thisContributionS;
 
-					if (tmax <= 0) throw runtime_error("tmax <= 0");
-					for (long long t = 1; t <= tmax; t++)
-					{
-						
-						cube cm = (*thecube) * t;
-						if (cm.is_oversize()) throw runtime_error("Cube multiplied is oversize!");
-
-						long long repeatability =
-							(maxSide + 1LL - cm.width) *
-							(maxSide + 1LL - cm.height) *
-							(maxSide + 1LL - cm.depth);
-
-						if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
-
-						//thisCxr = thisCxr + BIGINT(repeatability);
-
-						BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
-							+ BIGINT(l*(sumgcd)) * BIGINT(t*t) + BIGINT((sumgcd)* t + 1);
-						//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-						BIGINT contributionS = ehp * BIGINT(repeatability);
-
-						ofs << item << "," << t << "," << thisS << "," << contributionS << ",";
-						thisS = thisS + contributionS;
-						ofs << thisS << endl;
-
-					}
-				}
 			}
 		}
+	}
 
+	{
+		lock_guard<mutex> lm(m_data);
+		//C = C + thisCxr;
+		S = S + thisS;
+
+		if (maxResultDigits > 0 && ((itcount % 10) == 0))
 		{
-			lock_guard<mutex> lm(m_data);
-			//C = C + thisCxr;
-			S = S + thisS;
-			if (maxResultDigits > 0 && ((itcount % 10) == 0))
-			{
-				//C.truncate(maxResultDigits);
-				S.truncate(maxResultDigits);
-			}
+			//C.truncate(maxResultDigits);
+			S.truncate(maxResultDigits);
 		}
-
 	}
 }
 
@@ -181,13 +175,13 @@ void solver::solve()
 
 	for (long long m = 0; m <= ceil(sqrt(maxSide)) + 1.0; m++)
 	{
-		long long nmax = ceil(sqrt(maxSide - m*m)) + 1.0;
+		long long nmax = (long long)ceil(sqrt(maxSide - m*m)) + 1LL;
 		for (long long n = 0; n <= nmax; n++)
 		{
-			long long pmax = ceil(sqrt(maxSide - m*m - n*n)) + 1.0;
+			long long pmax = (long long)ceil(sqrt(maxSide - m*m - n*n)) + 1LL;
 			for (long long p = 0; p <= pmax; p++)
 			{
-				long long qmax = ceil(sqrt(maxSide - m*m - n*n - p*p)) + 1.0;
+				long long qmax = (long long)ceil(sqrt(maxSide - m*m - n*n - p*p)) + 1LL;
 				for (long long q = 0; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)
