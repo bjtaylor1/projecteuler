@@ -94,10 +94,10 @@ namespace euler579cs2
                             massiveinteger ehp = new massiveinteger(l*l*l)*new massiveinteger(t*t*t) +
                                                  new massiveinteger(l*sumgcd)*new massiveinteger(t*t) + new massiveinteger(sumgcd*t + 1);
                             massiveinteger contributionS = ehp*new massiveinteger(repeatability);
-                            var line = $"{item},{t},{thisS},{contributionS},";
+//                            var line = $"{item},{t},{thisS},{contributionS},";
                             thisS += contributionS;
-                            line += thisS;
-                            //File.AppendAllLines("s5_verbose_csh.csv", new [] {line});
+//                            line += thisS;
+//                            File.AppendAllLines("s5_verbose_csh.csv", new [] {line});
                         }
                     }
                 }
