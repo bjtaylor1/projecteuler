@@ -41,6 +41,11 @@ namespace euler579cs2
             }
         }
 
+        public override string ToString()
+        {
+            return $"{x},{y},{z}";
+        }
+
         public static bool operator ==(vertex left, vertex right)
         {
             return Equals(left, right);

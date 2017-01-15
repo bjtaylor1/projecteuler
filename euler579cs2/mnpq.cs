@@ -26,7 +26,7 @@
 
         public override string ToString()
         {
-            return $"{m}{n},{p},{q}";
+            return $"{m},{n},{p},{q}";
         }
 
     }

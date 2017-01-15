@@ -92,7 +92,11 @@ void solver::process_mnpq(const mnpq& item)
 					long long width = thecube->width,
 						height = thecube->height,
 						depth = thecube->depth;
-					long long tmax = maxSide / (max(width, max(height, depth)));
+					long long maxSize = max(width, max(height, depth));
+					long long tmax = maxSide / maxSize;
+					if (tmax * maxSize >= maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
+					if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
+
 					if (tmax <= 0) throw runtime_error("tmax <= 0");
 					for (long long t = 1; t <= tmax; t++)
 					{
