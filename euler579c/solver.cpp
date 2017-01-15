@@ -14,7 +14,6 @@ long long addgcd(long long current, const vector3d& v)
 
 vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 {
-	vector<vectortriple> triples;
 	set<vector3d> allVectors;
 	vector<long long> perm = hint.as_vector();
 	sort(perm.begin(), perm.end());
