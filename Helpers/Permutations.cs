@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace euler579
+namespace Helpers
 {
-
     public class Permutations
     {
         public static void Get<T>(T[] items, int numItemsInPermutation, bool allowDuplicates, bool combinationsOnly, Func<T[], bool> process)
