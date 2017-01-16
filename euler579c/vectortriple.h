@@ -16,6 +16,12 @@ public:
 			(!N.is_orthogonal_to(U))
 			) throw runtime_error("Vector triple initialized with bad vectors!");
 	}
+
+	set<vector3d> get_key() const
+	{
+		set<vector3d> absVectors({ u.to_key(), v.to_key(), n.to_key() });
+		return absVectors;
+	}
 };
 
 #endif

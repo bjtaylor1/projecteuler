@@ -98,6 +98,42 @@ cube::cube(const set<vertex>& initVertices, long long Sumgcd) : vertices(initVer
 	if (initVertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) initVertices");
 }
 
+template<class T1, class T2>
+bool sort_pair_first(const pair<T1, T2>& p1, const pair<T1, T2>& p2)
+{
+	return p1.first < p2.first;
+}
+
+vectortriple cube::get_triple() const
+{
+	//look at all the vertices distance from the first:
+	int examined = 0;
+	vector<pair<long long, vertex>> verticesByDistanceFromFirst;
+	for (set<vertex>::const_iterator v = ++vertices.begin(); v != vertices.end(); v++)
+	{
+		long long distsq = v->dist_squared_from(*vertices.begin());
+		pair<long long, vertex> p(distsq, *v);
+		verticesByDistanceFromFirst.push_back(p);
+		examined++;
+	}
+	if (examined != 7) throw runtime_error("Should have examined 7 vertices!");
+	sort(verticesByDistanceFromFirst.begin(), verticesByDistanceFromFirst.end(), sort_pair_first<long long, vertex>);
+	if (verticesByDistanceFromFirst[0].first != verticesByDistanceFromFirst[1].first ||
+		verticesByDistanceFromFirst[1].first != verticesByDistanceFromFirst[2].first) throw runtime_error("Failed to get 3 nearest vertices 1");
+
+	if (verticesByDistanceFromFirst[2].first == verticesByDistanceFromFirst[3].first) throw runtime_error("Failed to get 3 nearest vertices 2");
+
+	vertex u1 = verticesByDistanceFromFirst[0].second - *vertices.begin();
+	vertex v1 = verticesByDistanceFromFirst[1].second - *vertices.begin();
+	vertex n1 = verticesByDistanceFromFirst[2].second - *vertices.begin();
+	
+	vector3d u(u1.x, u1.y, u1.z);
+	vector3d v(v1.x, v1.y, v1.z);
+	vector3d n(n1.x, n1.y, n1.z);
+	return vectortriple(u, v, n);
+
+}
+
 
 bool cube::is_oversize() const
 {

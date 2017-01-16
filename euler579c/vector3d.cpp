@@ -7,9 +7,11 @@ long long vector3d::gcd() const
 	return util::gcd(set<long long>({ x, y, z }));
 }
 
-vector3d vector3d::to_abs() const
+vector3d vector3d::to_key() const
 {
-	return vector3d(abs(x), abs(y), abs(z));
+	vector<long long> sides({ abs(x), abs(y), abs(z) });
+	sort(sides.begin(), sides.end());
+	return vector3d(sides[0], sides[1], sides[2]);
 }
 
 

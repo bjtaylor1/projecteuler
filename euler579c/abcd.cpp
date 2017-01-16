@@ -27,9 +27,17 @@ long long abcd::get_count_zero() const
 	return countzero;
 }
 
+abcd abcd::to_key() const
+{
+	vector<long long> v({ abs(a), abs(b), abs(c) });
+	sort(v.begin(), v.end());
+
+	return abcd(v[0], v[1], v[2], d);
+}
+
 ostream& operator<<(ostream& os, const abcd& item)
 {
-	os << item.a << "," << item.b << "," << item.c << ", side = " << item.d;
+	os << item.a << "," << item.b << "," << item.c << "," << item.d;
 	return os;
 }
 

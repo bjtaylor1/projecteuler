@@ -35,3 +35,11 @@ ostream& operator<<(ostream& os, const vertex & vertex)
 	os << vertex.x << "," << vertex.y << "," << vertex.z;
 	return os;
 }
+
+long long vertex::dist_squared_from(const vertex & other) const
+{
+	return
+		(other.x - x)*(other.x - x) +
+		(other.y - y)*(other.y - y) +
+		(other.z - z)*(other.z - z);
+}

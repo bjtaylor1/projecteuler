@@ -12,6 +12,7 @@ public:
 	long long x, y, z;
 	vertex(long long X, long long Y, long long Z) : x(X), y(Y), z(Z) {}
 	virtual ~vertex() {}
+	long long dist_squared_from(const vertex& other) const;
 };
 
 bool operator<(const vertex&, const vertex&);
