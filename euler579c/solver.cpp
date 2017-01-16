@@ -103,6 +103,8 @@ void solver::process_mnpq(const mnpq& item)
 						if (v != k.end()) cout << ",";
 						cout << *v;
 					}
+					if (k.size() == 1) cout << ",,,,,,";
+					else if (k.size() == 2) cout << ",,,";
 					cout << endl;
 				}
 
