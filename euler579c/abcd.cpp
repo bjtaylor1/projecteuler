@@ -48,8 +48,14 @@ set<abcd> get_permutations(const abcd & item)
 	set<abcd> abcds;
 	do
 	{
-		abcd i(baseArray[order[0]], baseArray[order[1]], baseArray[order[2]], item.d);
-		abcds.insert(i);
+		for (int neg = 0; neg < 8; neg++)
+		{
+			int aNeg = (neg & 1) == 0 ? 1 : -1;
+			int bNeg = (neg & 2) == 0 ? 1 : -1;
+			int cNeg = (neg & 4) == 0 ? 1 : -1;
+			abcd i(aNeg * baseArray[order[0]], bNeg * baseArray[order[1]], cNeg * baseArray[order[2]], item.d);
+			abcds.insert(i);
+		}
 	} while (next_permutation(order, order + 3));
 	return abcds;
 }

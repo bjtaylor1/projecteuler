@@ -80,8 +80,6 @@ void solver::process_mnpq(const mnpq& item)
 	//BIGINT thisCxr = 0;
 	BIGINT thisS = 0;
 
-	set<set<vector3d>> thisAbcdsTriples;
-
 	for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 	{
 		if (!thecube->is_oversize())
@@ -93,21 +91,6 @@ void solver::process_mnpq(const mnpq& item)
 			}
 			if (inserted)
 			{
-				//output the unique vectors of the cube that this abcd has produced.
-				set<vector3d> k = thecube->get_triple().get_key();
-				if (thisAbcdsTriples.insert(k).second)
-				{
-					cout << baseAbcd << "," << baseAbcd.to_key();
-					for (set<vector3d>::const_iterator v = k.begin(); v != k.end(); v++)
-					{
-						if (v != k.end()) cout << ",";
-						cout << *v;
-					}
-					if (k.size() == 1) cout << ",,,,,,";
-					else if (k.size() == 2) cout << ",,,";
-					cout << endl;
-				}
-
 				long long width = thecube->width,
 					height = thecube->height,
 					depth = thecube->depth;

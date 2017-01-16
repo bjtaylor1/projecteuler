@@ -16,7 +16,6 @@ public:
 	static void solve();
 	
 	static set<cube> cubes_done;
-	static set<set<vector3d>> triples;
 	static void process_mnpq(const mnpq& mnpq);
 };
 
