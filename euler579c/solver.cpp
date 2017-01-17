@@ -171,15 +171,15 @@ void solver::solve()
 		threads.push_back(thread(processor));
 	}
 
-	for (long long m = 0; m <= ceil(sqrt(maxSide)) + 1.0; m++)
+	for (long long m = 0; m <= ceil(/*sqrt*/(maxSide)) + 1.0; m++)
 	{
-		long long nmax = (long long)ceil(sqrt(maxSide - m*m));
+		long long nmax = (long long)ceil(/*sqrt*/(maxSide - m*m));
 		for (long long n = 0; n <= nmax; n++)
 		{
-			long long pmax = (long long)ceil(sqrt(maxSide - m*m - n*n));
+			long long pmax = (long long)ceil(/*sqrt*/(maxSide - m*m - n*n));
 			for (long long p = 0; p <= pmax; p++)
 			{
-				long long qmax = (long long)ceil(sqrt(maxSide - m*m - n*n - p*p));
+				long long qmax = (long long)ceil(/*sqrt*/(maxSide - m*m - n*n - p*p));
 				for (long long q = 0; q <= qmax; q++)
 				{
 					if (((m + n + p + q) % 2) == 1)
