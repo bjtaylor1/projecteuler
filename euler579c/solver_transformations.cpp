@@ -25,34 +25,34 @@ transformation solver::t_z[] =
 
 transformation solver::make_x_transformation(double angleDegrees)
 {
-	long long sinval = my_round(sin(angleDegrees * M_PI / 180));
-	long long cosval = my_round(cos(angleDegrees * M_PI / 180));
+	long long sinval = (long long)(sin(angleDegrees * M_PI / 180));
+	long long cosval = (long long)(cos(angleDegrees * M_PI / 180));
 	return transformation(vector<long long>
 	{
 		1, 0, 0,
 		0, cosval, -sinval,
 		0, -sinval, cosval
-	});
+	}, 'x', angleDegrees);
 }
 transformation solver::make_y_transformation(double angleDegrees)
 {
-	long long sinval = my_round(sin(angleDegrees * M_PI / 180));
-	long long cosval = my_round(cos(angleDegrees * M_PI / 180));
+	long long sinval = (long long)(sin(angleDegrees * M_PI / 180));
+	long long cosval = (long long)(cos(angleDegrees * M_PI / 180));
 	return transformation(vector<long long>
 	{
 		cosval, 0, sinval,
 		0, 1, 0,
 		-sinval, 0, cosval
-	});
+	}, 'y', angleDegrees);
 }
 transformation solver::make_z_transformation(double angleDegrees)
 {
-	long long sinval = my_round(sin(angleDegrees * M_PI / 180));
-	long long cosval = my_round(cos(angleDegrees * M_PI / 180));
+	long long sinval = (long long)(sin(angleDegrees * M_PI / 180));
+	long long cosval = (long long)(cos(angleDegrees * M_PI / 180));
 	return transformation(vector<long long>
 	{
 		cosval, -sinval, 0,
 		sinval, cosval, 0,
 		0, 0, 1
-	});
+	}, 'z', angleDegrees);
 }

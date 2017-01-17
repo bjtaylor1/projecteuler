@@ -20,6 +20,12 @@ int main(int argc, char** argv)
 	try {
 		if (argc > 2) {
 
+			double d = cos(M_PI);
+			double angleDegrees = 180.0;
+			double angleRads = angleDegrees * M_PI / 180;
+			double d1 = cos(angleRads);
+			long long l1 = my_round(d1);
+
 			long long n = stoi(argv[1]),
 				numThreads = stoi(argv[2]);
 

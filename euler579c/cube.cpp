@@ -33,27 +33,20 @@ bool compare_x(const vertex& v1, const vertex& v2) { return v1.x < v2.x; }
 bool compare_y(const vertex& v1, const vertex& v2) { return v1.y < v2.y; }
 bool compare_z(const vertex& v1, const vertex& v2) { return v1.z < v2.z; }
 
-set<vertex> cube::get_vertices(const vector3d & U, const vector3d & V, const vector3d & N, bool flipX, bool flipY, bool flipZ, int* order)
+set<vertex> cube::align_vertices(const vectortriple& vt)
 {
-	if (
-		(!U.is_orthogonal_to(V)) ||
-		(!V.is_orthogonal_to(N)) ||
-		(!N.is_orthogonal_to(U))
-		) throw runtime_error("Cube initialized with bad vectors!");
-
-
 	long minx = 0, miny = 0, minz = 0;
 	vertex O(0, 0, 0);
 	vector<vertex> tempvertices
 	{
 		O,
-		U,
-		V,
-		N,
-		U+V,
-		U+N,
-		V+N,
-		U+V+N
+		vt.u,
+		vt.v,
+		vt.n,
+		vt.u+vt.v,
+		vt.u+vt.n,
+		vt.v+vt.n,
+		vt.u+vt.v+vt.n
 	};
 
 	long long minX = min_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
@@ -65,23 +58,8 @@ set<vertex> cube::get_vertices(const vector3d & U, const vector3d & V, const vec
 		vert->y -= minY;
 		vert->z -= minZ;
 	}
-	long long maxX = max_element(tempvertices.begin(), tempvertices.end(), compare_x)->x;
-	long long maxY = max_element(tempvertices.begin(), tempvertices.end(), compare_y)->y;
-	long long maxZ = max_element(tempvertices.begin(), tempvertices.end(), compare_z)->z;
 
-	set<vertex> initVertices;
-	for (vector<vertex>::const_iterator it = tempvertices.begin(); it != tempvertices.end(); it++)
-	{
-		long long xyz[] =
-		{
-			flipX ? maxX - it->x : it->x,
-			flipY ? maxY - it->y : it->y,
-			flipZ ? maxZ - it->z : it->z
-		};
-
-		initVertices.insert(vertex(xyz[order[0]], xyz[order[1]], xyz[order[2]]));
-	}
-	return initVertices;
+	return set<vertex>(tempvertices.begin(), tempvertices.end());
 }
 
 cube::cube(const set<vertex>& initVertices, long long Sumgcd) : vertices(initVertices), sumgcd(Sumgcd)
@@ -96,6 +74,10 @@ cube::cube(const set<vertex>& initVertices, long long Sumgcd) : vertices(initVer
 	depth = max_element(initVertices.begin(), initVertices.end(), compare_z)->z;
 
 	if (initVertices.size() != 8) throw runtime_error("A cube has less than 8 (distinct) initVertices");
+}
+
+cube::cube(const vectortriple& vt) : cube(align_vertices(vt), vt.sumgcd())
+{
 }
 
 template<class T1, class T2>

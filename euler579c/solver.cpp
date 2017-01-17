@@ -51,31 +51,21 @@ void solver::process_mnpq(const mnpq& item)
 {
 	abcd baseAbcd = item.get_abcd();
 	vectortriple baseTriple = get_triple(baseAbcd, item);
-
-	long long l = baseTriple.u.length;
-
 	set<cube> cubes;
-	set<abcd> abcds = get_permutations(baseAbcd);
-	for (set<abcd>::const_iterator abcd = abcds.begin(); abcd != abcds.end(); abcd++)
+	for (long long x = 0; x < 4; x++)
 	{
-		vectortriple triple = get_triple(*abcd, item);
-		if (triple.u.gcd() == 1 || triple.v.gcd() == 1 || triple.n.gcd() == 1)
+		for (long long y = 0; y < 4; y++)
 		{
-			long long sumgcd = triple.u.gcd() + triple.v.gcd() + triple.n.gcd(); //  accumulate(cube->uvn.begin(), cube->uvn.end(), 0, addgcd);
-
-			for (int f = 0; f < 8; f++)
+			for (long long z = 0; z < 4; z++)
 			{
-				bool flipX = (f & 1) != 0,
-					flipY = (f & 2) != 0,
-					flipZ = (f & 4) != 0;
-				int order[] = { 0,1,2 };
-				do {
-					cube c(cube::get_vertices(triple.u, triple.v, triple.n, flipX, flipY, flipZ, order), sumgcd);
-					cubes.insert(c);
-				} while (next_permutation(order, order + 3));
+				vectortriple vt = t_x[x] * (t_y[y] * (t_z[z] * baseTriple));
+				cube c(vt);
+				cubes.insert(c);
 			}
 		}
 	}
+
+	long long l = baseTriple.u.length;
 
 	//BIGINT thisCxr = 0;
 	BIGINT thisS = 0;

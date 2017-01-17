@@ -10,12 +10,14 @@ using namespace std;
 class cube
 {
 public:
+	cube(const vectortriple&);
+	cube(const set<vertex>& Vertices, long long Sumgcd);
+
 	static long long maxSize;
 	long long width, height, depth;
 	long long sumgcd;
 	set<vertex> vertices;
-	static set<vertex> get_vertices(const vector3d& U, const vector3d& V, const vector3d& N, bool flipX, bool flipY, bool flipZ, int* order);
-	cube(const set<vertex>& Vertices, long long Sumgcd);
+	static set<vertex> align_vertices(const vectortriple&);
 	bool is_oversize() const;
 	vectortriple get_triple() const;
 };

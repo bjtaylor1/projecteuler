@@ -9,12 +9,14 @@ using namespace std;
 class transformation
 {
 public:
+	char axis; double angle;
+
 	vector<long long> numbers;
-	transformation(const vector<long long>& Numbers);
+	transformation(const vector<long long>& Numbers, char axis, double angle);
 	long long operator[](size_t) const;
 };
 
-vector3d operator*(const vector3d&, const transformation&);
+vector3d operator*(const transformation&, const vector3d&);
 
 
 #endif
