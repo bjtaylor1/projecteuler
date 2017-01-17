@@ -50,87 +50,90 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 void solver::process_mnpq(const mnpq& item)
 {
 	abcd baseAbcd = item.get_abcd();
-	vectortriple baseTriple = get_triple(baseAbcd, item);
-	if (baseTriple.u.gcd() == 1 || baseTriple.v.gcd() == 1 || baseTriple.n.gcd() == 1)
+	if (baseAbcd.d <= maxSide)
 	{
-		set<cube> cubes;
-		for (long long x = 0; x < 4; x++)
+		vectortriple baseTriple = get_triple(baseAbcd, item);
+		if (baseTriple.u.gcd() == 1 || baseTriple.v.gcd() == 1 || baseTriple.n.gcd() == 1)
 		{
-			for (long long y = 0; y < 4; y++)
+			set<cube> cubes;
+			for (long long x = 0; x < 4; x++)
 			{
-				for (long long z = 0; z < 4; z++)
+				for (long long y = 0; y < 4; y++)
 				{
-					vectortriple vt = t_x[x] * (t_y[y] * (t_z[z] * baseTriple));
-					cube c(vt);
-					cubes.insert(c);
-				}
-			}
-		}
-
-		long long l = baseTriple.u.length;
-
-		//BIGINT thisCxr = 0;
-		BIGINT thisS = 0;
-
-		int countUsed = 0;
-		for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
-		{
-			if (!thecube->is_oversize())
-			{
-				bool inserted;
-				{
-					lock_guard<mutex> lm(m_data);
-					inserted = cubes_done.insert(*thecube).second;
-				}
-				if (inserted)
-				{
-					countUsed++;
-					long long width = thecube->width,
-						height = thecube->height,
-						depth = thecube->depth;
-					long long maxSize = max(width, max(height, depth));
-					long long tmax = maxSide / maxSize;
-					if (tmax * maxSize > maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
-					if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
-
-					if (tmax <= 0) throw runtime_error("tmax <= 0");
-					BIGINT thisContributionS;
-					for (long long t = 1; t <= tmax; t++)
+					for (long long z = 0; z < 4; z++)
 					{
-						long long repeatability =
-							(maxSide + 1LL - thecube->width*t) *
-							(maxSide + 1LL - thecube->height*t) *
-							(maxSide + 1LL - thecube->depth*t);
-
-						if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
-
-						//thisCxr = thisCxr + BIGINT(repeatability);
-
-						BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
-							+ BIGINT(l*(thecube->sumgcd)) * BIGINT(t*t) + BIGINT((thecube->sumgcd)* t + 1);
-						//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-						BIGINT contributionS = ehp * BIGINT(repeatability);
-
-						thisContributionS = thisContributionS + contributionS;
+						vectortriple vt = t_x[x] * (t_y[y] * (t_z[z] * baseTriple));
+						cube c(vt);
+						cubes.insert(c);
 					}
-					thisS = thisS + thisContributionS;
 				}
 			}
-		}
 
-		{
-			lock_guard<mutex> lm(m_data);
-			//C = C + thisCxr;
-			S = S + thisS;
-			if (countUsed > maxCount)
+			long long l = baseTriple.u.length;
+
+			//BIGINT thisCxr = 0;
+			BIGINT thisS = 0;
+
+			int countUsed = 0;
+			for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 			{
-				maxCount = countUsed;
-				cout << countUsed << " " << baseAbcd << endl;
+				if (!thecube->is_oversize())
+				{
+					bool inserted;
+					{
+						lock_guard<mutex> lm(m_data);
+						inserted = cubes_done.insert(*thecube).second;
+					}
+					if (inserted)
+					{
+						countUsed++;
+						long long width = thecube->width,
+							height = thecube->height,
+							depth = thecube->depth;
+						long long maxSize = max(width, max(height, depth));
+						long long tmax = maxSide / maxSize;
+						if (tmax * maxSize > maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
+						if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
+
+						if (tmax <= 0) throw runtime_error("tmax <= 0");
+						BIGINT thisContributionS;
+						for (long long t = 1; t <= tmax; t++)
+						{
+							long long repeatability =
+								(maxSide + 1LL - thecube->width*t) *
+								(maxSide + 1LL - thecube->height*t) *
+								(maxSide + 1LL - thecube->depth*t);
+
+							if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
+
+							//thisCxr = thisCxr + BIGINT(repeatability);
+
+							BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
+								+ BIGINT(l*(thecube->sumgcd)) * BIGINT(t*t) + BIGINT((thecube->sumgcd)* t + 1);
+							//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
+							BIGINT contributionS = ehp * BIGINT(repeatability);
+
+							thisContributionS = thisContributionS + contributionS;
+						}
+						thisS = thisS + thisContributionS;
+					}
+				}
 			}
-			if (maxResultDigits > 0)
+
 			{
-				//C.truncate(maxResultDigits);
-				S.truncate(maxResultDigits);
+				lock_guard<mutex> lm(m_data);
+				//C = C + thisCxr;
+				S = S + thisS;
+				if (countUsed > maxCount)
+				{
+					maxCount = countUsed;
+					cout << countUsed << " " << baseAbcd << endl;
+				}
+				if (maxResultDigits > 0)
+				{
+					//C.truncate(maxResultDigits);
+					S.truncate(maxResultDigits);
+				}
 			}
 		}
 	}
