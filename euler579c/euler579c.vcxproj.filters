@@ -63,6 +63,9 @@
     <ClInclude Include="blockingqueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="transformation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -96,6 +99,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BigInteger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="transformation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="solver_transformations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

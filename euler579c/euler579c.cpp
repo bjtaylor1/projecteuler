@@ -18,7 +18,6 @@ void testmassiveint(unsigned long long i, unsigned long long j)
 int main(int argc, char** argv)
 {
 	try {
-
 		if (argc > 2) {
 
 			long long n = stoi(argv[1]),
