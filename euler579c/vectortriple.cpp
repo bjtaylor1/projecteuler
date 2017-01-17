@@ -28,3 +28,9 @@ vectortriple operator*(const transformation& t, const vectortriple& vt)
 	vector3d n = t*vt.n;
 	return vectortriple(u,v,n);
 }
+
+ostream& operator<<(ostream& os, const vectortriple& v)
+{
+	os << v.u << "  " << v.v << "  " << v.n;
+	return os;
+}

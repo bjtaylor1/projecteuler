@@ -16,5 +16,6 @@ public:
 };
 
 vectortriple operator*(const transformation&, const vectortriple&);
+ostream& operator<<(ostream&, const vectortriple& v);
 
 #endif
