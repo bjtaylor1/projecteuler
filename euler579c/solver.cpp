@@ -6,7 +6,7 @@
 #include "vectortriple.h"
 #include "blockingqueue.h"
 
-long long itcount = 0;
+long long solver::maxCount = 0;
 
 long long addgcd(long long current, const vector3d& v)
 {
@@ -72,6 +72,7 @@ void solver::process_mnpq(const mnpq& item)
 		//BIGINT thisCxr = 0;
 		BIGINT thisS = 0;
 
+		int countUsed = 0;
 		for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 		{
 			if (!thecube->is_oversize())
@@ -83,6 +84,7 @@ void solver::process_mnpq(const mnpq& item)
 				}
 				if (inserted)
 				{
+					countUsed++;
 					long long width = thecube->width,
 						height = thecube->height,
 						depth = thecube->depth;
@@ -120,8 +122,12 @@ void solver::process_mnpq(const mnpq& item)
 			lock_guard<mutex> lm(m_data);
 			//C = C + thisCxr;
 			S = S + thisS;
-
-			if (maxResultDigits > 0 && ((itcount % 10) == 0))
+			if (countUsed > maxCount)
+			{
+				maxCount = countUsed;
+				cout << countUsed << " " << baseAbcd << endl;
+			}
+			if (maxResultDigits > 0)
 			{
 				//C.truncate(maxResultDigits);
 				S.truncate(maxResultDigits);

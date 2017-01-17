@@ -13,6 +13,7 @@ public:
 	static BIGINT /*C, */ S;
 	static long long maxSide, numThreads;
 	static size_t maxResultDigits;
+	static long long maxCount;
 
 	static void solve();
 	
