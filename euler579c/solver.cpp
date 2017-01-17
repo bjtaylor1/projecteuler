@@ -76,7 +76,7 @@ void solver::process_mnpq(const mnpq& item)
 			{
 				if (thecube->depth == maxSide || thecube->height == maxSide || thecube->width == maxSide)
 				{
-					cout << thecube->get_triple() << endl;
+					cout << thecube->get_triple() << "  " << (*thecube) << endl;
 				}
 
 				if (!thecube->is_oversize())
