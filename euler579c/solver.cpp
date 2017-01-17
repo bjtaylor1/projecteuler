@@ -12,7 +12,7 @@ long long addgcd(long long current, const vector3d& v)
 }
 
 BIGINT /*solver::C(0),*/ solver::S(0);
-long long solver::maxSide = 0, solver::numThreads = 0;
+long long solver::maxSide = 0, solver::numThreads = 0, solver::countOne = 0;
 size_t solver::maxResultDigits = 0;
 set<cube> solver::cubes_done;
 
@@ -72,65 +72,78 @@ void solver::process_mnpq(const mnpq& item)
 			//BIGINT thisCxr = 0;
 			BIGINT thisS = 0;
 
-			for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
+			if (cubes.size() == 0)
 			{
-				if (thecube->depth == maxSide || thecube->height == maxSide || thecube->width == maxSide)
+				throw runtime_error("No cubes found!");
+			}
+			else if (cubes.size() == 1)
+			{
+				countOne++;
+				if (countOne > 1) throw runtime_error("More than one instance of only one cube!");
+			}
+			else
+			{
+				for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 				{
-					lock_guard<mutex> lm(m_data);
-					cout << thecube->get_triple() << "  " << (*thecube) << endl;
-				}
-
-				if (!thecube->is_oversize())
-				{
-					bool inserted;
+					if (thecube->depth == maxSide || thecube->height == maxSide || thecube->width == maxSide)
 					{
 						lock_guard<mutex> lm(m_data);
-						inserted = cubes_done.insert(*thecube).second;
+						cout << thecube->get_triple() << "  " << (*thecube) << endl;
 					}
-					if (inserted)
+
+					if (!thecube->is_oversize())
 					{
-						long long width = thecube->width,
-							height = thecube->height,
-							depth = thecube->depth;
-						long long maxSize = max(width, max(height, depth));
-						long long tmax = maxSide / maxSize;
-						if (tmax * maxSize > maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
-						if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
-
-						if (tmax <= 0) throw runtime_error("tmax <= 0");
-						BIGINT thisContributionS;
-						for (long long t = 1; t <= tmax; t++)
+						bool inserted;
 						{
-							long long repeatability =
-								(maxSide + 1LL - thecube->width*t) *
-								(maxSide + 1LL - thecube->height*t) *
-								(maxSide + 1LL - thecube->depth*t);
-
-							if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
-
-							//thisCxr = thisCxr + BIGINT(repeatability);
-
-							BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
-								+ BIGINT(l*(thecube->sumgcd)) * BIGINT(t*t) + BIGINT((thecube->sumgcd)* t + 1);
-							//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-							BIGINT contributionS = ehp * BIGINT(repeatability);
-
-							thisContributionS = thisContributionS + contributionS;
+							lock_guard<mutex> lm(m_data);
+							inserted = cubes_done.insert(*thecube).second;
 						}
-						thisS = thisS + thisContributionS;
+						if (inserted)
+						{
+							long long width = thecube->width,
+								height = thecube->height,
+								depth = thecube->depth;
+							long long maxSize = max(width, max(height, depth));
+							long long tmax = maxSide / maxSize;
+							if (tmax * maxSize > maxSide) throw runtime_error("tmax is too lenient - would produce oversize cubes!");
+							if ((tmax + 1) * maxSize <= maxSide) throw runtime_error("tmax is not lenient enough - could squeeze another one out!");
+
+							if (tmax <= 0) throw runtime_error("tmax <= 0");
+							BIGINT thisContributionS;
+							for (long long t = 1; t <= tmax; t++)
+							{
+								long long repeatability =
+									(maxSide + 1LL - thecube->width*t) *
+									(maxSide + 1LL - thecube->height*t) *
+									(maxSide + 1LL - thecube->depth*t);
+
+								if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
+
+								//thisCxr = thisCxr + BIGINT(repeatability);
+
+								BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
+									+ BIGINT(l*(thecube->sumgcd)) * BIGINT(t*t) + BIGINT((thecube->sumgcd)* t + 1);
+								//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
+								BIGINT contributionS = ehp * BIGINT(repeatability);
+
+								thisContributionS = thisContributionS + contributionS;
+							}
+							thisS = thisS + thisContributionS;
+						}
 					}
 				}
-			}
 
-			{
-				lock_guard<mutex> lm(m_data);
-				//C = C + thisCxr;
-				S = S + thisS;
-				if (maxResultDigits > 0)
 				{
-					//C.truncate(maxResultDigits);
-					S.truncate(maxResultDigits);
+					lock_guard<mutex> lm(m_data);
+					//C = C + thisCxr;
+					S = S + thisS;
+					if (maxResultDigits > 0)
+					{
+						//C.truncate(maxResultDigits);
+						S.truncate(maxResultDigits);
+					}
 				}
+
 			}
 		}
 	}

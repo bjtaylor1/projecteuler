@@ -11,8 +11,9 @@ class solver
 {
 public:
 	static BIGINT /*C, */ S;
-	static long long maxSide, numThreads;
+	static long long maxSide, numThreads, countOne;
 	static size_t maxResultDigits;
+	
 
 	static void solve();
 	
