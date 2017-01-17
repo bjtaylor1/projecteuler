@@ -72,16 +72,7 @@ void solver::process_mnpq(const mnpq& item)
 			//BIGINT thisCxr = 0;
 			BIGINT thisS = 0;
 
-			if (cubes.size() == 0)
-			{
-				throw runtime_error("No cubes found!");
-			}
-			else if (cubes.size() == 1)
-			{
-				countOne++;
-				if (countOne > 1) throw runtime_error("More than one instance of only one cube!");
-			}
-			else
+			if (cubes.size() > 1)
 			{
 				for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 				{
