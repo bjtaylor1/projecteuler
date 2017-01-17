@@ -76,11 +76,6 @@ void solver::process_mnpq(const mnpq& item)
 			{
 				for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 				{
-					if (thecube->depth == maxSide || thecube->height == maxSide || thecube->width == maxSide)
-					{
-						lock_guard<mutex> lm(m_data);
-						cout << thecube->get_triple() << "  " << (*thecube) << endl;
-					}
 
 					if (!thecube->is_oversize())
 					{
@@ -91,6 +86,12 @@ void solver::process_mnpq(const mnpq& item)
 						}
 						if (inserted)
 						{
+							if (thecube->depth == maxSide || thecube->height == maxSide || thecube->width == maxSide)
+							{
+								lock_guard<mutex> lm(m_data);
+								cout << thecube->get_triple() << "  " << (*thecube) << endl;
+							}
+
 							long long width = thecube->width,
 								height = thecube->height,
 								depth = thecube->depth;
