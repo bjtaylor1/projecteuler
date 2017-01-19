@@ -32,7 +32,7 @@ void make_triples(long pmax)
 		{
 			if (a[j] + a[k] == a[i])
 			{
-				if (util<long>::gcd(i, j, k) == 1)
+				//if (util<long>::gcd(i, j, k) == 1)
 				{
 					vector<long> triple({ j,k,i });
 					triples.insert(triple);
@@ -64,21 +64,25 @@ void make_triples_map()
 set<pair<long, long>> get_triples_including_nonprimitive(long side)
 {
 	set<pair<long, long>> result;
-	for (long f = 3; f < side; f++)
-	{
-		if (side % f == 0)
-		{
-			auto factorsTriples = triplesMap.find(f);
-			if (factorsTriples != triplesMap.end())
-			{
-				long d = side / f;
-				for (auto triple : factorsTriples->second)
-				{
-					result.insert(pair<long, long>({ triple.first * d, triple.second * d }));
-				}
-			}
-		}
-	}
+	//if we have non primitiveS:
+	return triplesMap.find(side)->second;
+
+
+	//for (long f = 3; f < side; f++)
+	//{
+	//	if (side % f == 0)
+	//	{
+	//		auto factorsTriples = triplesMap.find(f);
+	//		if (factorsTriples != triplesMap.end())
+	//		{
+	//			long d = side / f;
+	//			for (auto triple : factorsTriples->second)
+	//			{
+	//				result.insert(pair<long, long>({ triple.first * d, triple.second * d }));
+	//			}
+	//		}
+	//	}
+	//}
 	return result;
 }
 
@@ -99,9 +103,10 @@ void process_envelopes(long AE, long AB, long AD)
 			long p = AE + (2 * AB) + BX;
 			if (p <= nmax)
 			{
-				long r = nmax / p;
+				long r = 1;// nmax / p;
 				long pThis = p * r * (r + 1) / 2;
 				ptot += pThis;
+				cout << AE << "," << AB << "," << (BX / 2) << " = " << p << ", " << r << " times = " << pThis << endl;
 			}
 			//it's a heron
 		}
@@ -125,6 +130,7 @@ int main(int argc, char** argv)
 			long AB = ABAD.first;
 			long AD = ABAD.second;
 			process_envelopes(AE, AB, AD);
+			//process_envelopes(AB, AE, AD);
 		}
 	}
 
