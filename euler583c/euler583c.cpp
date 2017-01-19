@@ -26,13 +26,13 @@ void make_triples(long pmax)
 	}
 	for (long i = 1; i < pmax; i++)
 	{
-		if (i % 1000 == 0) cout << "\r" << (((double)i) / pmax);
+		//if (i % 1000 == 0) cout << "\r" << (((double)i) / pmax);
 		long j = 1, k = i;
 		while (j < k)
 		{
 			if (a[j] + a[k] == a[i])
 			{
-				//if (util<long>::gcd(i, j, k) == 1)
+				if (util<long>::gcd(i, j, k) == 1)
 				{
 					vector<long> triple({ j,k,i });
 					triples.insert(triple);
@@ -43,7 +43,6 @@ void make_triples(long pmax)
 			else if (a[j] + a[k] > a[i]) k--;
 		}
 	}
-	cout << endl;
 	delete[] a;
 }
 
@@ -65,24 +64,24 @@ set<pair<long, long>> get_triples_including_nonprimitive(long side)
 {
 	set<pair<long, long>> result;
 	//if we have non primitiveS:
-	return triplesMap.find(side)->second;
+	//return triplesMap.find(side)->second;
 
 
-	//for (long f = 3; f < side; f++)
-	//{
-	//	if (side % f == 0)
-	//	{
-	//		auto factorsTriples = triplesMap.find(f);
-	//		if (factorsTriples != triplesMap.end())
-	//		{
-	//			long d = side / f;
-	//			for (auto triple : factorsTriples->second)
-	//			{
-	//				result.insert(pair<long, long>({ triple.first * d, triple.second * d }));
-	//			}
-	//		}
-	//	}
-	//}
+	for (long f = 3; f < side; f++)
+	{
+		if (side % f == 0)
+		{
+			auto factorsTriples = triplesMap.find(f);
+			if (factorsTriples != triplesMap.end())
+			{
+				long d = side / f;
+				for (auto triple : factorsTriples->second)
+				{
+					result.insert(pair<long, long>({ triple.first * d, triple.second * d }));
+				}
+			}
+		}
+	}
 	return result;
 }
 
@@ -90,25 +89,27 @@ long long ptot = 0;
 long nmax;
 void process_envelopes(long AE, long AB, long AD)
 {
-	auto BYBXes = get_triples_including_nonprimitive(AE);
-	for (const pair<long, long>& BYBX : BYBXes)
+	for (long f = 1; f <= nmax / (AE + 2*AB); f++)
 	{
-		long BY = BYBX.first;
-		if (BY > AB) break; //they should be sorted, so no point continuing, as the rest will be 'overflap' as well
-		long BX = BYBX.second;
-		if (BX % 2 == 1) continue; // BC needs to be integral
-		long AC2 = hyp(AE, (2 * AB) + BY);
-		if (AC2 != -1 && AC2 % 2 == 0)
+		long ae = f*AE, ab = f*AB;
+		auto bybxes = get_triples_including_nonprimitive(ae);
+		for (const pair<long, long>& bybx : bybxes)
 		{
-			long p = AE + (2 * AB) + BX;
-			if (p <= nmax)
+			long by = bybx.first;
+			if (by > 2*ab) break; //they should be sorted, so no point continuing, as the rest will be 'overflap' as well
+			long bx = bybx.second;
+			if (bx % 2 == 1) continue; // BC needs to be integral
+			long ac2 = hyp(ae, (2 * ab) + by);
+			if (ac2 != -1 && ac2 % 2 == 0)
 			{
-				long r = 1;// nmax / p;
-				long pThis = p * r * (r + 1) / 2;
+				long ad = f*AD, ac = ac2 / 2;
+				long pThis = ae + (2 * ab) + bx;
+				if (pThis > nmax) break;
+				//long pThis = p * r * (r + 1) / 2;
 				ptot += pThis;
-				cout << AE << "," << AB << "," << (BX / 2) << " = " << p << ", " << r << " times = " << pThis << endl;
+				cout << ae << "," << ab << "," << bx << "," << ad << "," << ac << endl;
+
 			}
-			//it's a heron
 		}
 	}
 }
