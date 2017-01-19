@@ -9,6 +9,14 @@ using namespace std;
 set<vector<long>> triples;
 map<long, set<pair<long, long>>> triplesMap;
 
+long hyp(long long a, long long b)
+{
+	long long h2 = (a*a) + (b*b);
+	double hd = sqrt(h2);
+	long long h = (long long)(hd + 0.5);
+	return (long)(h*h == h2 ? h : -1);
+}
+
 void make_triples(long pmax)
 {
 	long long* a = new long long[pmax];
@@ -39,6 +47,8 @@ void make_triples(long pmax)
 	delete[] a;
 }
 
+
+
 void make_triples_map()
 {
 	for (const vector<long>& triple : triples)
@@ -51,15 +61,50 @@ void make_triples_map()
 	}
 }
 
-void process_envelopes(long AE, long AB)
+set<pair<long, long>> get_triples_including_nonprimitive(long side)
 {
-	for (const pair<long, long>& BYBX : triplesMap.find(AE)->second)
+	set<pair<long, long>> result;
+	for (long f = 3; f < side; f++)
+	{
+		if (side % f == 0)
+		{
+			auto factorsTriples = triplesMap.find(f);
+			if (factorsTriples != triplesMap.end())
+			{
+				long d = side / f;
+				for (auto triple : factorsTriples->second)
+				{
+					result.insert(pair<long, long>({ triple.first * d, triple.second * d }));
+				}
+			}
+		}
+	}
+	return result;
+}
+
+long long ptot = 0;
+long nmax;
+void process_envelopes(long AE, long AB, long AD)
+{
+	auto BYBXes = get_triples_including_nonprimitive(AE);
+	for (const pair<long, long>& BYBX : BYBXes)
 	{
 		long BY = BYBX.first;
 		if (BY > AB) break; //they should be sorted, so no point continuing, as the rest will be 'overflap' as well
 		long BX = BYBX.second;
 		if (BX % 2 == 1) continue; // BC needs to be integral
-
+		long AC2 = hyp(AE, (2 * AB) + BY);
+		if (AC2 != -1 && AC2 % 2 == 0)
+		{
+			long p = AE + (2 * AB) + BX;
+			if (p <= nmax)
+			{
+				long r = nmax / p;
+				long pThis = p * r * (r + 1) / 2;
+				ptot += pThis;
+			}
+			//it's a heron
+		}
 	}
 }
 
@@ -68,26 +113,22 @@ int main(int argc, char** argv)
 	if (argc < 2) return 1;
 
 	long long tot = 0;
-	long nmax = stoi(argv[1]);
+	nmax = stoi(argv[1]);
 	make_triples(nmax);
 	make_triples_map();
-		
-	for (const pair<long, set<pair<long, long>>> AEAB : triplesMap)
-	{
 
-	}
-	for (const vector<long>& triple : triples)
+	for (const pair<long, set<pair<long, long>>> AEset : triplesMap)
 	{
-		long AE = triple[0];
-		long AB = triple[1];
-		
+		long AE = AEset.first;
+		for (const pair<long, long>& ABAD : AEset.second)
+		{
+			long AB = ABAD.first;
+			long AD = ABAD.second;
+			process_envelopes(AE, AB, AD);
+		}
 	}
-//	cout << "There are " << count << " triples. They are:" << endl;
-	//for (const set<long>& triple : triples)
-	//{
-	//	vector<long> v(triple.begin(), triple.end());
-	//	cout << v[0] << "," << v[1] << "," << v[2] << endl;
-	//}
+
+	cout << ptot << endl;
 	return 0;
 }
 
