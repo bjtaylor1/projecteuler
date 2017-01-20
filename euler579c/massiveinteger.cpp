@@ -63,3 +63,35 @@ void massiveinteger::truncate(size_t n)
 		digits.erase(digits.begin() + n, digits.end());
 	}
 }
+
+string massiveinteger::approx() const
+{
+	int count = 0;
+	stringstream ss;
+	for (vector<int>::const_reverse_iterator digit = digits.rbegin(); digit != digits.rend(); digit++)
+	{
+		if (count == 1) ss << "." << (*digit);
+		else if (count < 4) ss << (*digit);
+		else break;
+		count++;
+	}
+	ss << "e" << (digits.size() - 1);
+	return ss.str();
+}
+
+string massiveinteger::mod10e(long n) const
+{
+	stringstream ss;
+	if (digits.size() <= n) ss << (*this);
+	else
+	{
+		vector<int> digitsR(digits.rbegin(), digits.rend());
+		digitsR.erase(digitsR.begin(), digitsR.begin() + (digitsR.size() - n));
+		for (int digit : digitsR)
+		{
+			ss << digit;
+		}
+	}
+	return ss.str();
+
+}

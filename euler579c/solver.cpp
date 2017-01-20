@@ -121,11 +121,11 @@ void solver::process_mnpq(const mnpq& item)
 				lock_guard<mutex> lm(m_data);
 				//C = C + thisCxr;
 				S = S + thisS;
-				if (maxResultDigits > 0)
-				{
-					//C.truncate(maxResultDigits);
-					S.truncate(maxResultDigits);
-				}
+				//if (maxResultDigits > 0)
+				//{
+				//	//C.truncate(maxResultDigits);
+				//	S.truncate(maxResultDigits);
+				//}
 			}
 
 
