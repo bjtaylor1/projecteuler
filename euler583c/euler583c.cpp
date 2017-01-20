@@ -120,8 +120,10 @@ int main(int argc, char** argv)
 
 	long long tot = 0;
 	nmax = stoi(argv[1]);
-	make_triples(nmax);
-	make_triples_map();
+	triples.get_allocator().allocate(nmax / 6);//approx 16%
+	make_triples(nmax); cout << "made " << triples.size() << " triples" << endl;
+	triplesMap.get_allocator().allocate(triples.size() * 2);
+	make_triples_map(); cout << "made " << triplesMap.size() << " triplesMap" << endl;
 
 	for (const pair<long, set<pair<long, long>>> AEset : triplesMap)
 	{
