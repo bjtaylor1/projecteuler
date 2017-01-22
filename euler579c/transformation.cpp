@@ -1,10 +1,21 @@
 #include "stdafx.h"
 #include "transformation.h"
 
-transformation::transformation(const vector<long long>& Numbers, char Axis, double Angle) : numbers(Numbers), axis(Axis), angle(Angle)
+string get_desc(char Axis, double Angle)
+{
+	stringstream ss_desc;
+	ss_desc << "Rotate " << Angle << " about " << Axis << " axis";
+	return ss_desc.str();
+}
+
+transformation::transformation(const vector<long long>& Numbers, const string& Desc) : numbers(Numbers), desc(Desc)
 {
 	if (Numbers.size() != 9) throw runtime_error("A transformation must be initialized with 9 numbers.");
 }
+
+transformation::transformation(const vector<long long>& Numbers, char Axis, double Angle) : transformation(Numbers, get_desc(Axis, Angle)) {}
+
+
 
 long long transformation::operator[](size_t i) const
 {

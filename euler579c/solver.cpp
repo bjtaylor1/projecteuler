@@ -60,9 +60,12 @@ void solver::process_mnpq(const mnpq& item)
 				{
 					for (long long z = 0; z < 4; z++)
 					{
-						vectortriple vt = t_x[x] * (t_y[y] * (t_z[z] * baseTriple));
-						cube c(vt);
-						cubes.insert(c);
+						for (long long r = 0; r < 4; r++)
+						{
+							vectortriple vt = reflection[r] * (t_x[x] * (t_y[y] * (t_z[z] * baseTriple)));
+							cube c(vt);
+							cubes.insert(c);
+						}
 					}
 				}
 			}

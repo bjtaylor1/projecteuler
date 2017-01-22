@@ -29,6 +29,7 @@ public:
 	void truncate(size_t n);
 	string approx() const;
 	string mod10e(long n) const;
+	string all() const;
 };
 
 ostream& operator<<(ostream& os, const massiveinteger& m1);

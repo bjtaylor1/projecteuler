@@ -9,10 +9,11 @@ using namespace std;
 class transformation
 {
 public:
-	char axis; double angle;
+	string desc;
 
 	vector<long long> numbers;
 	transformation(const vector<long long>& Numbers, char axis, double angle);
+	transformation(const vector<long long>& Numbers, const string& Desc);
 	long long operator[](size_t) const;
 };
 

@@ -20,7 +20,7 @@ public:
 	static set<cube> cubes_done;
 	static void process_mnpq(const mnpq& mnpq);
 
-	static transformation t_x[], t_y[], t_z[];
+	static transformation t_x[], t_y[], t_z[], reflection[];
 
 	static transformation make_x_transformation(double angleDegrees);
 	static transformation make_y_transformation(double angleDegrees);

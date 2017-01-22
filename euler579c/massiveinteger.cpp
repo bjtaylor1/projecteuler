@@ -95,3 +95,15 @@ string massiveinteger::mod10e(long n) const
 	return ss.str();
 
 }
+
+string massiveinteger::all() const
+{
+	stringstream ss;
+	vector<int> digitsR(digits.rbegin(), digits.rend());
+	for (int digit : digitsR)
+	{
+		ss << digit;
+	}
+	return ss.str();
+
+}

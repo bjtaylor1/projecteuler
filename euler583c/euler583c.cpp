@@ -16,6 +16,13 @@ long hyp(long long a, long long b)
 	long long h = (long long)(hd + 0.5);
 	return (long)(h*h == h2 ? h : -1);
 }
+long side(long long h, long long b)
+{
+	long long a2 = (h*h) - (b*b);
+	double ad = sqrt(a2);
+	long long a = (long long)(ad + 0.5);
+	return (long)(a*a == a2 ? a : -1);
+}
 
 void make_triples(long pmax)
 {
@@ -120,22 +127,41 @@ int main(int argc, char** argv)
 
 	long long tot = 0;
 	nmax = stoi(argv[1]);
-	triples.get_allocator().allocate(nmax / 6);//approx 16%
-	make_triples(nmax); cout << "made " << triples.size() << " triples" << endl;
-	triplesMap.get_allocator().allocate(triples.size() * 2);
-	make_triples_map(); cout << "made " << triplesMap.size() << " triplesMap" << endl;
 
-	for (const pair<long, set<pair<long, long>>> AEset : triplesMap)
+	for (long long P = 1; P <= nmax; P++)
 	{
-		long AE = AEset.first;
-		for (const pair<long, long>& ABAD : AEset.second)
+		for (long long AE = 2; AE <= P / 2; AE+=2) //assumption: AE is even...
 		{
-			long AB = ABAD.first;
-			long AD = ABAD.second;
-			process_envelopes(AE, AB, AD);
-			//process_envelopes(AB, AE, AD);
+			long long halfAE = AE / 2;
+			long long ABmax = (P - (2 * AE)) / 2;
+			for (long long AB = ABmax; AB >= 1; AB--) //by going down, the flap will grow - so we can break as soon as the flap is too big
+			{
+				long long AD = hyp(AB, AE);
+				if (AD != -1)
+				{
+					long long twiceBC = (P - (2 * AB) - AE);
+					if ((twiceBC % 2) == 0)
+					{
+						long long BC = twiceBC / 2;
+						long long twiceBX = side(twiceBC, AE);
+						if (twiceBX > 2*AB) break;
+
+						if (twiceBX != -1)
+						{
+							long long BX = twiceBX / 2;
+							long long AC = hyp(halfAE, AB + BX);
+							if (AC != -1)
+							{
+								cout << AE << "," << AB << "," << BC  << "," << AD << "," << AC << "," << P << endl;
+								tot += P;
+							}
+						}
+					}
+				}
+			}
 		}
 	}
+
 
 	cout << ptot << endl;
 	return 0;
