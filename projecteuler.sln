@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "euler583c", "euler583c\euler583c.vcxproj", "{7A4D15EA-CC91-4771-B27A-D3ACB16D0A56}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "euler587c", "euler587c\euler587c.vcxproj", "{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,16 @@ Global
 		{7A4D15EA-CC91-4771-B27A-D3ACB16D0A56}.Release|x64.Build.0 = Release|x64
 		{7A4D15EA-CC91-4771-B27A-D3ACB16D0A56}.Release|x86.ActiveCfg = Release|Win32
 		{7A4D15EA-CC91-4771-B27A-D3ACB16D0A56}.Release|x86.Build.0 = Release|Win32
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Debug|x64.ActiveCfg = Debug|x64
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Debug|x64.Build.0 = Debug|x64
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Debug|x86.ActiveCfg = Debug|Win32
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Debug|x86.Build.0 = Debug|Win32
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Release|Any CPU.ActiveCfg = Release|Win32
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Release|x64.ActiveCfg = Release|x64
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Release|x64.Build.0 = Release|x64
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Release|x86.ActiveCfg = Release|Win32
+		{C28A3696-2CF4-411E-ACE1-6083CBE1C3ED}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

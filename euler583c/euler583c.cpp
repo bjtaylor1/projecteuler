@@ -92,34 +92,7 @@ set<pair<long, long>> get_triples_including_nonprimitive(long side)
 	return result;
 }
 
-long long ptot = 0;
 long nmax;
-void process_envelopes(long AE, long AB, long AD)
-{
-	for (long f = 1; f <= nmax / (AE + 2*AB); f++)
-	{
-		long ae = f*AE, ab = f*AB;
-		auto bybxes = get_triples_including_nonprimitive(ae);
-		for (const pair<long, long>& bybx : bybxes)
-		{
-			long by = bybx.first;
-			if (by > 2*ab) break; //they should be sorted, so no point continuing, as the rest will be 'overflap' as well
-			long bx = bybx.second;
-			if (bx % 2 == 1) continue; // BC needs to be integral
-			long ac2 = hyp(ae, (2 * ab) + by);
-			if (ac2 != -1 && ac2 % 2 == 0)
-			{
-				long ad = f*AD, ac = ac2 / 2;
-				long pThis = ae + (2 * ab) + bx;
-				if (pThis > nmax) break;
-				//long pThis = p * r * (r + 1) / 2;
-				ptot += pThis;
-				cout << ae << "," << ab << "," << bx << "," << ad << "," << ac << endl;
-
-			}
-		}
-	}
-}
 
 int main(int argc, char** argv)
 {
@@ -128,10 +101,11 @@ int main(int argc, char** argv)
 	long long tot = 0;
 	nmax = stoi(argv[1]);
 
-	for (long long P = 1; P <= nmax; P++)
+	for (long long P = nmax; P >= 1; P-=2)
 	{
 		for (long long AE = 2; AE <= P / 2; AE+=2) //assumption: AE is even...
 		{
+			cout << "\r" << (((double)AE) / (P / 2));
 			long long halfAE = AE / 2;
 			long long ABmax = (P - (2 * AE)) / 2;
 			for (long long AB = ABmax; AB >= 1; AB--) //by going down, the flap will grow - so we can break as soon as the flap is too big
@@ -144,7 +118,7 @@ int main(int argc, char** argv)
 					{
 						long long BC = twiceBC / 2;
 						long long twiceBX = side(twiceBC, AE);
-						if (twiceBX > 2*AB) break;
+						if (twiceBX > 2 * AB) break;
 
 						if (twiceBX != -1)
 						{
@@ -163,7 +137,7 @@ int main(int argc, char** argv)
 	}
 
 
-	cout << ptot << endl;
+	cout << tot << endl;
 	return 0;
 }
 
