@@ -23,5 +23,6 @@ public:
 };
 
 vertex operator+(const vertex&, const vector3d&);
+vector3d operator*(const vector3d&, long long);
 
 #endif

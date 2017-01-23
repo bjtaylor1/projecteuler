@@ -14,6 +14,6 @@ set<primemultiple> primemultiples::operator[](long long total) const
 void primemultiples::add(long long total, long long prime, const mnpq& item)
 {
 	lock_guard<mutex> lm(m);
-	auto pairs = mem.find(total);
-	pairs->second.insert(primemultiple(prime, item));
+	auto pairs = mem.insert(pair<long long, set<primemultiple>>(total, set<primemultiple>()));
+	pairs.first->second.insert(primemultiple(prime, item));
 }

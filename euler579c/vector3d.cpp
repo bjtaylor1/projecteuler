@@ -65,3 +65,8 @@ vector3d vector3d::cross_product(const vector3d& rhs) const
 	n = n / (n.length / rhs.length);
 	return  n;
 }
+
+vector3d operator*(const vector3d& v, long long n)
+{
+	return vector3d(v.x*n, v.y*n, v.z*n);
+}
