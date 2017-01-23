@@ -93,11 +93,21 @@ void solver::process_mnpq(const mnpq& item)
 							if (found && util<long long>::gcd(vt.u.gcd(), vt.v.gcd(), vt.n.gcd()) == 1
 									&& vt.u.gcd() > 1 && vt.v.gcd() > 1 && vt.n.gcd() > 1)
 							{
-								cube np(vt);
+								for (long long x = 0; x < 4; x++)
+								{
+									for (long long y = 0; y < 4; y++)
+									{
+										for (long long z = 0; z < 4; z++)
+										{
+											vectortriple vt0 = (t_x[x] * (t_y[y] * (t_z[z] * vt)));
+											cube np(vt0);
 #ifdef CAUTIOUS
-								if (!np.is_nonprimitive()) throw runtime_error("Non primitive cube should be non-primitive");
+											if (!np.is_nonprimitive()) throw runtime_error("Non primitive cube should be non-primitive");
 #endif
-								cubes.insert(np);
+											cubes.insert(np);
+										}
+									}
+								}
 							}
 						}
 					}
