@@ -10,6 +10,8 @@ class util
 public:
 	static TInt gcd_l(TInt a, TInt b)
 	{
+		a = abs(a);
+		b = abs(b);
 		for (;;)
 		{
 			if (a == 0)

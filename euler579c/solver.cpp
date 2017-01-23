@@ -23,7 +23,7 @@ blockingqueue<mnpq> mnpq_queue(10000);
 mutex m_data, m_primemultiples;
 
 
-vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint, long long uFactor, long long vFactor)
+vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint, long long uFactor, long long vFactor, bool throwIfNotFound, bool& found)
 {
 	vector<vectortriple> triples;
 	set<vector3d> allVectors;
@@ -40,17 +40,20 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint, long long uFacto
 	{
 		if (v->is_orthogonal_to(u))
 		{
-			vector3d normalizedV = (*v)*vFactor,
+			vector3d 
+				normalizedV = (*v)*vFactor,
 				normalizedU = u*uFactor;
 			vector3d n = normalizedV.cross_product(normalizedU);
+			found = true;
 			return vectortriple(normalizedU, normalizedV, n);
 		}
 	}
-	throw runtime_error("No triple found!");
+	if(throwIfNotFound) throw runtime_error("No triple found!");
 }
 vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 {
-	return get_triple(baseAbcd, hint, 1, 1);
+	bool found = false;
+	return get_triple(baseAbcd, hint, 1, 1, true, found);
 }
 
 
@@ -85,10 +88,12 @@ void solver::process_mnpq(const mnpq& item)
 						if (pm.primefactor != prime)
 						{
 							//test with: mnpq(0, 6, 2, 5), mnpq(2, 6, 3, 6);
-							vectortriple vt = get_triple(baseAbcd, pm.item, prime, pm.primefactor);
-							
-							
-							cout << vt << endl;
+							bool found = false;
+							vectortriple vt = get_triple(baseAbcd, pm.item, prime, pm.primefactor, false, found);
+							if (found && util<long long>::gcd(vt.u.gcd(), vt.v.gcd(), vt.n.gcd()) == 1)
+							{
+								cubes.insert(cube(vt));
+							}
 						}
 					}
 
@@ -132,7 +137,6 @@ void solver::process_mnpq(const mnpq& item)
 					if (inserted)
 					{
 						vectortriple rt = thecube->get_triple();
-						if (!(rt.n.gcd() == 1 || rt.u.gcd() == 1 || rt.v.gcd() == 1)) throw runtime_error("Non primitive cube!");
 
 						long long width = thecube->width,
 							height = thecube->height,
@@ -186,24 +190,24 @@ void processor()
 {
 	try
 	{
-		solver::process_mnpq(mnpq(0, 6, 2, 5));
-		solver::process_mnpq(mnpq(2,6,3,6));
-
-		//while (true)
-		//{
-		//	mnpq item = mnpq_queue.pop();
-		//	try
-		//	{
-		//		solver::process_mnpq(item);
-		//	}
-		//	catch (runtime_error e)
-		//	{
-		//		stringstream ss;
-		//		ss << e.what() << " while processing " << item;
-		//		cout << ss.str() << endl;
-		//		exit(1);
-		//	}
-		//}
+		//solver::process_mnpq(mnpq(0, 6, 2, 5));
+		//solver::process_mnpq(mnpq(2,6,3,6));
+		//exit(1);
+		while (true)
+		{
+			mnpq item = mnpq_queue.pop();
+			try
+			{
+				solver::process_mnpq(item);
+			}
+			catch (runtime_error e)
+			{
+				stringstream ss;
+				ss << e.what() << " while processing " << item;
+				cout << ss.str() << endl;
+				exit(1);
+			}
+		}
 	}
 	catch (queuefinished)
 	{

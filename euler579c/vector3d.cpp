@@ -4,7 +4,8 @@
 
 long long vector3d::gcd() const
 {
-	return util<long long>::gcd(x, y, z );
+	long long retval = util<long long>::gcd(x, y, z);
+	return retval;
 }
 
 vector3d vector3d::to_key() const
