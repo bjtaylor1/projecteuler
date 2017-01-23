@@ -164,10 +164,11 @@ void solver::process_mnpq(const mnpq& item)
 						BIGINT thisContributionS;
 						for (long long t = 1; t <= tmax; t++)
 						{
-							BIGINT repeatability =
-								BIGINT(maxSide + 1LL - thecube->width*t) *
-								BIGINT(maxSide + 1LL - thecube->height*t) *
-								BIGINT(maxSide + 1LL - thecube->depth*t);
+							BIGINT repeatability (
+								(maxSide + 1LL - thecube->width*t) *
+								(maxSide + 1LL - thecube->height*t) *
+								(maxSide + 1LL - thecube->depth*t)
+								);
 
 							//thisCxr = thisCxr + BIGINT(repeatability);
 
