@@ -180,7 +180,6 @@ void solver::process_mnpq(const mnpq& item)
 
 							thisContributionS = thisContributionS + contributionS;
 						}
-						if (thecube->is_nonprimitive()) cout << thecube->get_triple() << " : " << l << ", " << thecube->sumgcd << "," << thisContributionS << endl;
 						thisS = thisS + thisContributionS;
 					}
 				}
