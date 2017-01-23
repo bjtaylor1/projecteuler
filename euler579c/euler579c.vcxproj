@@ -183,7 +183,6 @@
     </ClCompile>
     <ClCompile Include="transformation.cpp" />
     <ClCompile Include="solver_transformations.cpp" />
-    <ClCompile Include="util.cpp" />
     <ClCompile Include="vector3d.cpp" />
     <ClCompile Include="vectortriple.cpp" />
     <ClCompile Include="vertex.cpp" />

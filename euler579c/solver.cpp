@@ -84,8 +84,9 @@ void solver::process_mnpq(const mnpq& item)
 					{
 						if (pm.primefactor != prime)
 						{
+							//test with: mnpq(0, 6, 2, 5), mnpq(2, 6, 3, 6);
 							vectortriple vt = get_triple(baseAbcd, pm.item, prime, pm.primefactor);
-							long long nGcd = vt.n.gcd();
+							
 							
 							cout << vt << endl;
 						}

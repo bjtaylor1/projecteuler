@@ -3,16 +3,42 @@
 #ifndef CLASS_UTIL
 #define CLASS_UTIL
 
-#include "macros.h"
-
 using namespace std;
+template<class TInt>
 class util
 {
 public:
-	static long long gcd_l(long long, long long);
-	static long long gcd(const set<long long>);
-	static long long gcd(set<long long>::iterator begin, set<long long>::iterator end);
+	static TInt gcd_l(TInt a, TInt b)
+	{
+		for (;;)
+		{
+			if (a == 0)
+				return b;
+			b %= a;
+			if (b == 0)
+				return a;
+			a %= b;
+		}
+		throw runtime_error("gcd not found");
+	}
 
+	static TInt gcd(TInt x, TInt y, TInt z)
+	{
+		return gcd_l(x, gcd_l(y, z));
+	}
+
+	template<class TIterator>
+	static TInt gcd(TIterator first, TIterator last)
+	{
+		TInt l1 = *first;
+		if (++first == last) return l1;
+		else return gcd_l(abs(l1), abs(gcd(first, last)));
+	}
+
+	static TInt gcd(const set<TInt>& s)
+	{
+		return gcd(s.begin(), s.end());
+	}
 
 
 };
