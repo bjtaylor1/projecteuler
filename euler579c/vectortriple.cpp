@@ -3,6 +3,7 @@
 
 vectortriple::vectortriple(const vector3d U, const vector3d V, const vector3d N) : u(U), v(V), n(N)
 {
+#ifdef CAUTIOUS
 	if (
 		(!U.is_orthogonal_to(V)) ||
 		(!V.is_orthogonal_to(N)) ||
@@ -11,6 +12,7 @@ vectortriple::vectortriple(const vector3d U, const vector3d V, const vector3d N)
 
 	if (U.length != V.length || U.length != N.length) 
 		throw runtime_error("Vector triple initialized with different length vectors!");
+#endif
 }
 
 set<vector3d> vectortriple::get_key() const
@@ -21,7 +23,8 @@ set<vector3d> vectortriple::get_key() const
 
 long long vectortriple::sumgcd() const
 {
-	return u.gcd() + v.gcd() + n.gcd();
+	long long returnvalue = u.gcd() + v.gcd() + n.gcd();
+	return returnvalue;
 }
 
 vectortriple operator*(const transformation& t, const vectortriple& vt)

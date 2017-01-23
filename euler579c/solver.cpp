@@ -90,9 +90,14 @@ void solver::process_mnpq(const mnpq& item)
 							//test with: mnpq(0, 6, 2, 5), mnpq(2, 6, 3, 6);
 							bool found = false;
 							vectortriple vt = get_triple(baseAbcd, pm.item, prime, pm.primefactor, false, found);
-							if (found && util<long long>::gcd(vt.u.gcd(), vt.v.gcd(), vt.n.gcd()) == 1)
+							if (found && util<long long>::gcd(vt.u.gcd(), vt.v.gcd(), vt.n.gcd()) == 1
+									&& vt.u.gcd() > 1 && vt.v.gcd() > 1 && vt.n.gcd() > 1)
 							{
-								cubes.insert(cube(vt));
+								cube np(vt);
+#ifdef CAUTIOUS
+								if (!np.is_nonprimitive()) throw runtime_error("Non primitive cube should be non-primitive");
+#endif
+								cubes.insert(np);
 							}
 						}
 					}
@@ -111,19 +116,20 @@ void solver::process_mnpq(const mnpq& item)
 					{
 						vectortriple vt = (t_x[x] * (t_y[y] * (t_z[z] * baseTriple)));
 						cube c(vt);
-						cubes.insert(c);
+#ifdef CAUTIOUS
+						if (c.is_nonprimitive()) throw runtime_error("Non primitive!");
+						if (cubes.insert(c).first->is_nonprimitive())
+							throw runtime_error("Duplicate of a nonprimitive!");
+#endif
 					}
 				}
 			}
-
-			long long l = baseTriple.u.length;
 
 			//BIGINT thisCxr = 0;
 			BIGINT thisS = 0;
 
 			for (set<cube>::const_iterator thecube = cubes.begin(); thecube != cubes.end(); thecube++)
 			{
-
 				if (!thecube->is_oversize())
 				{
 					bool inserted;
@@ -133,7 +139,8 @@ void solver::process_mnpq(const mnpq& item)
 					}
 					if (inserted)
 					{
-						vectortriple rt = thecube->get_triple();
+
+						long long l = thecube->get_triple().u.length;
 
 						long long width = thecube->width,
 							height = thecube->height,
@@ -162,6 +169,7 @@ void solver::process_mnpq(const mnpq& item)
 
 							thisContributionS = thisContributionS + contributionS;
 						}
+						if (thecube->is_nonprimitive()) cout << thecube->get_triple() << " : " << l << ", " << thecube->sumgcd << "," << thisContributionS << endl;
 						thisS = thisS + thisContributionS;
 					}
 				}
@@ -171,11 +179,14 @@ void solver::process_mnpq(const mnpq& item)
 				lock_guard<mutex> lm(m_data);
 				//C = C + thisCxr;
 				S = S + thisS;
-				//if (maxResultDigits > 0)
-				//{
-				//	//C.truncate(maxResultDigits);
-				//	S.truncate(maxResultDigits);
-				//}
+
+#ifndef NOTRUNCATE
+				if (maxResultDigits > 0)
+				{
+					//C.truncate(maxResultDigits);
+					S.truncate(maxResultDigits);
+				}
+#endif
 			}
 
 
@@ -221,7 +232,7 @@ void solver::solve()
 		threads.push_back(thread(processor));
 	}
 
-	for (long long m = 0; m <= ceil(/*sqrt*/(maxSide)) + 1.0; m++)
+	for (long long m = 0; m <= ceil(sqrt(maxSide)); m++)
 	{
 		long long nmax = (long long)ceil(sqrt(maxSide - m*m));
 		for (long long n = 0; n <= nmax; n++)

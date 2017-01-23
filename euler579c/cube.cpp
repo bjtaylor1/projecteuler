@@ -58,6 +58,7 @@ set<vertex> cube::align_vertices(const vectortriple& vt)
 
 cube::cube(const set<vertex>& initVertices, long long Sumgcd) : vertices(initVertices), sumgcd(Sumgcd)
 {
+	if (Sumgcd < 3) throw runtime_error("Sumgcd must be at least 3!");
 	long long finalMinX = min_element(initVertices.begin(), initVertices.end(), compare_x)->x;
 	long long finalMinY = min_element(initVertices.begin(), initVertices.end(), compare_y)->y;
 	long long finalMinZ = min_element(initVertices.begin(), initVertices.end(), compare_z)->z;
@@ -108,6 +109,13 @@ vectortriple cube::get_triple() const
 	vector3d n(n1.x, n1.y, n1.z);
 	return vectortriple(u, v, n);
 
+}
+
+bool cube::is_nonprimitive() const
+{
+	vectortriple vt = get_triple();
+	bool returnvalue = vt.u.gcd() > 1 && vt.v.gcd() > 1 && vt.n.gcd() > 1;
+	return returnvalue;
 }
 
 

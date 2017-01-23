@@ -50,7 +50,11 @@ int main(int argc, char** argv)
 
 			solver::solve();
 			//cout << "C(" << solver::maxSide << ") = " << solver::C << endl;
-			cout << "S(" << solver::maxSide << ") = " << solver::S.mod10e(n <= 50 ? 15 : 9) << " (" << solver::S.all() << ")" << endl;
+			cout << "S(" << solver::maxSide << ") = " << solver::S.mod10e(n <= 50 ? 15 : 9) 
+#ifdef NOTRUNCATE
+				<< " (" << solver::S.all() << ")" 
+#endif
+				<< endl;
 		}
 	}
 	catch (exception e) {
