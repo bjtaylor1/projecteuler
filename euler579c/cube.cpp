@@ -8,18 +8,12 @@ long long cube::maxSize = 0;
 
 bool is_less(const cube& lhs, const cube& rhs)
 {
-	if (lhs.width != rhs.width) return lhs.width < rhs.width;
-	if (lhs.depth != rhs.depth) return lhs.depth < rhs.depth;
-	if (lhs.height != rhs.height) return lhs.height < rhs.height;
-
-	set<vertex>::const_iterator it_l = lhs.vertices.begin(), it_r = rhs.vertices.begin();
+	vector<vertex> lhsVertices(lhs.vertices.begin(), lhs.vertices.end());
+	vector<vertex> rhsVertices(rhs.vertices.begin(), rhs.vertices.end());
 	for (long long l = 0; l < 8; l++)
 	{
-		if (it_l == lhs.vertices.end() || it_r == rhs.vertices.end()) throw runtime_error("A cube has less than 8 (distinct) vertices");
-		if ((*it_l) != (*it_r)) return (*it_l) < (*it_r);
-		++it_l; ++it_r;
+		if (lhsVertices[l] != rhsVertices[l]) return lhsVertices[l] < rhsVertices[l];
 	}
-	if (it_l != lhs.vertices.end() || it_r != rhs.vertices.end()) throw runtime_error("A cube has more than 8 vertices");
 	return false;
 }
 

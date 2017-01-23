@@ -18,5 +18,7 @@ public:
 };
 
 ostream& operator <<(ostream& os, const mnpq& item);
+bool operator<(const mnpq&, const mnpq&);
+bool operator!=(const mnpq&, const mnpq&);
 
 #endif

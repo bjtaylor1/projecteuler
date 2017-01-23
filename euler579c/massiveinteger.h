@@ -20,7 +20,7 @@ public:
 			throw runtime_error(ss.str().c_str());
 		}
 		do {
-			long rem = n % 10;
+			long long rem = n % 10;
 			digits.push_back(rem);
 			n = (n - rem) / 10;
 		} while (n > 0);

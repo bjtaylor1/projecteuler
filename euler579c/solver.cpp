@@ -5,6 +5,7 @@
 #include "macros.h"
 #include "vectortriple.h"
 #include "blockingqueue.h"
+#include "primemultiples.h"
 
 long long addgcd(long long current, const vector3d& v)
 {
@@ -15,9 +16,12 @@ BIGINT /*solver::C(0),*/ solver::S(0);
 long long solver::maxSide = 0, solver::numThreads = 0, solver::countOne = 0;
 size_t solver::maxResultDigits = 0;
 set<cube> solver::cubes_done;
+long long solver::primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73 };
+primemultiples solver::primeMultiples;
 
 blockingqueue<mnpq> mnpq_queue(10000);
-mutex m_data;
+mutex m_data, m_primemultiples;
+
 
 vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 {
@@ -48,11 +52,34 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 void solver::process_mnpq(const mnpq& item)
 {
 	abcd baseAbcd = item.get_abcd();
+
+	//abcd key = baseAbcd.to_key();
+	//if (key.a == 7 && key.b == 24 && key.c== 60)
+	//{
+	//	cout << item << endl;
+	//	exit(1);
+	//}
+
 	if (baseAbcd.d <= maxSide)
 	{
 		vectortriple baseTriple = get_triple(baseAbcd, item);
 		if (baseTriple.u.gcd() == 1 || baseTriple.v.gcd() == 1 || baseTriple.n.gcd() == 1)
 		{
+			if (baseAbcd.d >= 65) //optimization - 65 is the smallest side of first primitive cube with all vectors non-primitive / gcd of that vector (ref. Ionascu)
+			{
+				for (long long prime : primes)
+				{
+					//is it already paired?
+					long long multiple = prime * baseAbcd.d;
+					set<primemultiple> pmsThis = primeMultiples[multiple];
+
+
+					//store this one's info
+					if (multiple >= maxSide) break;
+					primeMultiples.add(multiple, prime, item);
+				}
+			}
+
 			set<cube> cubes;
 			for (long long x = 0; x < 4; x++)
 			{
@@ -60,9 +87,9 @@ void solver::process_mnpq(const mnpq& item)
 				{
 					for (long long z = 0; z < 4; z++)
 					{
-						for (long long r = 0; r < 4; r++)
+						//for (long long r = 0; r < 4; r++)
 						{
-							vectortriple vt = reflection[r] * (t_x[x] * (t_y[y] * (t_z[z] * baseTriple)));
+							vectortriple vt = /*reflection[r] * */ (t_x[x] * (t_y[y] * (t_z[z] * baseTriple)));
 							cube c(vt);
 							cubes.insert(c);
 						}
@@ -87,6 +114,9 @@ void solver::process_mnpq(const mnpq& item)
 					}
 					if (inserted)
 					{
+						vectortriple rt = thecube->get_triple();
+						if (!(rt.n.gcd() == 1 || rt.u.gcd() == 1 || rt.v.gcd() == 1)) throw runtime_error("Non primitive cube!");
+
 						long long width = thecube->width,
 							height = thecube->height,
 							depth = thecube->depth;
@@ -99,19 +129,18 @@ void solver::process_mnpq(const mnpq& item)
 						BIGINT thisContributionS;
 						for (long long t = 1; t <= tmax; t++)
 						{
-							long long repeatability =
-								(maxSide + 1LL - thecube->width*t) *
-								(maxSide + 1LL - thecube->height*t) *
-								(maxSide + 1LL - thecube->depth*t);
-
-							if (repeatability <= 0) throw runtime_error("Repeatability is <= 0 (oversize cube?)");
+							BIGINT repeatability =
+								BIGINT(maxSide + 1LL - thecube->width*t) *
+								BIGINT(maxSide + 1LL - thecube->height*t) *
+								BIGINT(maxSide + 1LL - thecube->depth*t);
 
 							//thisCxr = thisCxr + BIGINT(repeatability);
 
 							BIGINT ehp = BIGINT(l*l*l) * BIGINT(t*t*t)
-								+ BIGINT(l*(thecube->sumgcd)) * BIGINT(t*t) + BIGINT((thecube->sumgcd)* t + 1);
+								+ BIGINT(l*(thecube->sumgcd)) * BIGINT(t*t)
+								+ BIGINT((thecube->sumgcd)* t + 1);
 							//from arXiv:1508.03643v2 [math.NT] 17 Mar 2016, theorem 2.14
-							BIGINT contributionS = ehp * BIGINT(repeatability);
+							BIGINT contributionS = ehp * repeatability;
 
 							thisContributionS = thisContributionS + contributionS;
 						}

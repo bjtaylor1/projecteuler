@@ -152,6 +152,8 @@
     <ClInclude Include="cube.h" />
     <ClInclude Include="macros.h" />
     <ClInclude Include="mnpq.h" />
+    <ClInclude Include="primemultiple.h" />
+    <ClInclude Include="primemultiples.h" />
     <ClInclude Include="processor_queue.h" />
     <ClInclude Include="solver.h" />
     <ClInclude Include="stdafx.h" />
@@ -170,6 +172,8 @@
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="euler579c.cpp" />
     <ClCompile Include="mnpq.cpp" />
+    <ClCompile Include="primemultiple.cpp" />
+    <ClCompile Include="primemultiples.cpp" />
     <ClCompile Include="solver.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

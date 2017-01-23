@@ -14,9 +14,7 @@ bool operator<(const vertex & lhs, const vertex & rhs)
 
 bool operator !=(const vertex& lhs, const vertex& rhs)
 {
-	return lhs.x != rhs.x ||
-		lhs.y != rhs.y ||
-		lhs.z != rhs.z;
+	return lhs < rhs || rhs < lhs;
 }
 
 

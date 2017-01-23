@@ -20,3 +20,20 @@ ostream& operator<<(ostream& os, const mnpq& item)
 	os << item.m << "," << item.n << "," << item.p << "," << item.q;
 	return os;
 }
+
+bool operator<(const mnpq& lhs, const mnpq& rhs)
+{
+	if (lhs.m != rhs.m) return lhs.m < rhs.m;
+	if (lhs.n != rhs.n) return lhs.n < rhs.n;
+	if (lhs.p != rhs.p) return lhs.p < rhs.p;
+	if (lhs.q != rhs.q) return lhs.q < rhs.q;
+	return false;
+}
+
+bool operator!=(const mnpq& lhs, const mnpq& rhs)
+{
+	return lhs.m != rhs.m ||
+		lhs.n != rhs.n ||
+		lhs.p != rhs.p ||
+		lhs.q != rhs.q;
+}

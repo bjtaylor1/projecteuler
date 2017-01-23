@@ -43,19 +43,24 @@ double get_area_concave_tri(long long n)
 	return areaConcave;
 }
 
-double get_proportion(long long n)
+double get_percentage(long long n)
 {
 	double areaConcaveTri = get_area_concave_tri(n);
 	double proportion = areaConcaveTri / areaCorner;
-	return proportion;
+	return 100 * proportion;
 }
 
 int main()
 {
-	cout << get_proportion(1) << endl;
-	cout << get_proportion(2) << endl;
-	//cout << get_proportion(15) << endl;
-
-    return 0;
+	for (long long n = 0; n < 1e9; n++)
+	{
+		if (get_percentage(n) < 0.1)
+		{
+			cout << n << endl;
+			return 0;
+		}
+	}
+	cout << "Not found!" << endl;
+    return 1;
 }
 

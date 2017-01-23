@@ -8,6 +8,7 @@ vectortriple::vectortriple(const vector3d U, const vector3d V, const vector3d N)
 		(!V.is_orthogonal_to(N)) ||
 		(!N.is_orthogonal_to(U))
 		) throw runtime_error("Vector triple initialized with bad vectors!");
+
 }
 
 set<vector3d> vectortriple::get_key() const
