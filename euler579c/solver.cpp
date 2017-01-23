@@ -126,9 +126,10 @@ void solver::process_mnpq(const mnpq& item)
 					{
 						vectortriple vt = (t_x[x] * (t_y[y] * (t_z[z] * baseTriple)));
 						cube c(vt);
+						auto insertresult = cubes.insert(c);
 #ifdef CAUTIOUS
 						if (c.is_nonprimitive()) throw runtime_error("Non primitive!");
-						if (cubes.insert(c).first->is_nonprimitive())
+						if (insertresult.first->is_nonprimitive())
 							throw runtime_error("Duplicate of a nonprimitive!");
 #endif
 					}
