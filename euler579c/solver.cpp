@@ -40,7 +40,7 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint, long long uFacto
 	{
 		if (v->is_orthogonal_to(u))
 		{
-			vector3d 
+			vector3d
 				normalizedV = (*v)*vFactor,
 				normalizedU = u*uFactor;
 			vector3d n = normalizedV.cross_product(normalizedU);
@@ -48,7 +48,7 @@ vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint, long long uFacto
 			return vectortriple(normalizedU, normalizedV, n);
 		}
 	}
-	if(throwIfNotFound) throw runtime_error("No triple found!");
+	if (throwIfNotFound) throw runtime_error("No triple found!");
 }
 vectortriple get_triple(const abcd& baseAbcd, const mnpq& hint)
 {
@@ -109,12 +109,9 @@ void solver::process_mnpq(const mnpq& item)
 				{
 					for (long long z = 0; z < 4; z++)
 					{
-						//for (long long r = 0; r < 4; r++)
-						{
-							vectortriple vt = /*reflection[r] * */ (t_x[x] * (t_y[y] * (t_z[z] * baseTriple)));
-							cube c(vt);
-							cubes.insert(c);
-						}
+						vectortriple vt = (t_x[x] * (t_y[y] * (t_z[z] * baseTriple)));
+						cube c(vt);
+						cubes.insert(c);
 					}
 				}
 			}

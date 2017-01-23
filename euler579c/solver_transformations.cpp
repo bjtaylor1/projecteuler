@@ -23,34 +23,6 @@ transformation solver::t_z[] =
 	make_z_transformation(270.0)
 };
 
-transformation solver::reflection[] =
-{
-	transformation(vector<long long>(
-	{
-		1,0,0,
-		0,1,0,
-		0,0,1
-	}), "no-op (reflect)"),
-	transformation(vector<long long>(
-	{
-		-1,0,0,
-		0,1,0,
-		0,0,1
-	}), "reflect x"),
-	transformation(vector<long long>(
-	{
-		1,0,0,
-		0,-1,0,
-		0,0,1
-	}), "reflect y"),
-	transformation(vector<long long>(
-	{
-		1,0,0,
-		0,1,0,
-		0,0,-1
-	}), "reflect z")
-};
-
 transformation solver::make_x_transformation(double angleDegrees)
 {
 	long long sinval = (long long)(sin(angleDegrees * M_PI / 180));
