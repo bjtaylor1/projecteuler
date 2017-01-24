@@ -16,12 +16,15 @@ public:
 	static long long maxSize;
 	long long width, height, depth;
 	long long sumgcd;
+	mutable long long counted;
 	set<vertex> vertices;
 	static set<vertex> align_vertices(const vectortriple&);
 	bool is_oversize() const;
 	vectortriple get_triple() const;
 
 	bool is_nonprimitive() const;
+
+
 };
 
 bool operator <(const cube& lhs, const cube& rhs);

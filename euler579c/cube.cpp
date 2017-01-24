@@ -56,7 +56,7 @@ set<vertex> cube::align_vertices(const vectortriple& vt)
 	return set<vertex>(tempvertices.begin(), tempvertices.end());
 }
 
-cube::cube(const set<vertex>& initVertices, long long Sumgcd) : vertices(initVertices), sumgcd(Sumgcd)
+cube::cube(const set<vertex>& initVertices, long long Sumgcd) : vertices(initVertices), sumgcd(Sumgcd), counted(0)
 {
 	if (Sumgcd < 3) throw runtime_error("Sumgcd must be at least 3!");
 	long long finalMinX = min_element(initVertices.begin(), initVertices.end(), compare_x)->x;

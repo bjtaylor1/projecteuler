@@ -16,23 +16,23 @@ void testmassiveint(unsigned long long i, unsigned long long j)
 	cout << mi << " x " << mj << " == " << (mi * mj) << " == " << (i*j) << endl;
 }
 
+class cubecount
+{
+public:
+	cubecount(long long Counted) : counted(Counted), frequency(0) {}
+	long long counted;
+	mutable long long frequency;
+};
+
+bool operator<(const cubecount& c1, const cubecount& c2)
+{
+	return c1.counted < c2.counted;
+}
+
 int main(int argc, char** argv)
 {
 	try {
 		if (argc > 2) {
-
-			//vector3d u(-65, 156, 1092);
-			//vector3d v(420, 1015, -120);
-			//vector3d n(1020, -408, 119);
-			//vectortriple vt(u, v, n);
-			//cube c(vt);
-
-			//cout << c.width << "," << c.height << "," << c.depth << endl;
-
-
-			long long over231 = 2147483647LL + 100LL;
-			BIGINT b(over231);
-
 
 			double d = cos(M_PI);
 			double angleDegrees = 180.0;
@@ -49,6 +49,17 @@ int main(int argc, char** argv)
 			solver::numThreads = numThreads;
 
 			solver::solve();
+
+			set<cubecount> cubecounts;
+			for (cube c : solver::cubes_done)
+			{
+				cubecounts.insert(c.counted).first->frequency++;
+			}
+			for (cubecount cc : cubecounts)
+			{
+				cout << "Counted " << cc.counted << " times: " << cc.frequency << " cubes" << endl;
+			}
+
 			//cout << "C(" << solver::maxSide << ") = " << solver::C << endl;
 			cout << "S(" << solver::maxSide << ") = " << solver::S.mod10e(n <= 50 ? 15 : 9) 
 #ifdef NOTRUNCATE
