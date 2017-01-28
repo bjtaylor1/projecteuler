@@ -24,12 +24,21 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="euler586.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="euler586.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mpz_w.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mpz_w.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

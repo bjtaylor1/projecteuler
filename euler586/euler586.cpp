@@ -2,7 +2,8 @@
 //
 
 #include "stdafx.h"
-#include <mpir.h>
+#include "mpz_w.h"
+#include "euler586.h"
 
 using namespace std;
 
@@ -10,58 +11,60 @@ using namespace std;
 #define R 4
 long long K[N + 1];
 
-long long As[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+mpz_w As[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
 long long factor2(long long nminus1, long long& twotother, long long& r, long long& d)
 {
 	return 0;
 }
 
-bool is_prime(long long n)
+
+bool is_prime(mpz_w n)
 {
-
-	if (n <= 3 || n % 2 == 0) return true;
-	long long nminus1 = n - 1, twotother = 2, r = 1, d;
-	while ((d = nminus1 / twotother) % 2 == 0) {
-		r++;
-		twotother << 1;
-	}
-	long long mina = 2 * (long long)ceil(log(n) * log(n));
-	for (long long a : As)
+	if (n <= 3 || n.is_even()) return true;
+	mpz_w d, nminus1 = n - mpz_w::one;
+	long long s = mpz_scan1(nminus1.val, 0); //n = 2^s.d
+	mpz_tdiv_q_2exp(d.val, nminus1.val, s);
+	for (mpz_w a : As)
 	{
-
-		if (a <= mina)
+		mpz_w atothedmodn;
+		mpz_powm(atothedmodn.val, a.val, d.val, n.val);
+		if (atothedmodn != mpz_w::one)
 		{
-			long long t1 = (long long)pow(a, d);
-			if (t1 % n != 1)
+			for (long long r = 0; r < s; r++)
 			{
-				
+				mpz_w dtwotother;
+				mpz_mul_2exp(dtwotother.val, d.val, r);
+				mpz_w atothedtwotother;
+				mpz_powm(atothedtwotother.val, a.val, dtwotother.val, n.val);
+				if (++atothedtwotother != n)
+				{
+					return false;
+				}
 			}
 		}
 	}
+	return true;
 }
 
 int main()
 {
-	mpz_t bign1, bign2;
-	mpz_init_set_ui(bign1, 42);
-	mpz_init_set_ui(bign2, 5);
-	mpz_t res;
-	mpz_init(res);
-	mpz_mul(res, bign1, bign2);
-	gmp_printf("%Zd\n", res);
+	mpz_w t1 = 42, t2 = 5;
+	mpz_w tplus1 = ++t1;
 
+	gmp_printf("%Zd", t1.val);
+	return 0;
 	memset(K, 0, N * sizeof(long long));
 
 	for (long long a = 1; a <= N; a++)
 	{
-		for (long long b = a+1; b <= N; b++)
+		for (long long b = a + 1; b <= N; b++)
 		{
 			long long res = a*a + 3 * a*b + b*b;
 			if (res == 9889) cout << a << "," << b << endl;
-			if (res > N) 
+			if (res > N)
 				break;
-			else 
+			else
 				K[res]++;
 		}
 	}
@@ -75,6 +78,5 @@ int main()
 		}
 	}
 	cout << endl << endl << tot << endl;
-    return 0;
+	return 0;
 }
-
