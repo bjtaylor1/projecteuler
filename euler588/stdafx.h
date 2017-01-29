@@ -9,10 +9,5 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#include <string>
-#include <iostream>
-#include <mpir.h>
-#include <mpirxx.h>
 #include <vector>
-#include  <algorithm>
-#include <set>
+#include <iostream>

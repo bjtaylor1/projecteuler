@@ -55,6 +55,11 @@ bool operator!=(const mpz_w& lhs, const mpz_w& rhs)
 	return mpz_cmp(lhs.val, rhs.val) != 0;
 }
 
+bool operator==(const mpz_w& lhs, const mpz_w& rhs)
+{
+	return mpz_cmp(lhs.val, rhs.val) == 0;
+}
+
 
 mpz_w operator++(mpz_w& n)
 {

@@ -20,4 +20,5 @@ mpz_w operator-(const mpz_w&, const mpz_w&);
 mpz_w operator*(const mpz_w&, const mpz_w&);
 bool operator<=(const mpz_w&, long long);
 bool operator!=(const mpz_w&, const mpz_w&);
+bool operator==(const mpz_w&, const mpz_w&);
 #endif
