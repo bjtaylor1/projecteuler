@@ -11,3 +11,8 @@
 #include <tchar.h>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <set>
+#include <stack>
+#include <map>
