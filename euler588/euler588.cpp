@@ -40,8 +40,9 @@ void count_term(long long make, long long tot, vector<long long>& terms, set<vec
 	if (tot > make) return;
 	else if (tot == make)
 	{
-		vector<long long> sum;
-		copy_if(terms.begin(), terms.end(), back_inserter(sum), [](long long i) -> bool {return i > 0; });
+		vector<long long> sum = terms;
+		generate_n(back_inserter(sum), k - it, []() {return 0; }); //pad it with zeros
+		//copy_if(terms.begin(), terms.end(), back_inserter(sum), [](long long i) -> bool {return i > 0; });
 		sort(sum.begin(), sum.end());
 		sums.insert(sum);
 	}
@@ -74,7 +75,7 @@ long long get_coefficient(long long k, long long coeff)
 	for (auto sum : sums)
 	{
 		set<long long> setunique(sum.begin(), sum.end());
-		long divisor = 1;;
+		long divisor = 1;
 		for (auto i : setunique)
 		{
 			long long countthis = count_if(sum.begin(), sum.end(), [i](long long n) -> bool { return n == i; });
@@ -85,13 +86,19 @@ long long get_coefficient(long long k, long long coeff)
 	return result;
 }
 
-int main()
+int main(int argc, char** argv)
 {
-
-	for (long long coeff = 12; coeff >= 1; coeff--)
+	if (argc < 2) return 1;
+	long long k = stoi(argv[1]);
+	long long countodd = 0;
+	for (long long term = k * MAXTERM; term >= 0; term--)
 	{
-		cout << coeff << ": " << get_coefficient(3, coeff) << endl;
+		long long coeff = get_coefficient(k, term);
+		cout << term << ": " << coeff << endl;
+		if (coeff % 2 == 1) countodd++;
 	}
+
+	cout << "count odd: " << countodd << endl;
 
     return 0;
 }
