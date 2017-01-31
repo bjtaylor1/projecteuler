@@ -72,6 +72,7 @@ long long get_coefficient(long long k, long long coeff)
 	set<vector<long long>> sums;
 	count_term(coeff, 0, terms, sums, k, 0);
 	long long result = 0;
+	cout << endl;
 	for (auto sum : sums)
 	{
 		set<long long> setunique(sum.begin(), sum.end());
@@ -81,7 +82,18 @@ long long get_coefficient(long long k, long long coeff)
 			long long countthis = count_if(sum.begin(), sum.end(), [i](long long n) -> bool { return n == i; });
 			divisor *= fact(countthis);
 		}
-		result += factk / divisor;
+		long long constituent = factk / divisor;
+		//if (constituent % 2 == 1)
+		//{
+		//	cout << endl << coeff << ": (";
+		//	for (auto i : setunique)
+		//	{
+		//		long long countthis = count_if(sum.begin(), sum.end(), [i](long long n) -> bool { return n == i; });
+		//		cout << countthis << "  ";
+		//	}
+		//	cout << ") " << endl;
+		//}
+		result += constituent;
 	}
 	return result;
 }
@@ -94,7 +106,7 @@ int main(int argc, char** argv)
 	for (long long term = k * MAXTERM; term >= 0; term--)
 	{
 		long long coeff = get_coefficient(k, term);
-		cout << term << ": " << coeff << endl;
+		cout << term << "," << coeff << endl;
 		if (coeff % 2 == 1) countodd++;
 	}
 
