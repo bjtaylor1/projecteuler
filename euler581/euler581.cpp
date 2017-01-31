@@ -59,10 +59,19 @@ pair<long long, long long> solve_pell(long long D)
 		U[n + 1] = a[n] * V[n] - U[n];
 		V[n + 1] = (D - U[n + 1] * U[n + 1]) / V[n];
 		a[n + 1] = (a0 + U[n + 1]) / V[n + 1];
+
 		if (a[n + 1] > a0)
 		{
-			pair<long long, long long> solution(P[n], Q[n]);
-			return solution;
+			if (n % 2 == 1)
+			{
+				pair<long long, long long> solution(P[n], Q[n]);
+				return solution;
+			}
+			else
+			{
+				pair<long long, long long> solution(P[n] * P[n] + D * Q[n] * Q[n], 2 * P[n] * Q[n]);
+				return solution;
+			}
 		}
 
 		P[n + 1] = a[n + 1] * P[n] + P[n - 1];
