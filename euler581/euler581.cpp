@@ -44,6 +44,7 @@ typedef iterative_result<double> ird;
 
 pair<long long, long long> solve_pell(long long D)
 {
+	//http://mathafou.free.fr/themes_en/kpell.html
 	long long a0 = (long long)sqrt(D);
 	irl U(2), V(2), a(2), P(2), Q(2);
 	U[0] = 0;
@@ -79,8 +80,32 @@ long long get_highest_prime_factor(long long p)
 	return 1;
 }
 
-int main()
+void makesquarefrees(const set<long long>& primes, set<long long>& current, set<long long>& squarefrees, long long sf)
 {
+	if(sf != 2) squarefrees.insert(sf);
+	for (auto p : primes)
+	{
+		if (current.insert(p).second)
+		{
+			makesquarefrees(primes, current, squarefrees, p*sf);
+			current.erase(p);
+		}
+	}
+}
+
+int main(int argc, char** argv)
+{
+	//from https://en.wikipedia.org/wiki/St%C3%B8rmer's_theorem
+	if (argc < 2) return 1;
+	long long N = stoi(argv[1]);
+	set<long long> primes, squarefrees({ 1 });
+	long long pk;
+	for (long long p = 1; p <= N; p++)	if (isprime(p)) primes.insert(pk = p);
+	makesquarefrees(primes, set<long long>(), squarefrees, 1);
+
+
+
+
 	auto sln = solve_pell(13);
 	cout << sln.first << "," << sln.second << endl;
 

@@ -11,3 +11,6 @@
 #include <tchar.h>
 #include <iostream>
 #include <map>
+#include <vector>
+#include <string>
+#include <set>
