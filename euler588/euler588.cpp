@@ -83,16 +83,10 @@ long long get_coefficient(long long k, long long coeff)
 			divisor *= fact(countthis);
 		}
 		long long constituent = factk / divisor;
-		//if (constituent % 2 == 1)
-		//{
-		//	cout << endl << coeff << ": (";
-		//	for (auto i : setunique)
-		//	{
-		//		long long countthis = count_if(sum.begin(), sum.end(), [i](long long n) -> bool { return n == i; });
-		//		cout << countthis << "  ";
-		//	}
-		//	cout << ") " << endl;
-		//}
+		if (constituent % 2 == 1)
+		{
+			cout << coeff << ": " << factk << "/" << divisor << " = " << constituent << endl;
+		}
 		result += constituent;
 	}
 	return result;
@@ -106,7 +100,6 @@ int main(int argc, char** argv)
 	for (long long term = k * MAXTERM; term >= 0; term--)
 	{
 		long long coeff = get_coefficient(k, term);
-		cout << term << "," << coeff << endl;
 		if (coeff % 2 == 1) countodd++;
 	}
 

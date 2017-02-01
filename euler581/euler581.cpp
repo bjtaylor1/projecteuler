@@ -119,30 +119,102 @@ vector<pair<long long, long long>> makemoresolutions(pair<long long, long long> 
 	return result;
 }
 
+void addtosquarefrees(long long current, set<long long>& squarefrees, set<long long>& primes)
+{
+	for (long long p : primes)
+	{
+		long long sf = current * p;
+		if (sf != 2) squarefrees.insert(sf);
+		set<long long> otherPrimes = primes;
+		otherPrimes.erase(p);
+		addtosquarefrees(sf, squarefrees, otherPrimes);
+	}
+}
+
+set<long long> makesquarefrees4(const set<long long>& primesSet)
+{
+	set<long long> squarefrees;
+	int size = primesSet.size();
+	if (size > 64) throw runtime_error("Too many");
+	long long primesArray[32];
+	long long i = 0;
+	for (long long p : primesSet)
+	{
+		primesArray[i++] = p;
+	}
+	long long max = (long long)pow(2, size);
+	for (long long i = 1; i < max; i++)
+	{
+		long long t = 1;
+		for (int bit = 0; bit < size; bit++)
+		{
+			if (((1 << bit) & i) != 0) t *= primesArray[bit];
+		}
+		if(t != 2) squarefrees.insert(t);
+	}
+	cout << endl;
+	return squarefrees;
+}
+
+
+
+set<long long> makesquarefrees2(const set<long long>& primesSet) //it's copied, not referenced
+{
+	set<long long> squarefrees, primes = primesSet;
+	addtosquarefrees(1, squarefrees, primes);
+	return squarefrees;
+}
+
+set<long long> makesquarefrees(const set<long long>& primesSet) //it's copied, not referenced
+{
+	vector<long long> primes(primesSet.begin(), primesSet.end());
+	set<long long> squarefrees;
+	do
+	{
+		long long tot = 1;
+
+		for (auto p : primes)
+		{
+			long long sf = tot *= p;
+			if (sf != 2) squarefrees.insert(sf);
+		}
+	} while (next_permutation(primes.begin(), primes.end()));
+	return squarefrees;
+}
+
 int main(int argc, char** argv)
 {
 	//from https://en.wikipedia.org/wiki/St%C3%B8rmer's_theorem
 	if (argc < 2) return 1;
 	long long N = stoi(argv[1]);
-	set<long long> primes, squarefrees({ 1 });
+	
+	set<long long> primes;
 	long long pk;
 	for (long long p = 1; p <= N; p++)	if (isprime(p)) primes.insert(pk = p);
-	makesquarefrees(primes, set<long long>(), squarefrees, 1);
+	cout << "made " << primes.size() << " primes, the highest of which is " << pk << endl;
+	set<long long> squarefrees = makesquarefrees4(primes);
 
+	cout << "made " << squarefrees.size() << " squarefrees" << endl;
+	long long tot = 0;
 	long long maxsolutions = MAX(3, (pk + 1) / 2);
+	long long count = 0;
 	for (long long sf : squarefrees)
 	{
+		if (++count % 100 == 0) cout << "\r" << count << " of " << squarefrees.size();
 		auto firstsolution = solve_pell(sf*2);
 		auto allsolutions = makemoresolutions(firstsolution, maxsolutions, sf*2);
 		for (auto solution : allsolutions)
 		{
 			long long p1 = (solution.first - 1) / 2, p2 = (solution.first + 1) / 2;
-			if (get_highest_prime_factor(p1) <= pk && get_highest_prime_factor(p2) <= pk)
+			long long t = (p1 * p2) / 2;
+
+			if (get_highest_prime_factor(t) <= pk)
 			{
-				cout << p1 << "," << p2 << endl;
+				tot += p1;
 			}
 		}
 	}
+	cout << endl << tot << endl;
     return 0;
 }
 
