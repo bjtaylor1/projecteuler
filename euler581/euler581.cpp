@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define MAX(arg1,arg2) (arg1 > arg2 ? arg1 : arg2)
+
 bool isprime(long long t)
 {
 	for (long long f = (long long)((t / 2) + 1); f > 0; f--)
@@ -119,9 +121,6 @@ vector<pair<long long, long long>> makemoresolutions(pair<long long, long long> 
 
 int main(int argc, char** argv)
 {
-	auto firstSolution = solve_pell(2);
-	auto first3Solutions = makemoresolutions(firstSolution, 3, 2);
-
 	//from https://en.wikipedia.org/wiki/St%C3%B8rmer's_theorem
 	if (argc < 2) return 1;
 	long long N = stoi(argv[1]);
@@ -130,27 +129,19 @@ int main(int argc, char** argv)
 	for (long long p = 1; p <= N; p++)	if (isprime(p)) primes.insert(pk = p);
 	makesquarefrees(primes, set<long long>(), squarefrees, 1);
 
-
-
-
-	auto sln = solve_pell(13);
-	cout << sln.first << "," << sln.second << endl;
-
-	return 0;
-
-
-	long long count = 0;
-	long long tot = 0;
-	for (long long n = 1; ; n++)
+	long long maxsolutions = MAX(3, (pk + 1) / 2);
+	for (long long sf : squarefrees)
 	{
-		long long t = (n*(n + 1)) / 2;
-		long long hpf = get_highest_prime_factor(t);
-		if (hpf <= 47)
+		auto firstsolution = solve_pell(sf*2);
+		auto allsolutions = makemoresolutions(firstsolution, maxsolutions, sf*2);
+		for (auto solution : allsolutions)
 		{
-			cout << "T(" << n << ") = " << t << ", hpf = " << hpf << ", total = " << (tot += n) << endl;
+			long long p1 = (solution.first - 1) / 2, p2 = (solution.first + 1) / 2;
+			if (get_highest_prime_factor(p1) <= pk && get_highest_prime_factor(p2) <= pk)
+			{
+				cout << p1 << "," << p2 << endl;
+			}
 		}
-		//else  if (count++ % 1000 == 0)
-		//	cout << "n = " << n << ", hpf = " << hpf << endl;
 	}
     return 0;
 }
