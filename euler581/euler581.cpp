@@ -102,8 +102,26 @@ void makesquarefrees(const set<long long>& primes, set<long long>& current, set<
 	}
 }
 
+vector<pair<long long, long long>> makemoresolutions(pair<long long, long long> fundamental, long long numberOfSolutions, long long D)
+{
+	long long x = fundamental.first, y = fundamental.second;
+	vector<pair<long long, long long>> result;
+	for (long long i = 0; i < numberOfSolutions; i++)
+	{
+		result.push_back(pair<long long, long long>(x, y));
+		long long newx = fundamental.first * x + D * fundamental.second * y;
+		long long newy = fundamental.first * y + fundamental.second * x;
+		x = newx;
+		y = newy;
+	}
+	return result;
+}
+
 int main(int argc, char** argv)
 {
+	auto firstSolution = solve_pell(2);
+	auto first3Solutions = makemoresolutions(firstSolution, 3, 2);
+
 	//from https://en.wikipedia.org/wiki/St%C3%B8rmer's_theorem
 	if (argc < 2) return 1;
 	long long N = stoi(argv[1]);
