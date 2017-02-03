@@ -11,15 +11,21 @@ public:
 	mpz_w();
 	mpz_w(long long ui);
 	mpz_w& operator++();
+	mpz_w& operator/=(const mpz_w&);
+	mpz_w& operator+=(const mpz_w&);
 	bool is_even() const;
-
+	mpz_w sqrt() const;
 };
 
 mpz_w operator+(const mpz_w&, const mpz_w&);
 mpz_w operator-(const mpz_w&, const mpz_w&);
 mpz_w operator*(const mpz_w&, const mpz_w&);
 mpz_w operator/(const mpz_w&, const mpz_w&);
+mpz_w operator%(const mpz_w&, const mpz_w&);
 bool operator<=(const mpz_w&, long long);
+bool operator<=(const mpz_w&, const mpz_w&);
+bool operator>(const mpz_w&, const mpz_w&);
 bool operator!=(const mpz_w&, const mpz_w&);
 bool operator==(const mpz_w&, const mpz_w&);
+
 #endif

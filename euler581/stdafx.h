@@ -16,3 +16,5 @@
 #include <set>
 #include <algorithm>
 #include <numeric>
+#include <mpir.h>
+#include <mpirxx.h>

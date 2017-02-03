@@ -70,6 +70,8 @@ void factorize_actual_answers()
 int main()
 {
 	memset(K, 0, N * sizeof(long long));
+	mpz_w w;
+	cout << w.val;
 
 	for (long long b = 1; b <= N; b++)
 	{

@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "mpz_w.h"
 
 using namespace std;
 
@@ -41,13 +42,12 @@ public:
 
 };
 
-typedef iterative_result<long long> irl;
-typedef iterative_result<double> ird;
+typedef iterative_result<mpz_w> irl;
 
-pair<long long, long long> solve_pell(long long D)
+pair<mpz_w, mpz_w> solve_pell(long long D)
 {
 	//http://mathafou.free.fr/themes_en/kpell.html
-	long long a0 = (long long)sqrt(D);
+	mpz_w a0((long long)sqrt(D));
 	irl U(2), V(2), a(2), P(2), Q(2);
 	U[0] = 0;
 	V[0] = 1;
@@ -66,12 +66,12 @@ pair<long long, long long> solve_pell(long long D)
 		{
 			if (n % 2 == 1)
 			{
-				pair<long long, long long> solution(P[n], Q[n]);
+				pair<mpz_w, mpz_w> solution(P[n], Q[n]);
 				return solution;
 			}
 			else
 			{
-				pair<long long, long long> solution(P[n] * P[n] + D * Q[n] * Q[n], 2 * P[n] * Q[n]);
+				pair<mpz_w, mpz_w> solution(P[n] * P[n] + D * Q[n] * Q[n], 2 * P[n] * Q[n]);
 				return solution;
 			}
 		}
@@ -82,13 +82,13 @@ pair<long long, long long> solve_pell(long long D)
 
 }
 
-long long get_highest_prime_factor(long long p)
+mpz_w get_highest_prime_factor(mpz_w p)
 {
-	for (long long f = (long long)((p / 2) + 1);f > 0; f--)
+	for (mpz_w f = 2; f <= p.sqrt(); ++f)
 	{
-		if (p % f == 0 && isprime(f)) return f;
+		while (p % f == 0) p /= f;
 	}
-	return 1;
+	return p;
 }
 
 void makesquarefrees(const set<long long>& primes, set<long long>& current, set<long long>& squarefrees, long long sf)
@@ -104,34 +104,22 @@ void makesquarefrees(const set<long long>& primes, set<long long>& current, set<
 	}
 }
 
-vector<pair<long long, long long>> makemoresolutions(pair<long long, long long> fundamental, long long numberOfSolutions, long long D)
+vector<pair<mpz_w, mpz_w>> makemoresolutions(pair<mpz_w, mpz_w> fundamental, long long numberOfSolutions, long long D)
 {
-	long long x = fundamental.first, y = fundamental.second;
-	vector<pair<long long, long long>> result;
+	mpz_w x = fundamental.first, y = fundamental.second;
+	vector<pair<mpz_w, mpz_w>> result;
 	for (long long i = 0; i < numberOfSolutions; i++)
 	{
-		result.push_back(pair<long long, long long>(x, y));
-		long long newx = fundamental.first * x + D * fundamental.second * y;
-		long long newy = fundamental.first * y + fundamental.second * x;
+		result.push_back(pair<mpz_w, mpz_w>(x, y));
+		mpz_w newx = fundamental.first * x + D * fundamental.second * y;
+		mpz_w newy = fundamental.first * y + fundamental.second * x;
 		x = newx;
 		y = newy;
 	}
 	return result;
 }
 
-void addtosquarefrees(long long current, set<long long>& squarefrees, set<long long>& primes)
-{
-	for (long long p : primes)
-	{
-		long long sf = current * p;
-		if (sf != 2) squarefrees.insert(sf);
-		set<long long> otherPrimes = primes;
-		otherPrimes.erase(p);
-		addtosquarefrees(sf, squarefrees, otherPrimes);
-	}
-}
-
-set<long long> makesquarefrees4(const set<long long>& primesSet)
+set<long long> makesquarefrees(const set<long long>& primesSet)
 {
 	set<long long> squarefrees;
 	int size = primesSet.size();
@@ -156,32 +144,6 @@ set<long long> makesquarefrees4(const set<long long>& primesSet)
 	return squarefrees;
 }
 
-
-
-set<long long> makesquarefrees2(const set<long long>& primesSet) //it's copied, not referenced
-{
-	set<long long> squarefrees, primes = primesSet;
-	addtosquarefrees(1, squarefrees, primes);
-	return squarefrees;
-}
-
-set<long long> makesquarefrees(const set<long long>& primesSet) //it's copied, not referenced
-{
-	vector<long long> primes(primesSet.begin(), primesSet.end());
-	set<long long> squarefrees;
-	do
-	{
-		long long tot = 1;
-
-		for (auto p : primes)
-		{
-			long long sf = tot *= p;
-			if (sf != 2) squarefrees.insert(sf);
-		}
-	} while (next_permutation(primes.begin(), primes.end()));
-	return squarefrees;
-}
-
 int main(int argc, char** argv)
 {
 	//from https://en.wikipedia.org/wiki/St%C3%B8rmer's_theorem
@@ -192,21 +154,21 @@ int main(int argc, char** argv)
 	long long pk;
 	for (long long p = 1; p <= N; p++)	if (isprime(p)) primes.insert(pk = p);
 	cout << "made " << primes.size() << " primes, the highest of which is " << pk << endl;
-	set<long long> squarefrees = makesquarefrees4(primes);
+	set<long long> squarefrees = makesquarefrees(primes);
 
 	cout << "made " << squarefrees.size() << " squarefrees" << endl;
-	long long tot = 0;
+	mpz_w tot = 0;
 	long long maxsolutions = MAX(3, (pk + 1) / 2);
 	long long count = 0;
 	for (long long sf : squarefrees)
 	{
-		if (++count % 100 == 0) cout << "\r" << count << " of " << squarefrees.size();
 		auto firstsolution = solve_pell(sf*2);
 		auto allsolutions = makemoresolutions(firstsolution, maxsolutions, sf*2);
+		cout << "\r" << (count++) << " of " << squarefrees.size() << ": " << allsolutions.size() << " solutions, highest = " << allsolutions.rbegin()->first.val;
 		for (auto solution : allsolutions)
 		{
-			long long p1 = (solution.first - 1) / 2, p2 = (solution.first + 1) / 2;
-			long long t = (p1 * p2) / 2;
+			mpz_w p1 = (solution.first - 1) / 2, p2 = (solution.first + 1) / 2;
+			mpz_w t = (p1 * p2) / 2;
 
 			if (get_highest_prime_factor(t) <= pk)
 			{
@@ -214,7 +176,7 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-	cout << endl << tot << endl;
+	cout << endl << tot.val << endl;
     return 0;
 }
 
