@@ -2,7 +2,6 @@
 //
 
 #include "stdafx.h"
-#include "mpz_w.h"
 #include "euler586.h"
 
 using namespace std;

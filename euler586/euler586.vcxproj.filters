@@ -35,11 +35,5 @@
     <ClCompile Include="euler586.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mpz_w.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mpz_w.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

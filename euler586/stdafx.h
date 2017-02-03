@@ -13,6 +13,7 @@
 #include <iostream>
 #include <mpir.h>
 #include <mpirxx.h>
+#include <mpz_w.h>
 #include <vector>
 #include  <algorithm>
 #include <set>
