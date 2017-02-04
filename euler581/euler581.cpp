@@ -82,14 +82,6 @@ pair<mpz_w, mpz_w> solve_pell(long long D)
 
 }
 
-mpz_w get_highest_prime_factor(mpz_w p)
-{
-	for (mpz_w f = 2; f <= p.sqrt(); ++f)
-	{
-		while (p % f == 0) p /= f;
-	}
-	return p;
-}
 
 void makesquarefrees(const set<long long>& primes, set<long long>& current, set<long long>& squarefrees, long long sf)
 {
@@ -144,8 +136,67 @@ set<long long> makesquarefrees(const set<long long>& primesSet)
 	return squarefrees;
 }
 
+mpz_w test()
+{
+	mpz_w theval(42), anotherval(2);
+	theval = anotherval;
+	return theval;
+}
+
+mpz_w two(2);
+mpz_w get_factor(mpz_w n)
+{
+	mpz_w div2q, div2r;
+	mpz_fdiv_qr(div2q.val, div2r.val, n.val, two.val);
+	if (div2r == 0) return div2q;
+
+	//pollard-rho: fast but not necessarily the highest factor
+	int step = 0;
+	mpz_w x_fixed(2), cycle_size(2), x(2), factor(1);
+	while (factor == 1)
+	{
+		for (mpz_w count(1); count <= cycle_size && factor <= 1; ++count)
+		{
+			step++;
+			x = (x*x + 1) % n;
+			mpz_gcd(factor.val, (x - x_fixed).val, n.val);
+		}
+		cycle_size *= 2;
+		x_fixed = x;
+	}
+	return factor;
+}
+
+mpz_w get_highest_prime_factor(mpz_w n)
+{
+	set<mpz_w> q({ n });
+	while (true)
+	{
+		mpz_w highest = *q.rbegin();
+		q.erase(highest);
+		mpz_w f1 = get_factor(highest);
+		if (f1 == highest || f1 == 1) return highest;
+
+		mpz_w f2 = highest / f1;
+		q.insert(f1);
+		q.insert(f2);
+	}
+}
+
+void test_hpf(mpz_w n)
+{
+	mpz_w hpf = get_highest_prime_factor(n);
+	cout << "hpf of " << n.val << " is " << hpf.val << endl;
+}
+
 int main(int argc, char** argv)
 {
+	//test_hpf(12295263956598325033);
+	test_hpf(36);
+	test_hpf(10403);
+	test_hpf(36127);
+	test_hpf(51005766);
+	exit(1);
 	//from https://en.wikipedia.org/wiki/St%C3%B8rmer's_theorem
 	if (argc < 2) return 1;
 	long long N = stoi(argv[1]);
@@ -170,7 +221,8 @@ int main(int argc, char** argv)
 			mpz_w p1 = (solution.first - 1) / 2, p2 = (solution.first + 1) / 2;
 			mpz_w t = (p1 * p2) / 2;
 
-			if (get_highest_prime_factor(t) <= pk)
+			mpz_w hpf = get_highest_prime_factor(t);
+			if (hpf <= pk)
 			{
 				tot += p1;
 			}
