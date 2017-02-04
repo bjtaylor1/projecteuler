@@ -32,5 +32,8 @@
     <ClCompile Include="euler581.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FJ64_262K.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -19,3 +19,4 @@
 #include <mpir.h>
 #include <mpirxx.h>
 #include <mpz_w.h>
+#include <qs.h>

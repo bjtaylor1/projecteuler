@@ -144,6 +144,8 @@ mpz_w test()
 }
 
 mpz_w two(2);
+int is_prime_2_64(unsigned long long a);
+
 mpz_w get_factor(mpz_w n)
 {
 	mpz_w div2q, div2r;
@@ -167,6 +169,9 @@ mpz_w get_factor(mpz_w n)
 	return factor;
 }
 
+mpz_w two64minus1(9223372036854775807);
+unsigned long long spp = 3825123056546413051;//strong pseudoprime
+
 mpz_w get_highest_prime_factor(mpz_w n)
 {
 	set<mpz_w> q({ n });
@@ -174,6 +179,14 @@ mpz_w get_highest_prime_factor(mpz_w n)
 	{
 		mpz_w highest = *q.rbegin();
 		q.erase(highest);
+
+		if (highest <= two64minus1) //the test only works if it is less than this
+		{
+			unsigned long long highest_ui = mpz_get_ui(highest.val);
+			int primality = is_prime_2_64(highest_ui);
+			if (primality == 1) return highest;
+		}
+
 		mpz_w f1 = get_factor(highest);
 		if (f1 == highest || f1 == 1) return highest;
 
@@ -191,12 +204,6 @@ void test_hpf(mpz_w n)
 
 int main(int argc, char** argv)
 {
-	//test_hpf(12295263956598325033);
-	test_hpf(36);
-	test_hpf(10403);
-	test_hpf(36127);
-	test_hpf(51005766);
-	exit(1);
 	//from https://en.wikipedia.org/wiki/St%C3%B8rmer's_theorem
 	if (argc < 2) return 1;
 	long long N = stoi(argv[1]);
