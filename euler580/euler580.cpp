@@ -10,6 +10,7 @@ string get_representation(long long hs, long long hsm)
 	ss << hs << " x " << (hsm / hs);
 	return ss.str();
 }
+#define MAX(x,y) (x > y ? x : y)
 
 int main(int argc, char** argv)
 {
@@ -23,14 +24,19 @@ int main(int argc, char** argv)
 	
 	long long tot = 0;
 
+	
 	for (long partition = 0; partition < partitions; partition++)
 	{
+		cout << "\r" << setprecision(0) << (100.0 * (double)partition / partitions) << "%";
 		memset(is_hs, 0, MEMMAX * sizeof(bool));
 		long long h, kmin = partition * MEMMAX;
 		for (long long k = 1; (h = (4 * k + 1)) < limit; k++)
 		{
+			cout << "\r" << setprecision(0) << (100.0 * (double)h / limit) << "%";
 			long long hs = h*h;
-			for (long long hsm = hs; hsm < limit; hsm += hs)
+			long long minm = (4 * kmin + 1) / hs;  //min multiple for this partition
+			minm = MAX(minm, 1);
+			for (long long hsm = hs * minm; hsm < limit; hsm += hs)
 			{
 				if (((hsm - 1) % 4) == 0)
 				{
@@ -50,7 +56,7 @@ int main(int argc, char** argv)
 		}
 	}
 	delete[] is_hs;
-	cout << tot << endl;
+	cout << endl << tot << endl;
     return 0;
 }
 
