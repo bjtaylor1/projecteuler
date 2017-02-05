@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	if (argc < 2) return 1;
 	long long limit = stoll(argv[1]);
 	long long kmax = (limit - 1) / 4;
-#define MEMMAX 1000
+#define MEMMAX 10
 
 	long partitions = ceil(((double)kmax) / MEMMAX);
 	bool* is_hs = new bool[MEMMAX];
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 				}
 			}
 		}
-		for (long long k = 0; k < MEMMAX && (h = (4 * k + 1)) < limit; k++)
+		for (long long k = 0; k < MEMMAX && (h = (4 * (k+kmin) + 1)) < limit; k++)
 		{
 			if (!is_hs[k])
 			{
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 		}
 	}
 	delete[] is_hs;
-	cout << tot << endl;
+	cout << "===\n" << tot << endl;
     return 0;
 }
 
