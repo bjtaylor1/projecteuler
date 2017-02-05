@@ -148,6 +148,8 @@ int is_prime_2_64(unsigned long long a);
 
 mpz_w get_factor(mpz_w n)
 {
+	if (n <= 3) return n;
+
 	mpz_w div2q, div2r;
 	mpz_fdiv_qr(div2q.val, div2r.val, n.val, two.val);
 	if (div2r == 0) return div2q;

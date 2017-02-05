@@ -9,13 +9,6 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#include <iostream>
-#include <map>
-#include <vector>
 #include <string>
-#include <set>
-#include <algorithm>
-#include <numeric>
-#include <mpir.h>
-#include <mpirxx.h>
-#include <mpz_w.h>
+#include <iostream>
+#include <sstream>

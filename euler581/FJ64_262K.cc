@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+//https://people.ksp.sk/~misof/primes/
+
 using namespace std;
 
 typedef unsigned long long uint64; 
