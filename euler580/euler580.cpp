@@ -22,6 +22,8 @@ int main(int argc, char** argv)
 	{
 		long long h = 4 * k + 1;
 		long long hs = h*h;
+		//delete any less than this, as they're not needed in memory any more
+		sh.erase(sh.begin(), sh.lower_bound(hs));
 		for (long long hsm = hs; hsm < limit; hsm += hs)
 		{
 			if (((hsm - 1) %4) == 0 && sh.insert(hsm).second)
