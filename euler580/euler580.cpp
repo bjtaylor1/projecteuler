@@ -26,52 +26,12 @@ int main(int argc, char** argv)
 		{
 			if (((hsm - 1) %4) == 0 && sh.insert(hsm).second)
 			{
-				//cout << hsm << endl;
 				tot++;
 			}
 		}
 	}
 	cout << ((limit/4) - tot) << endl;
 
-	//long long MEMMAX = stoll(argv[2]);
-	//long long kmax = (limit - 1) / 4;
-
-	//long partitions = ceil(((double)kmax) / MEMMAX);
-	//int* is_hs = new int[MEMMAX];
-	//
-	//long long tot = 0;
-
-	//
-	//for (long partition = 0; partition < partitions; partition++)
-	//{
-	//	memset(is_hs, 0, MEMMAX * sizeof(int));
-	//	long long h, kmin = partition * MEMMAX;
-	//	for (long long k = 1; (h = (4 * k + 1)) < limit; k++)
-	//	{
-	//		long long hs = h*h;
-	//		long long minm = (4 * kmin + 1) / hs;  //min multiple for this partition
-	//		minm = MAX(minm, 1);
-	//		for (long long hsm = hs * minm; hsm < limit; hsm += hs)
-	//		{
-	//			if (((hsm - 1) % 4) == 0)
-	//			{
-	//				long long kofhsm = ((hsm - 1) / 4) - kmin;
-	//				if (kofhsm >= MEMMAX) break;
-	//				if(kofhsm >= 0) is_hs[kofhsm]++;
-	//			}
-	//		}
-	//	}
-	//	for (long long k = 0; k < MEMMAX && (h = (4 * (k+kmin) + 1)) < limit; k++)
-	//	{
-	//		if (is_hs[k] > 0)
-	//		{
-	//			cout << ((k+kmin)*4+1) << ": " << is_hs[k] << endl;
-	//			tot++;
-	//		}
-	//	}
-	//}
-	//delete[] is_hs;
-	//cout << endl << tot << " sf, " << ((limit/ 4) - tot) << " non-sf" << endl;
     return 0;
 }
 
