@@ -13,18 +13,19 @@ string get_representation(long long hs, long long hsm)
 
 int main(int argc, char** argv)
 {
-	if (argc < 2) return 1;
+	if (argc < 3) return 1;
 	long long limit = stoll(argv[1]);
+	long long MEMMAX = stoll(argv[2]);
 	long long kmax = (limit - 1) / 4;
-#define MEMMAX 10
 
 	long partitions = ceil(((double)kmax) / MEMMAX);
 	bool* is_hs = new bool[MEMMAX];
-	memset(is_hs, 0, MEMMAX * sizeof(bool));
+	
 	long long tot = 0;
 
 	for (long partition = 0; partition < partitions; partition++)
 	{
+		memset(is_hs, 0, MEMMAX * sizeof(bool));
 		long long h, kmin = partition * MEMMAX;
 		for (long long k = 1; (h = (4 * k + 1)) < limit; k++)
 		{
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
 				{
 					long long kofhsm = ((hsm - 1) / 4) - kmin;
 					if (kofhsm >= MEMMAX) break;
-					if(kofhsm > 0) is_hs[kofhsm] = true;
+					if(kofhsm >= 0) is_hs[kofhsm] = true;
 				}
 			}
 		}
@@ -43,13 +44,13 @@ int main(int argc, char** argv)
 		{
 			if (!is_hs[k])
 			{
-				cout << ((k+kmin)*4+1) << endl;
+				//cout << ((k+kmin)*4+1) << endl;
 				tot++;
 			}
 		}
 	}
 	delete[] is_hs;
-	cout << "===\n" << tot << endl;
+	cout << tot << endl;
     return 0;
 }
 
