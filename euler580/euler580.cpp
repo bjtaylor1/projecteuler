@@ -14,49 +14,64 @@ string get_representation(long long hs, long long hsm)
 
 int main(int argc, char** argv)
 {
-	if (argc < 3) return 1;
+	if (argc < 2) return 1;
 	long long limit = stoll(argv[1]);
-	long long MEMMAX = stoll(argv[2]);
-	long long kmax = (limit - 1) / 4;
-
-	long partitions = ceil(((double)kmax) / MEMMAX);
-	bool* is_hs = new bool[MEMMAX];
-	
+	set<long long> sh;
 	long long tot = 0;
-
-	
-	for (long partition = 0; partition < partitions; partition++)
+	for (long long k = 1; k < (limit - 1) / 4; k++)
 	{
-		cout << "\r" << setprecision(0) << (100.0 * (double)partition / partitions) << "%";
-		memset(is_hs, 0, MEMMAX * sizeof(bool));
-		long long h, kmin = partition * MEMMAX;
-		for (long long k = 1; (h = (4 * k + 1)) < limit; k++)
+		long long h = 4 * k + 1;
+		long long hs = h*h;
+		for (long long hsm = hs; hsm < limit; hsm += hs)
 		{
-			cout << "\r" << setprecision(0) << (100.0 * (double)h / limit) << "%";
-			long long hs = h*h;
-			long long minm = (4 * kmin + 1) / hs;  //min multiple for this partition
-			minm = MAX(minm, 1);
-			for (long long hsm = hs * minm; hsm < limit; hsm += hs)
+			if (((hsm - 1) %4) == 0 && sh.insert(hsm).second)
 			{
-				if (((hsm - 1) % 4) == 0)
-				{
-					long long kofhsm = ((hsm - 1) / 4) - kmin;
-					if (kofhsm >= MEMMAX) break;
-					if(kofhsm >= 0) is_hs[kofhsm] = true;
-				}
-			}
-		}
-		for (long long k = 0; k < MEMMAX && (h = (4 * (k+kmin) + 1)) < limit; k++)
-		{
-			if (!is_hs[k])
-			{
-				//cout << ((k+kmin)*4+1) << endl;
+				//cout << hsm << endl;
 				tot++;
 			}
 		}
 	}
-	delete[] is_hs;
-	cout << endl << tot << endl;
+	cout << ((limit/4) - tot) << endl;
+
+	//long long MEMMAX = stoll(argv[2]);
+	//long long kmax = (limit - 1) / 4;
+
+	//long partitions = ceil(((double)kmax) / MEMMAX);
+	//int* is_hs = new int[MEMMAX];
+	//
+	//long long tot = 0;
+
+	//
+	//for (long partition = 0; partition < partitions; partition++)
+	//{
+	//	memset(is_hs, 0, MEMMAX * sizeof(int));
+	//	long long h, kmin = partition * MEMMAX;
+	//	for (long long k = 1; (h = (4 * k + 1)) < limit; k++)
+	//	{
+	//		long long hs = h*h;
+	//		long long minm = (4 * kmin + 1) / hs;  //min multiple for this partition
+	//		minm = MAX(minm, 1);
+	//		for (long long hsm = hs * minm; hsm < limit; hsm += hs)
+	//		{
+	//			if (((hsm - 1) % 4) == 0)
+	//			{
+	//				long long kofhsm = ((hsm - 1) / 4) - kmin;
+	//				if (kofhsm >= MEMMAX) break;
+	//				if(kofhsm >= 0) is_hs[kofhsm]++;
+	//			}
+	//		}
+	//	}
+	//	for (long long k = 0; k < MEMMAX && (h = (4 * (k+kmin) + 1)) < limit; k++)
+	//	{
+	//		if (is_hs[k] > 0)
+	//		{
+	//			cout << ((k+kmin)*4+1) << ": " << is_hs[k] << endl;
+	//			tot++;
+	//		}
+	//	}
+	//}
+	//delete[] is_hs;
+	//cout << endl << tot << " sf, " << ((limit/ 4) - tot) << " non-sf" << endl;
     return 0;
 }
 
