@@ -16,17 +16,17 @@ int main(int argc, char** argv)
 	if (argc < 2) return 1;
 	long long limit = stoll(argv[1]);
 	long long kmax = (limit - 1) / 4;
-#define MEMMAX 10000000
+#define MEMMAX 1000
 
 	long partitions = ceil(((double)kmax) / MEMMAX);
 	bool* is_hs = new bool[MEMMAX];
-	memset(is_hs, 0, kmax * sizeof(bool));
+	memset(is_hs, 0, MEMMAX * sizeof(bool));
 	long long tot = 0;
 
 	for (long partition = 0; partition < partitions; partition++)
 	{
 		long long h, kmin = partition * MEMMAX;
-		for (long long k = kmin + 1; (h = (4 * k + 1)) < limit; k++)
+		for (long long k = 1; (h = (4 * k + 1)) < limit; k++)
 		{
 			long long hs = h*h;
 			for (long long hsm = hs; hsm < limit; hsm += hs)
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 				{
 					long long kofhsm = ((hsm - 1) / 4) - kmin;
 					if (kofhsm >= MEMMAX) break;
-					is_hs[kofhsm] = true;
+					if(kofhsm > 0) is_hs[kofhsm] = true;
 				}
 			}
 		}
@@ -43,6 +43,7 @@ int main(int argc, char** argv)
 		{
 			if (!is_hs[k])
 			{
+				cout << ((k+kmin)*4+1) << endl;
 				tot++;
 			}
 		}
