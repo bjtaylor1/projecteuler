@@ -39,6 +39,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "euler580", "euler580\euler5
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "factorize", "factorize\factorize.vcxproj", "{CE9B31BB-E34E-4F27-A486-FBC1B8DB3676}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "euler592", "euler592\euler592.vcxproj", "{2E60238A-0B54-4CA2-B822-7EBA87C3281D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -241,6 +243,16 @@ Global
 		{CE9B31BB-E34E-4F27-A486-FBC1B8DB3676}.Release|x64.Build.0 = Release|x64
 		{CE9B31BB-E34E-4F27-A486-FBC1B8DB3676}.Release|x86.ActiveCfg = Release|Win32
 		{CE9B31BB-E34E-4F27-A486-FBC1B8DB3676}.Release|x86.Build.0 = Release|Win32
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Debug|x64.ActiveCfg = Debug|x64
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Debug|x64.Build.0 = Debug|x64
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Debug|x86.ActiveCfg = Debug|Win32
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Debug|x86.Build.0 = Debug|Win32
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Release|Any CPU.ActiveCfg = Release|Win32
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Release|x64.ActiveCfg = Release|x64
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Release|x64.Build.0 = Release|x64
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Release|x86.ActiveCfg = Release|Win32
+		{2E60238A-0B54-4CA2-B822-7EBA87C3281D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
