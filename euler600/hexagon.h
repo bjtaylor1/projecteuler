@@ -11,4 +11,6 @@ public:
 	bool operator <(const hexagon& rhs) const;
 };
 
+std::ostream& operator<<(std::ostream& os, const hexagon& h);
+
 #endif

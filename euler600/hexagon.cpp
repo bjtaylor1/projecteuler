@@ -28,3 +28,12 @@ bool hexagon::operator<(const hexagon & rhs) const
 {
 	return sides < rhs.sides;
 }
+
+ostream& operator<<(ostream& os, const hexagon& h)
+{
+	for (auto s : h.sides)
+	{
+		os << s << " ";
+	}
+	return os;
+}
