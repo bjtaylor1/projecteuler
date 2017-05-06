@@ -39,7 +39,8 @@ bool checksides(const vector<long>& sides, long maxperim)
 
 void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>& found)
 {
-	for (long side = 1; side <= maxperim - totperim; side++)
+	long sidestart = sides.size() > 0 && sides.size() <= 2 ? *sides.begin() : 1;
+	for (long side = sidestart; side <= maxperim - totperim; side++)
 	{
 		sides.push_back(side);
 		if (checksides(sides, maxperim))
