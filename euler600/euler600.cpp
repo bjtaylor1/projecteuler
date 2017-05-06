@@ -7,7 +7,7 @@
 using namespace std;
 
 #define EPSILON 1e-12
-#define ZERO(dbl) (abs(dbl) <= EPSILON)
+#define ZERO(dbl) (fabs(dbl) <= EPSILON)
 #define LT_ZERO(dbl) (dbl < -EPSILON)
 #define GT_ZERO(dbl) (dbl > EPSILON)
 
