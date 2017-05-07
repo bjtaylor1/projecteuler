@@ -21,7 +21,7 @@ hexagon::hexagon(const vector<long>& s, long _perimeter) : perimeter (_perimeter
 	hexweights.insert(hexweight(s[1], s[0], s[5], s[4], s[3], s[2]));
 	hexweights.insert(hexweight(s[0], s[5], s[4], s[3], s[2], s[1]));
 
-	sides = hexweights.begin()->get_sides();
+	sides = hexweights.rbegin()->get_sides();
 }
 
 bool hexagon::operator<(const hexagon & rhs) const

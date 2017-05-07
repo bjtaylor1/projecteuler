@@ -92,8 +92,9 @@ void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>
 			{
 				
 				hexagon h(sides, totperim + side);
-				auto insertresult = found.insert(h);
-				if (insertresult.second) numfound++;
+				if (h.sides == h.sides_orig) numfound++;
+				//auto insertresult = found.insert(h);
+				//if (insertresult.second) numfound++;
 				//if (!insertresult.second)
 				//{
 				//	cout << h << "is a duplicate of " << *insertresult.first << endl;
