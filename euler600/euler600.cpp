@@ -44,7 +44,7 @@ bool checksides(const vector<long>& sides, long maxperim)
 			//gone below
 			return false;
 		}
-		
+
 		if (ZERO(x) && ZERO(y) && sidescounted < 6)
 		{
 			//back at origin but not used all sides
@@ -55,37 +55,23 @@ bool checksides(const vector<long>& sides, long maxperim)
 		long maxtogetback = maxperim - perimeterused;
 		//we can't possibly get back in time:
 		if (GT_ZERO(dist - maxtogetback)) return false;
-		
+
 
 		angle += (M_PI / 3); //60 degrees
-		
+
 		if (sidescounted == 6)
 		{
 			if (ZERO(x) && ZERO(y))
 			{
-				//{
-				//	vector<vector<long>> split3 = split(sides, 3);
-				//	if (!all_of(split3.begin(), split3.end(), [](vector<long> v) { return is_sorted(v.begin(), v.end()); }))
-				//	{
-				//		return false;
-				//	}
-				//}
 
-				//{
-				//	vector<vector<long>> split2 = split(sides, 2);
-				//	if (!all_of(split2.begin(), split2.end(), [](vector<long> v) { return is_sorted(v.begin(), v.end()); }))
-				//	{
-				//		return false;
-				//	}
-				//}
-				return true;
-
-
+				vector<vector<long>> split3 = split(sides, 3);
+				vector<vector<long>> split2 = split(sides, 2);
+				bool sorted = 
+					all_of(split3.begin(), split3.end(), [](vector<long> v) { return is_sorted(v.begin(), v.end()); }) ||
+					all_of(split2.begin(), split2.end(), [](vector<long> v) { return is_sorted(v.begin(), v.end()); });
+				return sorted;
 			}
-			else
-			{
-				return false;
-			}
+			else return false;
 		}
 	}
 	return true;
@@ -139,6 +125,6 @@ int main(int argc, char** argv)
 
 	cout << "H(" << maxperim << ") = " << hexagons.size() << endl;
 	cout << "Took " << fixed << setprecision(2) << duration << " seconds " << endl;
-    return 0;
+	return 0;
 }
 
