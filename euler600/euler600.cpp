@@ -66,9 +66,9 @@ bool checksides(const vector<long>& sides, long maxperim)
 
 				vector<vector<long>> split3 = split(sides, 3);
 				vector<vector<long>> split2 = split(sides, 2);
-				bool sorted = 
-					all_of(split3.begin(), split3.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); }) ||
-					all_of(split2.begin(), split2.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); });
+				bool sorted = true;
+					//all_of(split3.begin(), split3.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); }) ||
+					//all_of(split2.begin(), split2.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); });
 				return sorted;
 			}
 			else return false;
@@ -77,7 +77,7 @@ bool checksides(const vector<long>& sides, long maxperim)
 	return true;
 }
 
-void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>& found)
+void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>& found, long& numfound)
 {
 	long sidemax = sides.size() > 0 ? sides.front() : LONG_MAX;
 	for (long side = 1; side <= maxperim - totperim && side <= sidemax; side++)
@@ -90,16 +90,18 @@ void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>
 		{
 			if (sides.size() == 6)
 			{
+				
 				hexagon h(sides, totperim + side);
 				auto insertresult = found.insert(h);
-				if (!insertresult.second)
-				{
-					cout << h << "is a duplicate of " << *insertresult.first << endl;
-				}
+				if (insertresult.second) numfound++;
+				//if (!insertresult.second)
+				//{
+				//	cout << h << "is a duplicate of " << *insertresult.first << endl;
+				//}
 			}
 			else
 			{
-				findhexagons(maxperim, totperim + side, sides, found);
+				findhexagons(maxperim, totperim + side, sides, found, numfound);
 			}
 		}
 
@@ -113,7 +115,8 @@ int main(int argc, char** argv)
 
 	set<hexagon> hexagons;
 	long maxperim = stoi(argv[1]);
-	findhexagons(maxperim, 0, vector<long>(), hexagons);
+	long numfound = 0;
+	findhexagons(maxperim, 0, vector<long>(), hexagons, numfound);
 	cout << endl << "found: " << endl;
 	for (auto h : hexagons)
 	{
@@ -123,7 +126,7 @@ int main(int argc, char** argv)
 	clock_t end = clock();
 	float duration = ((float)(end - begin)) / CLOCKS_PER_SEC;
 
-	cout << "H(" << maxperim << ") = " << hexagons.size() << endl;
+	cout << "H(" << maxperim << ") = " << numfound << endl;
 	cout << "Took " << fixed << setprecision(2) << duration << " seconds " << endl;
 	return 0;
 }
