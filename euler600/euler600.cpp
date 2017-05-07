@@ -96,6 +96,45 @@ bool checksides(const vector<long>& sides, long maxperim)
 mutex m_currentfirstside, m_numfound;
 long currentfirstside = 1, numfound, maxperim;
 
+long deduce(vector<long>& sides)
+{
+	if (sides.size() == 4)
+	{
+		//e.g. 2 2 1 2 (2 1)
+		if (sides[0] == sides[1] && sides[0] == sides[3])
+		{
+			sides.push_back(sides[0]);
+			sides.push_back(sides[2]);
+			return sides[0] + sides[2];
+		}
+
+		//e.g. 2 1 2 2 1 2
+		if (sides[0] == sides[2] && sides[2] == sides[3])
+		{
+			sides.push_back(sides[1]);
+			sides.push_back(sides[2]);
+			return sides[1] + sides[2];
+		}
+
+		//e.g. 2 1 1 2 1 1
+		if (sides[0] == sides[3] && sides[1] == sides[2])
+		{
+			sides.push_back(sides[1]);
+			sides.push_back(sides[1]);
+			return sides[1] + sides[1];
+		}
+
+		//e.g. 2 1 2 1 2 1
+		if (sides[0] == sides[2] && sides[1] == sides[3])
+		{
+			sides.push_back(sides[0]);
+			sides.push_back(sides[1]);
+			return sides[0] + sides[1];
+		}
+	}
+	return 0;
+}
+
 void findhexagons(long totperim, vector<long> sides)
 {
 	long sidemax = sides.front();
@@ -103,17 +142,26 @@ void findhexagons(long totperim, vector<long> sides)
 	{
 		sides.push_back(side);
 		long count = sides.size();
+
+		long numfoundatstart = numfound;
+		
 		auto checksidesresult = checksides(sides, maxperim);
 
 		if (checksidesresult)
 		{
+			totperim += deduce(sides);
+			long finalperim = totperim + side;
+			if (finalperim > maxperim) return;
 			if (sides.size() == 6)
 			{
-				long finalperim = totperim + side;
+				
 				hexagon h(sides, finalperim);
 				if (h.sides == h.sides_orig)
 				{
 					lock_guard<mutex> lm(m_numfound);
+#if _DEBUG
+					cout << h << endl;
+#endif
 					numfound++;
 				}
 			}
@@ -123,6 +171,14 @@ void findhexagons(long totperim, vector<long> sides)
 			}
 		}
 
+		//if (sides.size() >=2)
+		//{
+		//	if (numfound - numfoundatstart == 0)
+		//	{
+		//		return;
+		//	}
+		//}
+				
 		sides.pop_back();
 	}
 }
@@ -136,11 +192,13 @@ void start_findhexagons()
 		{
 			lock_guard<mutex> lm(m_currentfirstside);
 			firstside = currentfirstside++;
+#if !_DEBUG
 			cout << firstside << endl;
+#endif
 		}
 
 		vector<long> sides({ firstside });
-		findhexagons(0, sides);
+		findhexagons(firstside, sides);
 
 	} while (firstside <= (maxperim - 4) / 2);
 }
@@ -155,7 +213,12 @@ int main(int argc, char** argv)
 	numfound = 0;
 
 	vector<thread> vthreads;
-	for (long t = 0; t < 8; t++)
+#if _DEBUG
+	long numthreads = 1;
+#else
+	long numthreads = 8;
+#endif
+	for (long t = 0; t < numthreads; t++)
 	{
 		vthreads.push_back(thread(start_findhexagons));
 	}
