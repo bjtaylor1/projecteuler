@@ -26,6 +26,31 @@ vector<vector<T>> split(const vector<T>& _v, long numvectors)
 	return result;
 }
 
+template<typename TInt>
+static long gcd_l(TInt a, TInt b)
+{
+	a = abs(a);
+	b = abs(b);
+	for (;;)
+	{
+		if (a == 0)
+			return b;
+		b %= a;
+		if (b == 0)
+			return a;
+		a %= b;
+	}
+	throw runtime_error("gcd not found");
+}
+
+template<typename TIterator, typename TInt>
+static TInt gcd(TIterator first, TIterator last)
+{
+	TInt l1 = *first;
+	if (++first == last) return l1;
+	else return gcd_l(abs(l1), abs(gcd<TIterator, TInt>(first, last)));
+}
+
 bool checksides(const vector<long>& sides, long maxperim)
 {
 	double x = 0, y = 0;
@@ -61,25 +86,19 @@ bool checksides(const vector<long>& sides, long maxperim)
 
 		if (sidescounted == 6)
 		{
-			if (ZERO(x) && ZERO(y))
-			{
-
-				vector<vector<long>> split3 = split(sides, 3);
-				vector<vector<long>> split2 = split(sides, 2);
-				bool sorted = true;
-					//all_of(split3.begin(), split3.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); }) ||
-					//all_of(split2.begin(), split2.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); });
-				return sorted;
-			}
-			else return false;
+			return ZERO(x) && ZERO(y);// &&
+				//gcd<vector<long>::const_iterator, long>(sides.begin(), sides.end()) == 1;
 		}
 	}
 	return true;
 }
 
-void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>& found, long& numfound)
+mutex m_currentfirstside, m_numfound;
+long currentfirstside = 1, numfound, maxperim;
+
+void findhexagons(long totperim, vector<long> sides)
 {
-	long sidemax = sides.size() > 0 ? sides.front() : LONG_MAX;
+	long sidemax = sides.front();
 	for (long side = 1; side <= maxperim - totperim && side <= sidemax; side++)
 	{
 		sides.push_back(side);
@@ -90,19 +109,17 @@ void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>
 		{
 			if (sides.size() == 6)
 			{
-				
-				hexagon h(sides, totperim + side);
-				if (h.sides == h.sides_orig) numfound++;
-				//auto insertresult = found.insert(h);
-				//if (insertresult.second) numfound++;
-				//if (!insertresult.second)
-				//{
-				//	cout << h << "is a duplicate of " << *insertresult.first << endl;
-				//}
+				long finalperim = totperim + side;
+				hexagon h(sides, finalperim);
+				if (h.sides == h.sides_orig)
+				{
+					lock_guard<mutex> lm(m_numfound);
+					numfound++;
+				}
 			}
 			else
 			{
-				findhexagons(maxperim, totperim + side, sides, found, numfound);
+				findhexagons(totperim + side, sides);
 			}
 		}
 
@@ -110,14 +127,44 @@ void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>
 	}
 }
 
+
+void start_findhexagons()
+{
+	long firstside;
+	do
+	{
+		{
+			lock_guard<mutex> lm(m_currentfirstside);
+			firstside = currentfirstside++;
+			cout << firstside << endl;
+		}
+
+		vector<long> sides({ firstside });
+		findhexagons(0, sides);
+
+	} while (firstside <= (maxperim - 4) / 2);
+}
+
+
 int main(int argc, char** argv)
 {
 	const clock_t begin = clock();
 
 	set<hexagon> hexagons;
-	long maxperim = stoi(argv[1]);
-	long numfound = 0;
-	findhexagons(maxperim, 0, vector<long>(), hexagons, numfound);
+	maxperim = stoi(argv[1]);
+	numfound = 0;
+
+	vector<thread> vthreads;
+	for (long t = 0; t < 8; t++)
+	{
+		vthreads.push_back(thread(start_findhexagons));
+	}
+
+	for (vector<thread>::iterator t = vthreads.begin(); t != vthreads.end(); t++)
+	{
+		t->join();
+	}
+
 	cout << endl << "found: " << endl;
 	for (auto h : hexagons)
 	{
