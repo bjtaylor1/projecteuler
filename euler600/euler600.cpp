@@ -67,8 +67,8 @@ bool checksides(const vector<long>& sides, long maxperim)
 				vector<vector<long>> split3 = split(sides, 3);
 				vector<vector<long>> split2 = split(sides, 2);
 				bool sorted = 
-					all_of(split3.begin(), split3.end(), [](vector<long> v) { return is_sorted(v.begin(), v.end()); }) ||
-					all_of(split2.begin(), split2.end(), [](vector<long> v) { return is_sorted(v.begin(), v.end()); });
+					all_of(split3.begin(), split3.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); }) ||
+					all_of(split2.begin(), split2.end(), [](vector<long> v) { return is_sorted(v.rbegin(), v.rend()); });
 				return sorted;
 			}
 			else return false;
@@ -79,8 +79,8 @@ bool checksides(const vector<long>& sides, long maxperim)
 
 void findhexagons(long maxperim, long totperim, vector<long> sides, set<hexagon>& found)
 {
-	long sidestart = sides.size() > 0 ? sides.front() : 1;
-	for (long side = sidestart; side <= maxperim - totperim; side++)
+	long sidemax = sides.size() > 0 ? sides.front() : LONG_MAX;
+	for (long side = 1; side <= maxperim - totperim && side <= sidemax; side++)
 	{
 		sides.push_back(side);
 		long count = sides.size();
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 	set<hexagon> hexagons;
 	long maxperim = stoi(argv[1]);
 	findhexagons(maxperim, 0, vector<long>(), hexagons);
-	cout << endl << "found: << " << endl;
+	cout << endl << "found: " << endl;
 	for (auto h : hexagons)
 	{
 		cout << h << endl;
