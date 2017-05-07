@@ -4,7 +4,7 @@
 using namespace std;
 
 
-hexagon::hexagon(const vector<long>& s, long _perimeter) : perimeter (_perimeter)
+hexagon::hexagon(const vector<long>& s, long _perimeter) : perimeter (_perimeter), sides_orig(s)
 {
 	set<hexweight> hexweights;
 	hexweights.insert(hexweight(s[0], s[1], s[2], s[3], s[4], s[5]));
@@ -31,7 +31,7 @@ bool hexagon::operator<(const hexagon & rhs) const
 
 ostream& operator<<(ostream& os, const hexagon& h)
 {
-	for (auto s : h.sides)
+	for (auto s : h.sides_orig)
 	{
 		os << s << " ";
 	}

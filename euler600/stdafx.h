@@ -19,3 +19,4 @@
 #include <string>
 #include <ctime>
 #include <iomanip>
+#include <boost/circular_buffer.hpp>
