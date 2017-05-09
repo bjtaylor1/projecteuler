@@ -7,12 +7,12 @@
 
 #ifdef _WIN32
 #include "targetver.h"
+#include <tchar.h>
 #endif
 
 #define _USE_MATH_DEFINES
 
 #include <stdio.h>
-#include <tchar.h>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -24,3 +24,4 @@
 #include <thread>
 #include <ctime>
 #include <iomanip>
+#include <limits.h>
