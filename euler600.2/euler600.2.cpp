@@ -50,61 +50,71 @@ set<sidepair> sidepairs;
 set<sidepair>::const_iterator currentsidepair;
 mutex m_currentsidepair;
 
-void process(const set<sidepair>::const_iterator v0)
+void process(const vector<set<sidepair>::const_iterator>& vs)
 {
-	if (v0->s0 >= v0->s1)
+	for(auto v0 : vs)
 	{
-		long found = 0, duplicates = 0;
-		for (auto v1 = sidepairs.begin(); v1 != sidepairs.end(); v1++)
+		if (v0->s0 >= v0->s1)
 		{
-			double totx =
-				v0->s0 * cos(ANGLE_INCREMENT * 0) +
-				v0->s1 * cos(ANGLE_INCREMENT * 1) +
-				v1->s0 * cos(ANGLE_INCREMENT * 2) +
-				v1->s1 * cos(ANGLE_INCREMENT * 3);
-			double toty =
-				v0->s0 * sin(ANGLE_INCREMENT * 0) +
-				v0->s1 * sin(ANGLE_INCREMENT * 1) +
-				v1->s0 * sin(ANGLE_INCREMENT * 2) +
-				v1->s1 * sin(ANGLE_INCREMENT * 3);
-			double distsq = totx*totx + toty*toty;
-			double perimleft = (maxperim - v0->s0 - v0->s1 - v1->s0 - v1->s1);
-			double perimleftsq = perimleft * perimleft;
-			if (distsq <= perimleftsq)
+			long found = 0, duplicates = 0;
+			for (auto v1 = sidepairs.begin(); v1 != sidepairs.end(); v1++)
 			{
-				sidepair v2finder(-totx, -toty);
-
-				for (auto v2 = sidepairs.lower_bound(v2finder); v2 != sidepairs.end() && *v2 == v2finder; v2++)
+				double totx =
+					v0->s0 * cos(ANGLE_INCREMENT * 0) +
+					v0->s1 * cos(ANGLE_INCREMENT * 1) +
+					v1->s0 * cos(ANGLE_INCREMENT * 2) +
+					v1->s1 * cos(ANGLE_INCREMENT * 3);
+				double toty =
+					v0->s0 * sin(ANGLE_INCREMENT * 0) +
+					v0->s1 * sin(ANGLE_INCREMENT * 1) +
+					v1->s0 * sin(ANGLE_INCREMENT * 2) +
+					v1->s1 * sin(ANGLE_INCREMENT * 3);
+				double distsq = totx*totx + toty*toty;
+				double perimleft = (maxperim - v0->s0 - v0->s1 - v1->s0 - v1->s1);
+				double perimleftsq = perimleft * perimleft;
+				if (distsq <= perimleftsq)
 				{
-					vector<long> sides({ v0->s0, v0->s1, v1->s0, v1->s1, v2->s0, v2->s1 });
-					if (accumulate(sides.begin(), sides.end(), 0) <= maxperim)
+					sidepair v2finder(-totx, -toty);
+
+					for (auto v2 = sidepairs.lower_bound(v2finder); v2 != sidepairs.end() && *v2 == v2finder; v2++)
 					{
-						hexagon h(sides);
+						vector<long> sides({ v0->s0, v0->s1, v1->s0, v1->s1, v2->s0, v2->s1 });
+						if (accumulate(sides.begin(), sides.end(), 0) <= maxperim)
+						{
+							hexagon h(sides);
 #if _DEBUG
-						hexagons.insert(h);
+							hexagons.insert(h);
 #else
-						if (h.sides == h.sides_orig) hexcount++;
-						if (hexcount >= ULONG_MAX) throw runtime_error("Overflow");
+							if (h.sides == h.sides_orig) hexcount++;
+							if (hexcount >= ULONG_MAX) throw runtime_error("Overflow");
 #endif
+						}
 					}
 				}
 			}
-
 		}
 	}
 }
 
+long CHUNK_SIZE = 1000;
 void do_processing()
 {
-	set<sidepair>::const_iterator sp;
+	bool isended = false;
 	do {
+		vector<set<sidepair>::const_iterator> vs;
 		{
 			lock_guard<mutex> lm(m_currentsidepair);
-			if (currentsidepair == sidepairs.end()) return;
-			sp = currentsidepair++;
+			for (long i = 0; i++ < CHUNK_SIZE; currentsidepair++)
+			{
+				if (currentsidepair == sidepairs.end())
+				{
+					isended = true;
+				}
+				else vs.push_back(currentsidepair);
+			}
 		}
-		process(sp);
-	} while (sp != sidepairs.end());
+		process(vs);
+	} while (!isended);
 }
 
 int main(int argc, char** argv)
