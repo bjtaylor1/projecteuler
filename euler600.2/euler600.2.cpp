@@ -128,14 +128,21 @@ int main(int argc, char** argv)
 	maxperim = stoi(argv[1]);
 	numthreads = stoi(argv[2]);
 
-	for (long s0 = 1; s0 <= (maxperim - 4) / 2; s0++)
+	try
 	{
-		long maxside = (maxperim / 2) - s0 - 1;
-		for (long s1 = 1; s1 <= maxside; s1++)
+		for (long s0 = 1; s0 <= (maxperim - 4) / 2; s0++)
 		{
-			sidepair sp(s0, s1);
-			sidepairs.insert(sp);
+			long maxside = (maxperim / 2) - s0 - 1;
+			for (long s1 = 1; s1 <= maxside; s1++)
+			{
+				sidepair sp(s0, s1);
+				sidepairs.insert(sp);
+			}
 		}
+	}
+	catch (exception e)
+	{
+		cout << e.what() << endl;
 	}
 
 	cout << "Preprocessed " << sidepairs.size() << " side pairs." << endl;
