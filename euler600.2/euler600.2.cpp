@@ -42,7 +42,7 @@ ostream& operator <<(ostream& os, const sidepair& sp)
 	return os;
 }
 
-atomic<unsigned long long> hexcount = 0;
+atomic<unsigned long long> hexcount(0);
 #if _DEBUG
 set<hexagon> hexagons;
 #endif
