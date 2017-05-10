@@ -173,7 +173,11 @@ void do_processing()
 					long repetitions = maxperim / t.total_perim();
 					for (long f = 1; f <= repetitions; f++)
 					{
-						current_trios.insert(t * f);
+						trio tf = t*f;
+						if (maxperim - tf.total_perim() > tf.pos.dist())
+						{
+							current_trios.insert(tf);
+						}
 					}
 				}
 			}
