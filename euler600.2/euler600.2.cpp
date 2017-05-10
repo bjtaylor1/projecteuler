@@ -96,7 +96,7 @@ void process(const vector<set<sidepair>::const_iterator>& vs)
 	}
 }
 
-long CHUNK_SIZE = 1000;
+long CHUNK_SIZE = 16000;
 void do_processing()
 {
 	bool isended = false;
