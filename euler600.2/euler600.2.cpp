@@ -219,19 +219,22 @@ int main(int argc, char** argv)
 	
 	for (auto t : trios)
 	{
-		for (multimap<xy, trio>::const_iterator match = triomap.lower_bound(t.pos); 
-			match != triomap.end() && match->first == t.pos; match++)
+		if (t.s0 >= t.s1 && t.s0 >= t.s2)
 		{
-			hexagon h(vector<long>({ t.s0, t.s1, t.s2, match->second.s0, match->second.s1, match->second.s2 }));
-			if (h.sides == h.sides_orig)
+			for (multimap<xy, trio>::const_iterator match = triomap.lower_bound(t.pos);
+				match != triomap.end() && match->first == t.pos; match++)
 			{
-				long totperim = t.total_perim() + match->second.total_perim();
-				if (totperim <= maxperim)
+				hexagon h(vector<long>({ t.s0, t.s1, t.s2, match->second.s0, match->second.s1, match->second.s2 }));
+				if (h.sides == h.sides_orig)
 				{
+					long totperim = t.total_perim() + match->second.total_perim();
+					if (totperim <= maxperim)
+					{
 #if _DEBUG
-					cout << h << endl;
+						cout << h << endl;
 #endif
-					hexcount++;
+						hexcount++;
+					}
 				}
 			}
 		}
