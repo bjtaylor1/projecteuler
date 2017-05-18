@@ -24,7 +24,8 @@ result.txt
 [Rr]eleases/
 x64/
 x86/
-build/
+#build/
+CMakeFiles/
 bld/
 [Bb]in/
 [Oo]bj/

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "hexagon.h"
 #include "macros.h"
-
+#include <stxxl/vector>
 using namespace std;
 
 long maxperim;
@@ -53,7 +53,7 @@ long it_s0;
 
 void process(const vector<set<sidepair>::const_iterator>& vs)
 {
-	for(auto v0 : vs)
+	for (auto v0 : vs)
 	{
 		if (v0->s0 >= v0->s1)
 		{
@@ -86,7 +86,7 @@ void process(const vector<set<sidepair>::const_iterator>& vs)
 #if _DEBUG
 							hexagons.insert(h);
 #else
-							if (h.sides[0] == it_s0 && h.sides == h.sides_orig) hexcount++;
+							if (h.sides == h.sides_orig) hexcount++;
 							if (hexcount >= ULONG_MAX) throw runtime_error("Overflow");
 #endif
 						}
@@ -110,6 +110,7 @@ void do_processing()
 				if (currentsidepair == sidepairs.end())
 				{
 					isended = true;
+					break;
 				}
 				else vs.push_back(currentsidepair);
 			}
@@ -129,7 +130,8 @@ int main(int argc, char** argv)
 	maxperim = stoi(argv[1]);
 	numthreads = stoi(argv[2]);
 
-	
+
+
 	for (it_s0 = 1; it_s0 <= (maxperim - 4) / 2; it_s0++)
 	{
 		long maxside = (maxperim / 2) - it_s0 - 1;
@@ -138,20 +140,21 @@ int main(int argc, char** argv)
 			sidepair sp(it_s0, s1);
 			sidepairs.insert(sp);
 		}
-
-		cout << it_s0 << ": preprocessed " << sidepairs.size() << " side pairs." << endl;
-		currentsidepair = sidepairs.begin();
-	
-		vector<thread> threads;
-		for (long i = 0; i < numthreads; i++)
-		{
-			threads.push_back(thread(do_processing));
-		}
-		for (vector<thread>::iterator t = threads.begin(); t != threads.end(); t++)
-		{
-			t->join();
-		}
 	}
+
+	cout << "Preprocessed " << sidepairs.size() << " side pairs." << endl;
+	currentsidepair = sidepairs.begin();
+
+	vector<thread> threads;
+	for (long i = 0; i < numthreads; i++)
+	{
+		threads.push_back(thread(do_processing));
+	}
+	for (vector<thread>::iterator t = threads.begin(); t != threads.end(); t++)
+	{
+		t->join();
+	}
+
 
 #if _DEBUG
 	for (auto h : hexagons)
