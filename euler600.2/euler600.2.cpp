@@ -13,14 +13,12 @@ long maxperim;
 mutex m_multivectors;
 double ANGLE_INCREMENT = M_PI / 3;
 
-long numthreads = 0;
-
 class sidepair
 {
 public:
 	long s0, s1;
 	double x, y;
-	sidepair(){}
+	sidepair() {}
 	sidepair(long _s0, long _s1, double _x, double _y) : s0(_s0), s1(_s1), x(_x), y(_y) {}
 
 	sidepair(long _s0, long _s1) : s0(_s0), s1(_s1),
@@ -44,7 +42,7 @@ public:
 class sidepair_comparer
 {
 public:
-	bool operator()(const sidepair& lhs, const sidepair& rhs) const 
+	bool operator()(const sidepair& lhs, const sidepair& rhs) const
 	{
 		return lhs < rhs;
 	}
@@ -71,22 +69,15 @@ ostream& operator<<(ostream& os, const dummy& d)
 {
 	return os;
 }
-
-atomic<unsigned long long> hexcount(0);
-#if _DEBUG
-set<hexagon> hexagons;
-#endif
 #define DATA_NODE_BLOCK_SIZE (4096)
 #define DATA_LEAF_BLOCK_SIZE (4096)
-typedef stxxl::map<sidepair, dummy, sidepair_comparer, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> sidepairmap;
-sidepairmap sidepairs(sidepair_comparer(), sidepairmap::node_block_type::raw_size * 3, sidepairmap::node_block_type::raw_size * 3);
-sidepairmap::const_iterator currentsidepair;
 
+typedef stxxl::map<sidepair, dummy, sidepair_comparer, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> sidepairmap;
 
 mutex m_currentsidepair;
 long it_s0;
 
-void process(const vector<sidepairmap::const_iterator>& vs)
+void process(sidepairmap& sidepairs, atomic<unsigned long long>& hexcount, const vector<sidepairmap::const_iterator>& vs)
 {
 	for (auto v0 : vs)
 	{
@@ -133,7 +124,7 @@ void process(const vector<sidepairmap::const_iterator>& vs)
 }
 
 long CHUNK_SIZE = 16000;
-void do_processing()
+void do_processing(sidepairmap& sidepairs, atomic<unsigned long long>& hexcount, sidepairmap::const_iterator& currentsidepair)
 {
 	bool isended = false;
 	do {
@@ -150,13 +141,14 @@ void do_processing()
 				else vs.push_back(currentsidepair);
 			}
 		}
-		process(vs);
+		process(sidepairs, hexcount, vs);
 	} while (!isended);
 }
 
 int main(int argc, char** argv)
 {
-	try {
+	try
+	{
 		{
 			auto now = std::chrono::system_clock::now();
 			auto now_c = std::chrono::system_clock::to_time_t(now);
@@ -164,9 +156,13 @@ int main(int argc, char** argv)
 		}
 
 		maxperim = stoi(argv[1]);
-		numthreads = stoi(argv[2]);
 
-
+		atomic<unsigned long long> hexcount(0);
+#if _DEBUG
+		set<hexagon> hexagons;
+#endif
+		sidepairmap sidepairs(sidepair_comparer(), sidepairmap::node_block_type::raw_size * 3, sidepairmap::node_block_type::raw_size * 3);
+		sidepairmap::const_iterator currentsidepair;
 
 		for (it_s0 = 1; it_s0 <= (maxperim - 4) / 2; it_s0++)
 		{
@@ -182,16 +178,7 @@ int main(int argc, char** argv)
 		cout << "Preprocessed " << sidepairs.size() << " side pairs." << endl;
 		currentsidepair = sidepairs.begin();
 
-		vector<thread> threads;
-		for (long i = 0; i < numthreads; i++)
-		{
-			threads.push_back(thread(do_processing));
-		}
-		for (vector<thread>::iterator t = threads.begin(); t != threads.end(); t++)
-		{
-			t->join();
-		}
-
+		do_processing(sidepairs, hexcount, currentsidepair);
 
 #if _DEBUG
 		for (auto h : hexagons)
