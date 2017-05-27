@@ -5,6 +5,8 @@
 #include "hexagon.h"
 #include "macros.h"
 #include <stxxl/vector>
+#include <stxxl/map>
+
 using namespace std;
 
 long maxperim;
@@ -18,6 +20,9 @@ class sidepair
 public:
 	long s0, s1;
 	double x, y;
+	sidepair(){}
+	sidepair(long _s0, long _s1, double _x, double _y) : s0(_s0), s1(_s1), x(_x), y(_y) {}
+
 	sidepair(long _s0, long _s1) : s0(_s0), s1(_s1),
 		x(_s0 * cos(ANGLE_INCREMENT * 4) + s1 * cos(ANGLE_INCREMENT * 5)),
 		y(_s0 * sin(ANGLE_INCREMENT * 4) + s1 * sin(ANGLE_INCREMENT * 5)) {}
@@ -36,9 +41,34 @@ public:
 	}
 };
 
+class sidepair_comparer
+{
+public:
+	bool operator()(const sidepair& lhs, const sidepair& rhs) const 
+	{
+		return lhs < rhs;
+	}
+
+	static sidepair max_value()
+	{
+		sidepair spmax(LONG_MAX, LONG_MAX, DBL_MAX, DBL_MAX);
+		return spmax;
+	}
+};
+
 ostream& operator <<(ostream& os, const sidepair& sp)
 {
 	os << sp.s0 << "," << sp.s1;
+	return os;
+}
+
+class dummy
+{
+public:
+};
+
+ostream& operator<<(ostream& os, const dummy& d)
+{
 	return os;
 }
 
@@ -46,40 +76,45 @@ atomic<unsigned long long> hexcount(0);
 #if _DEBUG
 set<hexagon> hexagons;
 #endif
-set<sidepair> sidepairs;
-set<sidepair>::const_iterator currentsidepair;
+#define DATA_NODE_BLOCK_SIZE (4096)
+#define DATA_LEAF_BLOCK_SIZE (4096)
+typedef stxxl::map<sidepair, dummy, sidepair_comparer, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> sidepairmap;
+sidepairmap sidepairs(sidepair_comparer(), sidepairmap::node_block_type::raw_size * 3, sidepairmap::node_block_type::raw_size * 3);
+sidepairmap::const_iterator currentsidepair;
+
+
 mutex m_currentsidepair;
 long it_s0;
 
-void process(const vector<set<sidepair>::const_iterator>& vs)
+void process(const vector<sidepairmap::const_iterator>& vs)
 {
 	for (auto v0 : vs)
 	{
-		if (v0->s0 >= v0->s1)
+		if (v0->first.s0 >= v0->first.s1)
 		{
 			long found = 0, duplicates = 0;
 			for (auto v1 = sidepairs.begin(); v1 != sidepairs.end(); v1++)
 			{
 				double totx =
-					v0->s0 * cos(ANGLE_INCREMENT * 0) +
-					v0->s1 * cos(ANGLE_INCREMENT * 1) +
-					v1->s0 * cos(ANGLE_INCREMENT * 2) +
-					v1->s1 * cos(ANGLE_INCREMENT * 3);
+					v0->first.s0 * cos(ANGLE_INCREMENT * 0) +
+					v0->first.s1 * cos(ANGLE_INCREMENT * 1) +
+					v1->first.s0 * cos(ANGLE_INCREMENT * 2) +
+					v1->first.s1 * cos(ANGLE_INCREMENT * 3);
 				double toty =
-					v0->s0 * sin(ANGLE_INCREMENT * 0) +
-					v0->s1 * sin(ANGLE_INCREMENT * 1) +
-					v1->s0 * sin(ANGLE_INCREMENT * 2) +
-					v1->s1 * sin(ANGLE_INCREMENT * 3);
+					v0->first.s0 * sin(ANGLE_INCREMENT * 0) +
+					v0->first.s1 * sin(ANGLE_INCREMENT * 1) +
+					v1->first.s0 * sin(ANGLE_INCREMENT * 2) +
+					v1->first.s1 * sin(ANGLE_INCREMENT * 3);
 				double distsq = totx*totx + toty*toty;
-				double perimleft = (maxperim - v0->s0 - v0->s1 - v1->s0 - v1->s1);
+				double perimleft = (maxperim - v0->first.s0 - v0->first.s1 - v1->first.s0 - v1->first.s1);
 				double perimleftsq = perimleft * perimleft;
 				if (distsq <= perimleftsq)
 				{
 					sidepair v2finder(-totx, -toty);
 
-					for (auto v2 = sidepairs.lower_bound(v2finder); v2 != sidepairs.end() && *v2 == v2finder; v2++)
+					for (auto v2 = sidepairs.lower_bound(v2finder); v2 != sidepairs.end() && v2->first == v2finder; v2++)
 					{
-						vector<long> sides({ v0->s0, v0->s1, v1->s0, v1->s1, v2->s0, v2->s1 });
+						vector<long> sides({ v0->first.s0, v0->first.s1, v1->first.s0, v1->first.s1, v2->first.s0, v2->first.s1 });
 						if (accumulate(sides.begin(), sides.end(), 0) <= maxperim)
 						{
 							hexagon h(sides);
@@ -102,7 +137,7 @@ void do_processing()
 {
 	bool isended = false;
 	do {
-		vector<set<sidepair>::const_iterator> vs;
+		vector<sidepairmap::const_iterator> vs;
 		{
 			lock_guard<mutex> lm(m_currentsidepair);
 			for (long i = 0; i++ < CHUNK_SIZE; currentsidepair++)
@@ -121,58 +156,66 @@ void do_processing()
 
 int main(int argc, char** argv)
 {
-	{
-		auto now = std::chrono::system_clock::now();
-		auto now_c = std::chrono::system_clock::to_time_t(now);
-		std::cout << "start: " << std::put_time(std::localtime(&now_c), "%c") << endl;
-	}
-
-	maxperim = stoi(argv[1]);
-	numthreads = stoi(argv[2]);
-
-
-
-	for (it_s0 = 1; it_s0 <= (maxperim - 4) / 2; it_s0++)
-	{
-		long maxside = (maxperim / 2) - it_s0 - 1;
-		for (long s1 = 1; s1 <= maxside; s1++)
+	try {
 		{
-			sidepair sp(it_s0, s1);
-			sidepairs.insert(sp);
+			auto now = std::chrono::system_clock::now();
+			auto now_c = std::chrono::system_clock::to_time_t(now);
+			std::cout << "start: " << std::put_time(std::localtime(&now_c), "%c") << endl;
 		}
-	}
 
-	cout << "Preprocessed " << sidepairs.size() << " side pairs." << endl;
-	currentsidepair = sidepairs.begin();
+		maxperim = stoi(argv[1]);
+		numthreads = stoi(argv[2]);
 
-	vector<thread> threads;
-	for (long i = 0; i < numthreads; i++)
-	{
-		threads.push_back(thread(do_processing));
-	}
-	for (vector<thread>::iterator t = threads.begin(); t != threads.end(); t++)
-	{
-		t->join();
-	}
+
+
+		for (it_s0 = 1; it_s0 <= (maxperim - 4) / 2; it_s0++)
+		{
+			long maxside = (maxperim / 2) - it_s0 - 1;
+			for (long s1 = 1; s1 <= maxside; s1++)
+			{
+				sidepair sp(it_s0, s1);
+				pair<sidepair, dummy> p(sp, dummy());
+				sidepairs.insert(p);
+			}
+		}
+
+		cout << "Preprocessed " << sidepairs.size() << " side pairs." << endl;
+		currentsidepair = sidepairs.begin();
+
+		vector<thread> threads;
+		for (long i = 0; i < numthreads; i++)
+		{
+			threads.push_back(thread(do_processing));
+		}
+		for (vector<thread>::iterator t = threads.begin(); t != threads.end(); t++)
+		{
+			t->join();
+		}
 
 
 #if _DEBUG
-	for (auto h : hexagons)
-	{
-		cout << h << endl;
-	}
-	cout << "There are " << hexagons.size() << " hexagons." << endl;
+		for (auto h : hexagons)
+		{
+			cout << h << endl;
+		}
+		cout << "There are " << hexagons.size() << " hexagons." << endl;
 #else
-	cout << "There are " << hexcount << " hexagons." << endl;
+		cout << "There are " << hexcount << " hexagons." << endl;
 #endif
 
-	{
-		auto now = std::chrono::system_clock::now();
-		auto now_c = std::chrono::system_clock::to_time_t(now);
-		std::cout << "end: " << std::put_time(std::localtime(&now_c), "%c") << endl;
-	}
+		{
+			auto now = std::chrono::system_clock::now();
+			auto now_c = std::chrono::system_clock::to_time_t(now);
+			std::cout << "end: " << std::put_time(std::localtime(&now_c), "%c") << endl;
+		}
 
-	return 0;
+		return 0;
+	}
+	catch (std::exception e)
+	{
+		cout << e.what() << endl;
+		return 1;
+	}
 }
 
 
