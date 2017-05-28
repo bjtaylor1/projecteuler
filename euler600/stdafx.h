@@ -7,19 +7,19 @@
 #define _USE_MATH_DEFINES
 #ifdef _WIN32
 #include "targetver.h"
-#include <tchar.h>
 #endif
 
-#include <stdio.h>
 #include <vector>
 #include <set>
 #include <numeric>
 #include <iostream>
-#include <math.h>
 #include <string>
 #include <ctime>
 #include <iomanip>
+<<<<<<< HEAD
 #include <limits.h>
 #include <mutex>
 #include <algorithm>
 #include <thread>
+=======
+>>>>>>> old
