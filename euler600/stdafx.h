@@ -16,10 +16,7 @@
 #include <string>
 #include <ctime>
 #include <iomanip>
-<<<<<<< HEAD
 #include <limits.h>
 #include <mutex>
 #include <algorithm>
 #include <thread>
-=======
->>>>>>> old
