@@ -4,12 +4,10 @@
 //
 
 #pragma once
-
+#define _USE_MATH_DEFINES
+#ifdef _WIN32
 #include "targetver.h"
-
-#include <stdio.h>
-#include <tchar.h>
-
+#endif
 
 #include <vector>
 #include <set>
