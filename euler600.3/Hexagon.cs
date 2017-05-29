@@ -8,33 +8,57 @@ namespace euler600
 {
     public struct Hexagon
     {
+        public Hexagon Grow(int dir, int amount)
+        {
+            if (dir == 0)
+                return new Hexagon(S0 , S1, S2+ amount, S3, S4, S5 + amount);
+            else if (dir == 1)
+                return new Hexagon(S0, S1 + amount, S2, S3, S4 + amount, S5);
+            else if (dir == 2)
+                return new Hexagon(S0 + amount, S1, S2, S3 + amount, S4, S5);
+            else
+                throw new ArgumentException("Invalid dir", nameof(dir));
+        }
+
         public int S0, S1, S2, S3, S4, S5;
-        public bool IsFirst;
+
+        public Hexagon(int s0, int s1, int s2, int s3, int s4, int s5) : this(new SidePair(s0, s1), new SidePair(s2, s3), new SidePair(s4, s5)) { }
+
         public Hexagon(SidePair sp0, SidePair sp1, SidePair sp2)
         {
-            var hexWeights = new List<HexWeight>();
             S0 = sp0.S0;
             S1 = sp0.S1;
             S2 = sp1.S0;
             S3 = sp1.S1;
             S4 = sp2.S0;
             S5 = sp2.S1;
-            hexWeights.Add(new HexWeight(S0, S1, S2, S3, S4, S5));
-            hexWeights.Add(new HexWeight(S1, S2, S3, S4, S5, S0));
-            hexWeights.Add(new HexWeight(S2, S3, S4, S5, S0, S1));
-            hexWeights.Add(new HexWeight(S3, S4, S5, S0, S1, S2));
-            hexWeights.Add(new HexWeight(S4, S5, S0, S1, S2, S3));
-            hexWeights.Add(new HexWeight(S5, S0, S1, S2, S3, S4));
-            hexWeights.Add(new HexWeight(S5, S4, S3, S2, S1, S0));
-            hexWeights.Add(new HexWeight(S4, S3, S2, S1, S0, S5));
-            hexWeights.Add(new HexWeight(S3, S2, S1, S0, S5, S4));
-            hexWeights.Add(new HexWeight(S2, S1, S0, S5, S4, S3));
-            hexWeights.Add(new HexWeight(S1, S0, S5, S4, S3, S2));
-            hexWeights.Add(new HexWeight(S0, S5, S4, S3, S2, S1));
+        }
 
+        public bool IsValid()
+        {
+            return S0 > 0 && S1 > 0 && S2 > 0 && S3 > 0 && S4 > 0 && S5 > 0;
+        }
+
+        public bool IsFirst()
+        {
+            var hexWeights = new List<HexWeight>
+            {
+                new HexWeight(S0, S1, S2, S3, S4, S5),
+                new HexWeight(S1, S2, S3, S4, S5, S0),
+                new HexWeight(S2, S3, S4, S5, S0, S1),
+                new HexWeight(S3, S4, S5, S0, S1, S2),
+                new HexWeight(S4, S5, S0, S1, S2, S3),
+                new HexWeight(S5, S0, S1, S2, S3, S4),
+                new HexWeight(S5, S4, S3, S2, S1, S0),
+                new HexWeight(S4, S3, S2, S1, S0, S5),
+                new HexWeight(S3, S2, S1, S0, S5, S4),
+                new HexWeight(S2, S1, S0, S5, S4, S3),
+                new HexWeight(S1, S0, S5, S4, S3, S2),
+                new HexWeight(S0, S5, S4, S3, S2, S1)
+            };
             hexWeights.Sort();
             var hexWeight = hexWeights.First();
-            IsFirst =
+            return
                    S0 == hexWeight.S0 &&
                    S1 == hexWeight.S1 &&
                    S2 == hexWeight.S2 &&
@@ -46,6 +70,11 @@ namespace euler600
         public override string ToString()
         {
             return $"{S0}  {S1}  {S2}  {S3}  {S4}  {S5}";
+        }
+
+        public int TotalPerim()
+        {
+            return S0 + S1 + S2 + S3 + S4 + S5;
         }
     }
 
