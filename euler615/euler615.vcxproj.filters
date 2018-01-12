@@ -29,5 +29,8 @@
     <ClCompile Include="euler615.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="primes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
