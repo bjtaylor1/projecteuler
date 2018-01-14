@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,14 +12,22 @@ namespace euler569
     {
         static void Main(string[] args)
         {
-            const int limit = 100; //2500000
+            const int limit = 2500000;
             var peaks = new Pos[limit+1];
             var angles = new double[limit+1];
             peaks[1] = new Pos(2, 2);
             mpz_t prime = 2;
             int totalCount = 0;
+
+            Stopwatch sw = Stopwatch.StartNew();
             for(int i = 2; i <= limit; i++)
             {
+                if (i % 100 == 0)
+                {
+                    var velocity = (1000000000d) / sw.ElapsedTicks;
+                    Console.Write($"{(double)i / limit:P1}, velocity={velocity:0.00000}\r");
+                    sw.Restart();
+                }
                 var next2primes = (prime = prime.NextPrimeGMP(), prime = prime.NextPrimeGMP());
                 var xpos = peaks[i - 1].X + next2primes.Item1 + next2primes.Item2;
                 var ypos = peaks[i - 1].Y - next2primes.Item1 + next2primes.Item2;
@@ -38,6 +47,7 @@ namespace euler569
                 }
                 totalCount += count;
             }
+            Console.WriteLine($"\n{totalCount}");
         }
     }
 
