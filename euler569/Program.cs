@@ -12,40 +12,49 @@ namespace euler569
     {
         static void Main(string[] args)
         {
-            const int limit = 2500000;
-            var peaks = new Pos[limit+1];
+            const int maxCheck = 200;
+            const int limit = 100; //2500000;
             var angles = new double[limit+1];
-            peaks[1] = new Pos(2, 2);
             mpz_t prime = 2;
             int totalCount = 0;
-
+            var peaks = new Queue<Pos>();
+            var prevPeak = new Pos(2, 2, 1);
+            peaks.Enqueue(prevPeak);
             Stopwatch sw = Stopwatch.StartNew();
             for(int i = 2; i <= limit; i++)
             {
-                if (i % 100 == 0)
+                if (i % 10000 == 0)
                 {
                     var velocity = (1000000000d) / sw.ElapsedTicks;
                     Console.Write($"{(double)i / limit:P1}, velocity={velocity:0.00000}\r");
                     sw.Restart();
                 }
-                var next2primes = (prime = prime.NextPrimeGMP(), prime = prime.NextPrimeGMP());
-                var xpos = peaks[i - 1].X + next2primes.Item1 + next2primes.Item2;
-                var ypos = peaks[i - 1].Y - next2primes.Item1 + next2primes.Item2;
-                peaks[i] = new Pos(xpos, ypos);
-                angles[i] = peaks[i].AngleTo(peaks[i - 1]);
+                var next2Primes = (prime = prime.NextPrimeGMP(), prime = prime.NextPrimeGMP());
+                var xpos = prevPeak.X + next2Primes.Item1 + next2Primes.Item2;
+                var ypos = prevPeak.Y - next2Primes.Item1 + next2Primes.Item2;
+                var peak = new Pos(xpos, ypos, i);
+                peaks.Enqueue(peak);
+                double o = Math.Abs((double)prevPeak.Y - (double) peak.Y);
+                double a = Math.Abs((double)prevPeak.X - (double) peak.X);
+                var angle1 = o / a;
+                angles[i] = angle1;
                 int count = 0;
                 double minAngle = double.MaxValue;
-                var anglesToThis = peaks.Skip(1).Take(i - 1).Select(p => p.AngleTo(peaks[i])).ToArray();
-                for(int j = i-1; j >= 1; j--)
+                var peaksArray = peaks.ToArray();
+                for(int j = peaksArray.Length - 2; j >= 0; j--)
                 {
-                    double angle = peaks[j].AngleTo(peaks[i]);
-                    if(angle < minAngle)
+                    var dy = peak.Y - peaksArray[j].Y;
+                    double dx = Math.Abs((double)peak.X - (double) peaksArray[j].X);
+                    double minProduct = minAngle * dx;
+                    if (dy < minProduct)
                     {
-                        minAngle = angle;
+                        minAngle =(double) dy / dx;
                         count++;
                     }
                 }
                 totalCount += count;
+                prevPeak = peak;
+                while (peaks.Count > maxCheck) peaks.Dequeue();
             }
             Console.WriteLine($"\n{totalCount}");
         }
@@ -53,22 +62,20 @@ namespace euler569
 
     public class Pos
     {
-        public Pos(mpz_t x, mpz_t y)
+        public override string ToString()
+        {
+            return $"{Id}: {X}, {Y}";
+        }
+
+        public Pos(mpz_t x, mpz_t y, int id)
         {
             X = x;
             Y = y;
+            Id = id;
         }
 
         public mpz_t X { get; }
         public mpz_t Y { get; }
-
-        public double AngleTo(Pos other)
-        {
-            double o = Math.Abs((double)other.Y - (double)Y);
-            double a = Math.Abs((double)other.X - (double)X);
-            var tan = o / a;
-            double angle = Math.Atan(tan) * 180 / Math.PI;
-            return angle;
-        }
+        public int Id { get; }
     }
 }
