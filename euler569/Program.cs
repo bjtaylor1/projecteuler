@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mpir.NET;
 
 namespace euler569
@@ -12,14 +11,12 @@ namespace euler569
     {
         static void Main(string[] args)
         {
-            const int maxCheck = 200;
             const int limit = 100; //2500000;
-            var angles = new double[limit+1];
             mpz_t prime = 2;
             int totalCount = 0;
-            var peaks = new Queue<Pos>();
-            var prevPeak = new Pos(2, 2, 1);
-            peaks.Enqueue(prevPeak);
+            var peaks = new Pos[limit+1];
+            peaks[0] = new Pos(0, 0, 0);
+            peaks[1] = new Pos(2, 2, 1);
             Stopwatch sw = Stopwatch.StartNew();
             for(int i = 2; i <= limit; i++)
             {
@@ -30,31 +27,36 @@ namespace euler569
                     sw.Restart();
                 }
                 var next2Primes = (prime = prime.NextPrimeGMP(), prime = prime.NextPrimeGMP());
-                var xpos = prevPeak.X + next2Primes.Item1 + next2Primes.Item2;
-                var ypos = prevPeak.Y - next2Primes.Item1 + next2Primes.Item2;
-                var peak = new Pos(xpos, ypos, i);
-                peaks.Enqueue(peak);
-                double o = Math.Abs((double)prevPeak.Y - (double) peak.Y);
-                double a = Math.Abs((double)prevPeak.X - (double) peak.X);
-                var angle1 = o / a;
-                angles[i] = angle1;
-                int count = 0;
-                double minAngle = double.MaxValue;
-                var peaksArray = peaks.ToArray();
-                for(int j = peaksArray.Length - 2; j >= 0; j--)
+                var xpos = peaks[i-1].X + next2Primes.Item1 + next2Primes.Item2;
+                var ypos = peaks[i-1].Y - next2Primes.Item1 + next2Primes.Item2;
+                peaks[i] = new Pos(xpos, ypos, i);
+            }
+            for (int i = 1; i < limit;)
+            {
+                var next = peaks.Where(p => p.Id > i)
+                    .OrderByDescending(p => Fraction.AngleBetween(p, peaks[i]))
+                    .First();
+                peaks[i].Next = next.Id;
+                next.Previous = i;
+                i = next.Id;
+            }
+            peaks[limit].Next = limit + 1;
+            for (int i = 2; i <= limit; i = peaks[i].Next)
+            {
+                Fraction minAngle = Fraction.AngleBetween(peaks[i], peaks[i-1]);
+                int count = 1;
+
+                for (int j = i - 2; j >= peaks[i].Previous; j--)
                 {
-                    var dy = peak.Y - peaksArray[j].Y;
-                    double dx = Math.Abs((double)peak.X - (double) peaksArray[j].X);
-                    double minProduct = minAngle * dx;
-                    if (dy < minProduct)
+                    var angle = Fraction.AngleBetween(peaks[i], peaks[j]);
+                    if (angle.CompareTo(minAngle) < 0)
                     {
-                        minAngle =(double) dy / dx;
+                        minAngle = angle;
                         count++;
+
                     }
                 }
                 totalCount += count;
-                prevPeak = peak;
-                while (peaks.Count > maxCheck) peaks.Dequeue();
             }
             Console.WriteLine($"\n{totalCount}");
         }
@@ -73,9 +75,35 @@ namespace euler569
             Y = y;
             Id = id;
         }
-
+        public int Previous { get; set; }
         public mpz_t X { get; }
         public mpz_t Y { get; }
         public int Id { get; }
+        public int Next { get; set; }
+    }
+
+    public class Fraction : IComparable<Fraction>
+    {
+        public mpz_t Top { get; }
+        public mpz_t Bottom { get; }
+
+        public Fraction(mpz_t top, mpz_t bottom)
+        {
+            Top = top;
+            Bottom = bottom;
+        }
+
+        public int CompareTo(Fraction other)
+        {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+
+            return (Top * other.Bottom).CompareTo(other.Top * Bottom);
+        }
+
+        public static Fraction AngleBetween(Pos p1, Pos p2)
+        {
+            return new Fraction(p1.Y - p2.Y, p1.X - p2.X);
+        }
     }
 }
