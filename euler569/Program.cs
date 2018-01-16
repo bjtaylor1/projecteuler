@@ -31,6 +31,7 @@ namespace euler569
                 var ypos = peaks[i-1].Y - next2Primes.Item1 + next2Primes.Item2;
                 peaks[i] = new Pos(xpos, ypos, i);
             }
+            Console.WriteLine("\nMade peaks");
             for (int i = 1; i < limit;)
             {
                 var next = peaks.Where(p => p.Id > i)
@@ -41,21 +42,30 @@ namespace euler569
                 i = next.Id;
             }
             peaks[limit].Next = limit + 1;
-            for (int i = 2; i <= limit; i = peaks[i].Next)
+
+            int lowerLimit = 1;
+            for (int i = 2; i <= limit; i++)
             {
+                if (i % 10000 == 0)
+                {
+                    var velocity = (1000000000d) / sw.ElapsedTicks;
+                    Console.Write($"{(double)i / limit:P1}, velocity={velocity:0.00000}\r");
+                    sw.Restart();
+                }
+
                 Fraction minAngle = Fraction.AngleBetween(peaks[i], peaks[i-1]);
                 int count = 1;
-
-                for (int j = i - 2; j >= peaks[i].Previous; j--)
+                for (int j = i - 2; j >= lowerLimit; j--)
                 {
                     var angle = Fraction.AngleBetween(peaks[i], peaks[j]);
                     if (angle.CompareTo(minAngle) < 0)
                     {
                         minAngle = angle;
                         count++;
-
                     }
                 }
+                if (peaks[i].Previous > lowerLimit) lowerLimit = peaks[i].Previous;
+
                 totalCount += count;
             }
             Console.WriteLine($"\n{totalCount}");
