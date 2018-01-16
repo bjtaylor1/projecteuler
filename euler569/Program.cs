@@ -36,11 +36,11 @@ namespace euler569
                 peaks.Enqueue(peak);
                 double o = Math.Abs((double)prevPeak.Y - (double) peak.Y);
                 double a = Math.Abs((double)prevPeak.X - (double) peak.X);
-                var angle1 = o / a;
-                angles[i] = angle1;
+                angles[i] = o / a;
                 int count = 0;
                 double minAngle = double.MaxValue;
                 var peaksArray = peaks.ToArray();
+                var seen = new List<int>();
                 for(int j = peaksArray.Length - 2; j >= 0; j--)
                 {
                     var dy = peak.Y - peaksArray[j].Y;
@@ -50,8 +50,10 @@ namespace euler569
                     {
                         minAngle =(double) dy / dx;
                         count++;
+                        seen.Add(peaksArray[j].Id);
                     }
                 }
+                Console.WriteLine($"{i},{seen.Count},{string.Join(",", seen)}");
                 totalCount += count;
                 prevPeak = peak;
                 while (peaks.Count > maxCheck) peaks.Dequeue();
