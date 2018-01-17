@@ -11,12 +11,14 @@ namespace euler569
     {
         static void Main(string[] args)
         {
-            const int limit = 100; //2500000;
+            const int limit = 2500000;
             mpz_t prime = 2;
             int totalCount = 0;
-            var peaks = new Dictionary<int,Pos>();
-            peaks[0] = new Pos(0, 0, 0);
-            peaks[1] = new Pos(2, 2, 1);
+            var peaks = new Dictionary<int, Pos>(limit)
+            {
+                [0] = new Pos(0, 0, 0),
+                [1] = new Pos(2, 2, 1)
+            };
             Stopwatch sw = Stopwatch.StartNew();
             for(int i = 2; i <= limit; i++)
             {
@@ -32,16 +34,6 @@ namespace euler569
                 peaks[i] = new Pos(xpos, ypos, i);
             }
             Console.WriteLine("\nMade peaks");
-            for (int i = 1; i < limit;)
-            {
-                var next = peaks.Where(p => p.Key > i)
-                    .OrderByDescending(p => Fraction.AngleBetween(p.Value, peaks[i]))
-                    .First();
-                peaks[i].Next = next.Key;
-                next.Value.Previous = i;
-                i = next.Key;
-            }
-            peaks[limit].Next = limit + 1;
 
             int lowerLimit = 1;
             for (int i = 2; i <= limit; i++)
@@ -72,6 +64,7 @@ namespace euler569
 
 
                 totalCount += count;
+                if (peaks[i].Previous > lowerLimit) lowerLimit = peaks[i].Previous;
             }
             Console.WriteLine($"\n{totalCount}");
         }
