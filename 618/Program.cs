@@ -15,12 +15,18 @@ namespace _618
     {
         static void Main(string[] args)
         {
-            for(int n = 1; n <=10; n++)
+            var f = new int[25];
+            f[0] = 0;
+            f[1] = 1;
+            mpz_t tot = 0;
+            for (int k = 2; k <=24; k++)
             {
-                Console.WriteLine($"S({n}) = {S.Calculate(n)}");
+                f[k] = f[k - 2] + f[k - 1];
+                var s = S.Calculate(f[k]);
+                Console.WriteLine($"S({f[k]}) = {s.Total}");
+                tot += s.Total;
             }
-            
-
+            Console.WriteLine(tot % 1e9);
         }
     }
 
@@ -82,14 +88,14 @@ namespace _618
             //}
             //else
             {
-                var pfss = new List<Pfs>();
+                var pfss = new HashSet<Pfs>();
                 foreach(var p in Primes.Values.Where(p => p <= n/2 ))
                 {
                     var pfssLower = GetFactorsCached(n - p);
                     var pfssNew = pfssLower
                         .Select(pfs => new Pfs(pfs.Values.Concat(new[] { p }).OrderBy(v => v).ToImmutableArray()))
                         .ToArray();
-                    pfss.AddRange(pfssNew);
+                    foreach (var f in pfssNew) pfss.Add(f);
                 }
                 if (Primes.Values.Contains(n))
                 {
@@ -158,6 +164,22 @@ namespace _618
         public override string ToString()
         {
             return $"{string.Join(",", Values)} = {Total}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Pfs pfs &&
+                   Values.SequenceEqual(pfs.Values);
+        }
+
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return 1291433875 + Values.Aggregate(397, (p, i) => (p * 397) + i);
+            }
+            
         }
 
         public static Pfs operator+(Pfs lhs, Pfs rhs)
