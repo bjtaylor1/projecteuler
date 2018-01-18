@@ -67,11 +67,11 @@ namespace _618
             return fs;
         }
 
-        private static readonly ConcurrentDictionary<int, ImmutableArray<Pfs>> pfsCache = new ConcurrentDictionary<int, ImmutableArray<Pfs>>();
+        private static readonly ConcurrentDictionary<int, ImmutableArray<Pfs>> PfsCache = new ConcurrentDictionary<int, ImmutableArray<Pfs>>();
 
         private static ImmutableArray<Pfs> GetFactorsCached(int n)
         {
-            ImmutableArray<Pfs> result = pfsCache.GetOrAdd(n, CalcFactors);
+            ImmutableArray<Pfs> result = PfsCache.GetOrAdd(n, CalcFactors);
             return result;
         }
 
@@ -144,7 +144,7 @@ namespace _618
     {
         private readonly Lazy<mpz_t> total;
         public mpz_t Total => total.Value;
-        public Pfs(ImmutableArray<int> values, mpz_t knownTotal)
+        public Pfs(ImmutableDictionary<int,int> values, mpz_t knownTotal)
         {
             Values = values;
             total = new Lazy<mpz_t>(() => knownTotal);
@@ -152,15 +152,16 @@ namespace _618
             Debug.WriteLine(this.total.Value);
 #endif
         }
-        public Pfs(ImmutableArray<int> values)
+        public Pfs(ImmutableDictionary<int,int> values)
         {
             Values = values;
-            total = new Lazy<mpz_t>(() => values.Any() ? values.Where(i => i > 1).Aggregate(new mpz_t(1), (s,i) => s*i) : 0);
+            total = new Lazy<mpz_t>(() => values.Any() ? values.Where(i => i.Key > 1)
+                .Aggregate(new mpz_t(1), (s,i) => s*new mpz_t(i.Key).Power(i.Value)) : 0);
 #if DEBUG
             Debug.WriteLine(this.total.Value);
 #endif
         }
-        public ImmutableArray<int> Values { get; }
+        public ImmutableDictionary<int, int> Values { get; }
         public override string ToString()
         {
             return $"{string.Join(",", Values)} = {Total}";
@@ -177,7 +178,9 @@ namespace _618
         {
             unchecked
             {
-                return 1291433875 + Values.Aggregate(397, (p, i) => (p * 397) + i);
+                return 1291433875 + Values
+                    .SelectMany(k => new[]{k.Key, k.Value})
+                    .Aggregate(397, (p, i) => p * 397 + i);
             }
             
         }
