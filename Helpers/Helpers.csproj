@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="massiveinteger.cs" />
     <Compile Include="Permutations.cs" />
+    <Compile Include="Primes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
