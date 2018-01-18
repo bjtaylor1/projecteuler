@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -14,13 +15,10 @@ namespace _618
     {
         static void Main(string[] args)
         {
-            var s9real = S.Calculate(9);
-
-            var s5 = S.Calculate(5);
-            var s4 = S.Calculate(4);
-            var s9calc = s5 + s4;
-
-            Console.WriteLine(s9calc);
+            for(int n = 1; n <=10; n++)
+            {
+                Console.WriteLine($"S({n}) = {S.Calculate(n)}");
+            }
             
 
         }
@@ -51,10 +49,55 @@ namespace _618
 
         public static S Calculate(int n)
         {
-            var fs = new List<Pfs>();
+            var fs = GetFactorsCached(n);
+            S result = new S(fs);
+            return result;
+        }
 
+        private static List<Pfs> GetFactors(int n)
+        {
+            var fs = new List<Pfs>();
             DoFactorize(n, fs, new Stack<int>(), 0);
-            S result = new S(fs.ToImmutableArray());
+            return fs;
+        }
+
+        private static readonly ConcurrentDictionary<int, ImmutableArray<Pfs>> pfsCache = new ConcurrentDictionary<int, ImmutableArray<Pfs>>();
+
+        private static ImmutableArray<Pfs> GetFactorsCached(int n)
+        {
+            ImmutableArray<Pfs> result = pfsCache.GetOrAdd(n, CalcFactors);
+            return result;
+        }
+
+        private static ImmutableArray<Pfs> CalcFactors(int n)
+        {
+            ImmutableArray<Pfs> result;
+            //if(n <= 1)
+            //{
+            //    result = ImmutableArray.Create(new Pfs(ImmutableArray.Create<int>()));
+            //}
+            //else if (n == 2)
+            //{
+            //    result = ImmutableArray.Create( new Pfs(ImmutableArray.Create(2)) );
+            //}
+            //else
+            {
+                var pfss = new List<Pfs>();
+                foreach(var p in Primes.Values.Where(p => p <= n/2 ))
+                {
+                    var pfssLower = GetFactorsCached(n - p);
+                    var pfssNew = pfssLower
+                        .Select(pfs => new Pfs(pfs.Values.Concat(new[] { p }).OrderBy(v => v).ToImmutableArray()))
+                        .ToArray();
+                    pfss.AddRange(pfssNew);
+                }
+                if (Primes.Values.Contains(n))
+                {
+                    pfss.Add(new Pfs(ImmutableArray.Create(n)));
+                }
+
+                result = pfss.ToImmutableArray();
+            }
             return result;
         }
 
@@ -106,7 +149,7 @@ namespace _618
         public Pfs(ImmutableArray<int> values)
         {
             Values = values;
-            total = new Lazy<mpz_t>(() => values.Aggregate(new mpz_t(1), (s,i) => s*i));
+            total = new Lazy<mpz_t>(() => values.Any() ? values.Where(i => i > 1).Aggregate(new mpz_t(1), (s,i) => s*i) : 0);
 #if DEBUG
             Debug.WriteLine(this.total.Value);
 #endif
