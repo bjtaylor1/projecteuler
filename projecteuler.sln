@@ -47,6 +47,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "euler614", "euler614\euler6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "euler615n", "euler615n\euler615n.csproj", "{2633BAB9-5D77-4093-9FA3-D36D0E83B5AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "618", "618\618.csproj", "{1A3E7DBF-8A52-4979-BD36-872480CD318E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -291,6 +293,18 @@ Global
 		{2633BAB9-5D77-4093-9FA3-D36D0E83B5AC}.Release|x64.Build.0 = Release|Any CPU
 		{2633BAB9-5D77-4093-9FA3-D36D0E83B5AC}.Release|x86.ActiveCfg = Release|Any CPU
 		{2633BAB9-5D77-4093-9FA3-D36D0E83B5AC}.Release|x86.Build.0 = Release|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Debug|x64.Build.0 = Debug|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Debug|x86.Build.0 = Debug|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Release|x64.Build.0 = Release|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Release|x86.ActiveCfg = Release|Any CPU
+		{1A3E7DBF-8A52-4979-BD36-872480CD318E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
