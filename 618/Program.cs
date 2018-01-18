@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,11 +14,13 @@ namespace _618
     {
         static void Main(string[] args)
         {
-            var s2 = S.Calculate(2);
-            var s3 = S.Calculate(3);
-            Console.WriteLine($"s2 = {s2}, s3 = {s3}");
-            var s5 = s2 + s3;
-            Console.WriteLine(s5);
+            var s9real = S.Calculate(9);
+
+            var s5 = S.Calculate(5);
+            var s4 = S.Calculate(4);
+            var s9calc = s5 + s4;
+
+            Console.WriteLine(s9calc);
             
 
         }
@@ -37,6 +40,9 @@ namespace _618
         {
             Values = values;
             this.total = new Lazy<mpz_t>(() => values.Aggregate(new mpz_t(0), (s,i) => s+i.Total));
+#if DEBUG
+            Debug.WriteLine(this.total.Value);
+#endif
         }
 
         public mpz_t Total => total.Value;
@@ -46,6 +52,7 @@ namespace _618
         public static S Calculate(int n)
         {
             var fs = new List<Pfs>();
+
             DoFactorize(n, fs, new Stack<int>(), 0);
             S result = new S(fs.ToImmutableArray());
             return result;
@@ -92,11 +99,17 @@ namespace _618
         {
             Values = values;
             total = new Lazy<mpz_t>(() => knownTotal);
+#if DEBUG
+            Debug.WriteLine(this.total.Value);
+#endif
         }
         public Pfs(ImmutableArray<int> values)
         {
             Values = values;
             total = new Lazy<mpz_t>(() => values.Aggregate(new mpz_t(1), (s,i) => s*i));
+#if DEBUG
+            Debug.WriteLine(this.total.Value);
+#endif
         }
         public ImmutableArray<int> Values { get; }
         public override string ToString()
