@@ -22,25 +22,21 @@ namespace euler47
         static void Main(string[] args)
         {
             const int N = 4;
-            for(mpz_t i = 2; ; i++)
-            {
-                bool found = true;
-                mpz_t j = new mpz_t(i);
-                for (; j < i+N; j++)
-                {
-                    if (!HasDistinctPrimeFactors(j, N))
-                    {
-                        found = false;
-                        break;
-                    }
-                }
-                if (found)
+            const int NUM_PRIMES_REQUIRED = 1000;
+            const int RESULT_MAX = 1000000;
+            var primes = new HashSet<int> { 2 };
+            for (int i = 0; i < NUM_PRIMES_REQUIRED; i++) primes.Add((int)new mpz_t(primes.Last()).NextPrimeGMP());
+            var numFactors = new int[RESULT_MAX];
+            foreach (var p in primes)
+                for (int pf = p; pf < RESULT_MAX; pf += p)
+                    numFactors[pf]++;
+            Console.WriteLine("Made sieve");
+            for(int i = 0; i < RESULT_MAX; i++)
+                if(numFactors.Skip(i).Take(N).All(n => n >= N))
                 {
                     Console.WriteLine(i);
                     return;
                 }
-                else i = j;
-            }
         }
     }
 }
