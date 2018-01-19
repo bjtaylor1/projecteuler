@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Mpir.NET;
 
 namespace euler47
@@ -27,16 +29,22 @@ namespace euler47
             var primes = new HashSet<int> { 2 };
             for (int i = 0; i < NUM_PRIMES_REQUIRED; i++) primes.Add((int)new mpz_t(primes.Last()).NextPrimeGMP());
             var numFactors = new int[RESULT_MAX];
-            foreach (var p in primes)
+            Parallel.ForEach(primes, p =>
+            {
                 for (int pf = p; pf < RESULT_MAX; pf += p)
-                    numFactors[pf]++;
-            Console.WriteLine("Made sieve");
-            for(int i = 0; i < RESULT_MAX; i++)
-                if(numFactors.Skip(i).Take(N).All(n => n >= N))
+                    Interlocked.Increment(ref numFactors[pf]);
+            }); 
+            int d = 0;
+            for (int i = 0; i < RESULT_MAX; i++)
+            {
+                if (numFactors[i] >= N) d++;
+                else d = 0;
+                if (d >= N)
                 {
-                    Console.WriteLine(i);
+                    Console.WriteLine(i - N + 1);
                     return;
                 }
+            }
         }
     }
 }
