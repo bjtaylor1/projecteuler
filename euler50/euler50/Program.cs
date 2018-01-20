@@ -18,9 +18,11 @@ namespace euler50
             var indexes = Enumerable.Range(0, primes.Count+1).ToArray();
             int max = 0;
             int bestprime = 0;
-            for(int i = 0; i < primes.Count; i++)
+            for(int i = 0; i < primes.Count && 
+                primes.Skip(i).Take(max).Sum() <= limit /* is it possible to generate a longer string? */
+                ; i++)
             {
-                for(int c = 0; c <= primes.Count-i; c++)
+                for(int c = max; c <= primes.Count-i; c++)
                 {
                     var sum = primes.Skip(i).Take(c).Sum();
                     if (sum >= limit) break;
@@ -31,7 +33,7 @@ namespace euler50
                     }
                 }
             }
-            Console.WriteLine(bestprime);
+            Console.WriteLine($"\n{bestprime}, max = {max}");
         }
     }
 }
