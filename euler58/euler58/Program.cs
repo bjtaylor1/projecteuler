@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Mpir.NET;
 
@@ -9,33 +8,19 @@ namespace euler58
     {
         static void Main(string[] args)
         {
-            int i = 1;
-            double d;
-            mpz_t lastPrime = 2;
-            int numTotal = 0;
             mpz_t[] diags = { 1 };
-            double totPrimes = 0;
-            double ratio = double.MaxValue;
-            int totDiags = 1;
-            for(int sideLength = 3; ; sideLength+= 2)
+            double totPrimes = 0, totDiags = 1;
+            double ratio = 1;
+            int sideLengthExc = 0; // == sideLength - 1
+            do
             {
-                diags = new mpz_t[] { 1, 2, 3, 4 }.Select(s => diags.Last() + s * (sideLength - 1)).ToArray();
-                var primes = new HashSet<mpz_t>();
-                for (mpz_t prime = lastPrime; prime <= diags.Last(); lastPrime = prime = prime.NextPrimeGMP())
-                {
-                    primes.Add(prime);
-                }
-                primes.IntersectWith(diags);
-                totPrimes += primes.Count;
+                sideLengthExc += 2;
+                diags = Enumerable.Range(1, 4).Select(i => new mpz_t(diags.Last() + (sideLengthExc * i))).ToArray();
+                totPrimes += diags.Count(n => n.IsProbablyPrimeRabinMiller(100));
                 totDiags += 4;
                 ratio = totPrimes / totDiags;
-                if(sideLength % 10 == 1) Console.Write($"Side length = {sideLength}, ratio = {ratio}                \r");
-                if(ratio < 0.1)
-                {
-                    Console.WriteLine(sideLength);
-                    return;
-                }
-            }
+            } while (totPrimes / totDiags >= 0.1);
+            Console.WriteLine(sideLengthExc + 1);
         }
     }
 }
