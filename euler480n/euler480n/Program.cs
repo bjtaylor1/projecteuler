@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,29 +14,30 @@ namespace euler480n
         private const int LengthLimit = 15;
         private const string Phrase = "thereisasyetinsufficientdataforameaningfulanswer";
 
-        private static readonly Dictionary<string, long> StartingWithCache = new Dictionary<string, long>();
+        private static readonly ConcurrentDictionary<CacheKey, long> StartingWithCache = new ConcurrentDictionary<CacheKey, long>();
 
-        static long StartingWith(string word, ICollection<char> remaining)
+        private static long StartingWith(string word, ICollection<char> remaining)
         {
-            var key = remaining.GroupBy(c => c).Select(g => g.Count()).OrderBy(c => c)
-                .Aggregate(new StringBuilder(), (sb, i) => sb.Append(i)).ToString();
-            if (!StartingWithCache.TryGetValue(key, out var res))
+            var cacheKey = new CacheKey(word, remaining);
+            return StartingWithCache.GetOrAdd(cacheKey, CalculateStartingWith);
+        }
+
+        private static long CalculateStartingWith(CacheKey k)
+        {
+            long res = 1;
+            if (k.Word.Length < LengthLimit)
             {
-                res = 1;
-                if(word.Length < LengthLimit)
+                foreach (var c in k.Remaining.Distinct().ToArray())
                 {
-                    foreach (var c in remaining.Distinct().ToArray())
+                    if (k.Remaining.Remove(c))
                     {
-                        if (remaining.Remove(c))
-                        {
-                            res += StartingWith(word + c, remaining);
-                            remaining.Add(c);
-                        }
+                        res += StartingWith(k.Word + c, k.Remaining);
+                        k.Remaining.Add(c);
                     }
                 }
-                StartingWithCache.Add(key, res);
             }
             return res;
+
         }
 
         private static long StartingWith(string word)
@@ -76,4 +78,31 @@ namespace euler480n
             Console.Out.WriteLine(N("euler"));
         }
     }
+
+    public class CacheKey
+    {
+        public string Word { get; }
+        public ICollection<char> Remaining { get; }
+        public string RemainingKey { get; }
+
+        public CacheKey(string word, ICollection<char> remaining)
+        {
+            Word = word;
+            Remaining = remaining;
+            RemainingKey = remaining.GroupBy(c => c).Select(g => g.Count()).OrderBy(c => c)
+                .Aggregate(new StringBuilder(), (sb, i) => sb.Append(i)).ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is CacheKey key &&
+                   RemainingKey == key.RemainingKey;
+        }
+
+        public override int GetHashCode()
+        {
+            return -1573574710 + EqualityComparer<string>.Default.GetHashCode(RemainingKey);
+        }
+    }
+
 }
