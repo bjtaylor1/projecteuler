@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace euler480n
@@ -13,7 +14,7 @@ namespace euler480n
     {
         private const int LengthLimit = 15;
         private const string Phrase = "thereisasyetinsufficientdataforameaningfulanswer";
-
+        private static readonly char[] DistinctChars = Phrase.Distinct().ToArray();
         private static readonly ConcurrentDictionary<CacheKey, long> StartingWithCache = new ConcurrentDictionary<CacheKey, long>();
 
         private static long StartingWith(string word, ICollection<char> remaining)
@@ -52,16 +53,11 @@ namespace euler480n
 
         private static long N(string word)
         {
-            long result = 0;
-            for (int pos = word.Length - 1; pos >= 0; pos--)
-            {
-                var prefix = word.Substring(0, pos);
-                result++;
-                foreach (var c in Phrase.Distinct().Where(c => c < word[pos]).ToArray())
-                {
-                    result += StartingWith(prefix + c);
-                }
-             }
+            long result = word.Length;
+            var prefixes = word.SelectMany((c, i) 
+                => DistinctChars.Where(oc => oc < c).ToArray().Select(oc 
+                => word.Substring(0, i) + oc)).OrderBy(s => s).ToArray();
+            result += prefixes.AsParallel().Sum(s => StartingWith(s));
             return result;
         }
 
