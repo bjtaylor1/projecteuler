@@ -12,17 +12,10 @@ namespace euler480n
     {
         private const int LengthLimit = 15;
         private const string Phrase = "thereisasyetinsufficientdataforameaningfulanswer";
-        //private const int LengthLimit = 4;
-        //private const string Phrase = "aabc";
-        /*
-         * 15 : aaaaaacdeeeeeef
-           16 : aaaaaacdeeeeeeg
-           17 : aaaaaacdeeeeeeh
-*/
 
         private static readonly Dictionary<string, long> StartingWithCache = new Dictionary<string, long>();
 
-        static long StartingWith(string word, List<char> remaining)
+        static long StartingWith(string word, ICollection<char> remaining)
         {
             var key = remaining.GroupBy(c => c).Select(g => g.Count()).OrderBy(c => c)
                 .Aggregate(new StringBuilder(), (sb, i) => sb.Append(i)).ToString();
@@ -42,7 +35,6 @@ namespace euler480n
                 }
                 StartingWithCache.Add(key, res);
             }
-            //Console.WriteLine($"{res} starting with {word}");
             return res;
         }
 
@@ -56,14 +48,13 @@ namespace euler480n
             return StartingWith(word, remaining);
         }
 
-        static long N(string word)
+        private static long N(string word)
         {
             long result = 0;
             for (int pos = word.Length - 1; pos >= 0; pos--)
             {
                 var prefix = word.Substring(0, pos);
                 result++;
-                //Console.WriteLine($"1 for {prefix}");
                 foreach (var c in Phrase.Distinct().Where(c => c < word[pos]).ToArray())
                 {
                     result += StartingWith(prefix + c);
