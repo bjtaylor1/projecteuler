@@ -14,8 +14,9 @@ namespace euler480n
     {
         private const int LengthLimit = 15;
         private const string Phrase = "thereisasyetinsufficientdataforameaningfulanswer";
-        private static readonly char[] DistinctChars = Phrase.Distinct().ToArray();
+        private static readonly char[] DistinctChars = Phrase.Distinct().OrderBy(c => c).ToArray();
         private static readonly ConcurrentDictionary<CacheKey, long> StartingWithCache = new ConcurrentDictionary<CacheKey, long>();
+        private static readonly ConcurrentDictionary<string, long> WordCache = new ConcurrentDictionary<string, long>();
 
         private static long StartingWith(string word, ICollection<char> remaining)
         {
@@ -51,27 +52,43 @@ namespace euler480n
             return StartingWith(word, remaining);
         }
 
-        private static long N(string word)
+        private static long CalcP(string word)
         {
             long result = word.Length;
-            var prefixes = word.SelectMany((c, i) 
-                => DistinctChars.Where(oc => oc < c).ToArray().Select(oc 
-                => word.Substring(0, i) + oc)).OrderBy(s => s).ToArray();
+            var prefixes = word.SelectMany((c, i)
+                => DistinctChars.Where(oc => oc < c).ToArray().Select(oc
+                    => word.Substring(0, i) + oc)).OrderBy(s => s).ToArray();
             result += prefixes.AsParallel().Sum(s => StartingWith(s));
             return result;
         }
 
-        private static void test(string word)
+        private static long P(string word)
         {
-            Console.WriteLine($"N({word}) = {N(word)}");
+            var result = WordCache.GetOrAdd(word, CalcP);
+            return result;
+        }
+
+        private static void Wr(long n, StringBuilder sb)
+        {
+            var firstIndexGreater = Array.FindIndex(DistinctChars, i => P(sb.ToString() + i) > n);
+            if (firstIndexGreater > 0)
+            {
+                sb.Append(DistinctChars[firstIndexGreater - 1]);
+                Wr(n, sb);
+            }
+        }
+
+        private static string W(long n)
+        {
+            var sb = new StringBuilder();
+            Wr(n, sb);
+            return sb.ToString();
         }
 
         static void Main(string[] args)
         {
-            Console.Out.WriteLine(N("aaaaaacdeeeeeef"));
-            Console.Out.WriteLine(N("aaaaaacdeeeeeey"));
-            Console.Out.WriteLine(N("euleoywuttttsss"));
-            Console.Out.WriteLine(N("euler"));
+            Console.WriteLine(
+                W(P("legionary") + P("calorimeters") - P("annihilate") + P("orchestrated") - P("fluttering")));
         }
     }
 
