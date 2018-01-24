@@ -205,3 +205,6 @@ FakesAssemblies/
 
 packages/
 *.dll
+
+# Python compiled
+*.pyc
