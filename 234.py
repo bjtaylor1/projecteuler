@@ -13,7 +13,15 @@ def M(lbexc, ubinc, n): #sum of kn where kn>lbexc and kn<=ubinc for any int k
     
 def S(n):
     r = int(n**0.5)
-    ps = primes.values(r+contingency)
+    ps = primes.values(r+1000)
+    
+    lpsindex = 0
+    lpsindexes = {}
+    for i in range(2,r+1):
+        if(i >= ps[lpsindex+1]):
+            lpsindex += 1
+        lpsindexes[i] = lpsindex
+        
     tot=0
     for lbr in range(2, r+1):
         lbexc=lbr*lbr
@@ -21,8 +29,8 @@ def S(n):
         if ubinc > n:
             ubinc = n
             
-        lps = max(filter(lambda p: p <= lbr, ps))
-        ups = min(filter(lambda p: p >= lbr + 1, ps))
+        lps = ps[lpsindexes[lbr]] #max(filter(lambda p: p <= lbr, ps))
+        ups = ps[lpsindexes[lbr]+1] #min(filter(lambda p: p >= lbr + 1, ps))
         sumlps = M(lbexc, ubinc, lps)
         sumups = M(lbexc, ubinc, ups)
         sumboth = M(lbexc, ubinc, lps*ups)
@@ -30,3 +38,4 @@ def S(n):
     return tot
     
 print(S(999966663333))
+#print(S(1000))
