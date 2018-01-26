@@ -27,12 +27,10 @@ namespace _618
                 if (p == n) return new int[] { p };
                 else
                 {
-                    var n1 = n;
                     int[] sLower = S(n - p);
                     int[] res = sLower.Select(s =>
                     {
-                        var n2 = n;
-                        var r = s * p;//.Concat(new[] { p }).OrderBy(i => i).ToArray();
+                        var r = s * p;
                         return r;
                     }).ToArray();
                     return res;
