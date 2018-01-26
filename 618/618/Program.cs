@@ -10,36 +10,36 @@ namespace _618
     class Program
     {
         private static int[] primes = new[] { 2, 3, 5, 7 };
-        private static ConcurrentDictionary<int, int[][]> cache = new ConcurrentDictionary<int, int[][]>();
-        static int[][] S(int n)
+        private static ConcurrentDictionary<int, int[]> cache = new ConcurrentDictionary<int, int[]>();
+        static int[] S(int n)
         {
             var sum = cache.GetOrAdd(n, CalcN);
             return sum;
         }
 
-        private static int[][] CalcN(int n)
+        private static int[] CalcN(int n)
         {
-            if (n == 0) return new int[][] { };
+            if (n == 0) return new int[] { };
             IEnumerable<int> subprimes = primes.Where(p => p <= n).ToArray();
 
-            int[][] values = subprimes.SelectMany(p =>
+            int[] values = subprimes.SelectMany(p =>
             {
-                if (p == n) return new int[][] { new[] { p } };
+                if (p == n) return new int[] { p };
                 else
                 {
                     var n1 = n;
-                    int[][] sLower = S(n - p);
-                    int[][] res = sLower.Select(s =>
+                    int[] sLower = S(n - p);
+                    int[] res = sLower.Select(s =>
                     {
                         var n2 = n;
-                        var r = s.Concat(new[] { p }).OrderBy(i => i).ToArray();
+                        var r = s * p;//.Concat(new[] { p }).OrderBy(i => i).ToArray();
                         return r;
                     }).ToArray();
                     return res;
                 }
             }).ToArray();
             
-            var result = values.Where(v => v.Any()).Distinct(SequenceEqualityComparer.Instance).ToArray();
+            var result = values.Where(v => v > 0).Distinct().ToArray();
             return result;
         }
 
@@ -48,7 +48,7 @@ namespace _618
             int max = 0;
             var s8 = S(8);
 
-            Console.WriteLine();
+            Console.WriteLine(s8);
         }
     }
 
