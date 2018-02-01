@@ -1,40 +1,6 @@
-def S_asc(n, last):
-    if(n==1):
-        res = 1 if last >= 1 else 0
-    else:
-        res=0
-        for i in range(0,last+1):
-            res += S_asc(n-1, i)
-        
-    return res
-    
-def S_desc(n, last):
-    if(n==1):
-        res = 1 if last >= 1 else 0
-    else:
-        res=0
-        for i in range(last,10):
-            res += S_desc(n-1, i)
-        
-    return res    
-    
-    
-def NB(n):
-    print(n)
-    if n==1:
-        res = 9
-    else:
-        res = -9 #as we've counted the ones below 10 twice
-        res += sum(S_asc(n,i) for i in range(0,10))
-        res += sum(S_desc(n,i) for i in range(0,10))
-    
-    return res
-    
-def NBTot(n):
-    res = sum(NB(i) for i in range(1,n+1))
-    return res
-    
-# print(NBTot(1))
-# print(NBTot(2))
-# print(NBTot(6))
-print(NBTot(100))
+dsc=[[0]+[1]*9]
+asc=dsc[:]
+for n in range(1,100):
+    asc.append([sum(asc[n-1][0:i+1]) for i in range(0,10)])
+    dsc.append([sum(dsc[n-1][i:10]) for i in range(0,10)])
+print(sum(sum(a) - 9 for a in asc) + sum(sum(d) for d in dsc))
