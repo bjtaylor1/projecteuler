@@ -1,4 +1,5 @@
 *.csv
+*.orig
 
 *.VC.opendb
 *.VC.db
