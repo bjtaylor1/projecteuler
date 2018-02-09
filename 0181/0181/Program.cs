@@ -5,10 +5,9 @@ namespace _0181
 {
     class Program
     {
+        public const long MAX_B = 40, MAX_W = 60; 
         static ConcurrentDictionary<(long, long, long, long), long> gcache = new ConcurrentDictionary<(long, long, long, long), long>();
         static long G(long nw, long kw, long nb, long kb) => gcache.GetOrAdd((nw, kw, nb, kb), G);
-        static ConcurrentDictionary<(long, long), long> pcache = new ConcurrentDictionary<(long n, long firstGroup), long>();
-        static long P(long n, long firstGroup) => pcache.GetOrAdd((n, firstGroup), P);
 
         static long G((long nw, long kw, long nb, long kb) param)
         {
@@ -17,44 +16,29 @@ namespace _0181
             long nb = param.nb;
             long kw = param.kw;
             long kb = param.kb;
-            if (kb <= 0 || kw <= 0 || nb < 0 || nw < 0) return 0;
-
-            if(nb == 0)
+            if (nb < 0 || nw < 0) result = 0;
+            else if (kb == 0 && kw == 0)
             {
-                result = 1;
-            }
-            else if(nw == 0)
-            {
-                result = 1;
+                result = nw == 0 && nb == 0 ? 1 : 0;
             }
             else
             {
-                result = P(nb + nw, nb + nw) ;
-                for(long gw = 1; gw <= nw; gw++)
+                result = 0;
+                long gb = kb, gw = kw;
+                while(gb >= 0 && gw >= 0)
                 {
-                    for(long gb = 1; gb <= nb; gb++)
+                    if (nw - gw >= 0 && nb - gb >= 0)
                     {
-                        if (gb + gw < nb + nw)
-                        {
-                            result += G(nw - gw, kw, nb - gb, kb);
-                        }
+                        long @this = G(nw - gw, gw, nb - gb, gb);
+                        result += @this;
+                    }
+                    if(--gb < 0)
+                    {
+                        gb = MAX_B;
+                        gw--;
                     }
                 }
-
             }
-            return result;
-        }
-        static long P((long n, long firstGroup) param)
-        {
-            if(param.firstGroup <= 0 || param.n < 0)
-            {
-                return 0;
-            }
-
-            if (param.n <= 1) return 1;
-            long with = P((param.n - param.firstGroup, param.firstGroup));
-            long without = P((param.n, param.firstGroup - 1));
-            long result = with + without;
             return result;
         }
 
@@ -66,7 +50,7 @@ namespace _0181
 
         static void Main(string[] args)
         {
-            Console.WriteLine(G(1,1,3,3));
+            Console.WriteLine(G(MAX_W, MAX_W, MAX_B, MAX_B));
         }
     }
 }
