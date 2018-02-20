@@ -13,21 +13,16 @@ namespace _0201
             else return max;
         }
 
-        //const int usage = 50;
-        const int usage = 3;
-        //static int[] set = Enumerable.Range(1, 100).ToArray();
-        //static int[] set = Enumerable.Range(1, 100).Select(i => i * i).ToArray();
-        static int[] set = new[] { 1, 3, 6, 8, 10, 11 };
+        const int usage = 50;
+        //const int usage = 3;
+        static int[] set = Enumerable.Range(1, 100).Select(i => i * i).ToArray();
+        //static int[] set = new[] { 1, 3, 6, 8, 10, 11 };
         static ConcurrentDictionary<(int tot, int max, int left), mpz_t> cache = new ConcurrentDictionary<(int tot, int max, int left), mpz_t>();
         static mpz_t Ways(int tot, int max, int left) => cache.GetOrAdd((tot, NormalizeMax(max), left), Ways);
         static mpz_t Ways(int tot) => Ways(tot, set.Length - 1, usage);
         static mpz_t Ways((int tot, int max, int left) p)
         {
-            if(cache.Count > 100000)
-            {
-                Console.WriteLine();
-            }
-
+            if (set.Take(p.max + 1).Reverse().Take(p.left).Sum() < p.tot) return 0;
             if (p.left > usage) return 0;
             if (p.tot < 0 || p.max < -1) return 0;
             if (p.tot == 0) return p.left == 0 ? 1 : 0;
@@ -40,13 +35,21 @@ namespace _0201
         {
 
             var minSum = set.Take(usage).Sum();
-            Console.WriteLine($"W({minSum}) = {Ways(minSum)}");
-
             var maxSum = set.Reverse().Take(usage).Sum();
+            Console.WriteLine($"Sum diff = {(maxSum - minSum)}");
+            Console.WriteLine($"W({minSum}) = {Ways(minSum)}");
+            Console.WriteLine($"W({maxSum}) = {Ways(maxSum)}");
             mpz_t tot = 0;
             for (int sum = minSum; sum <= maxSum; sum++)
             {
-                Console.WriteLine(sum);
+                if(cache.Count > 30000000)
+                {
+                    Console.WriteLine("\nClearing!");
+                    cache.Clear();
+                    GC.Collect();
+                    GC.WaitForFullGCComplete();
+                }
+                Console.Write($"{((double)(sum - minSum) / (maxSum - minSum)):P1} {sum} {cache.Count}\r");
                 if (Ways(sum) == 1) tot += sum;
             }
             Console.WriteLine(tot);
