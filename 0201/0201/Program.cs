@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using Mpir.NET;
 
 namespace _0201
 {
     class Program
     {
-        const int usage = 3;
-        static int[] set = new[] { 1, 3, 6, 8, 10, 11 };
+        const int usage = 50;
+        //static int[] nums
+        static int[] set = Enumerable.Range(1, 100).Select(i => i * i).ToArray();
+        //static int[] set = new[] { 1, 3, 6, 8, 10, 11 };
         //static int[] set = new[] { 1,2,3 };
         static ConcurrentDictionary<(int tot, int max, int used), mpz_t> cache = new ConcurrentDictionary<(int tot, int max, int left), mpz_t>();
+        static mpz_t Ways(int tot, int max, int used) => cache.GetOrAdd((tot, max, used), Ways);
+        static mpz_t Ways(int tot) => Ways(tot, set.Length - 1, 0);
         static mpz_t Ways((int tot, int max, int used) p)
         {
             if (p.tot < 0 || p.max < -1) return 0;
@@ -21,7 +26,15 @@ namespace _0201
         }
         static void Main(string[] args)
         {
-            Console.WriteLine(cache.GetOrAdd((18, set.Length - 1, 0), Ways));
+            var minSum = set.Take(usage).Sum();
+            var maxSum = set.Reverse().Take(usage).Sum();
+            mpz_t tot = 0;
+            for(int sum = minSum; sum <= maxSum; sum++)
+            {
+                Console.WriteLine(sum);
+                if (Ways(sum) == 1) tot += sum;
+            }
+            Console.WriteLine(tot);
         }
     }
 }
