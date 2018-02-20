@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EqualityComparers, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EqualityComparers.1.0.1\lib\netstandard2.0\EqualityComparers.dll</HintPath>
+    </Reference>
     <Reference Include="FsMpir.NET, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Mpir.NET.0.4.0\lib\net40\FsMpir.NET.dll</HintPath>
     </Reference>
