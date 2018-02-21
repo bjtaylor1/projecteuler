@@ -15,6 +15,7 @@ namespace _0201
         static int[] set = Enumerable.Range(1, 100).Select(i => i * i).ToArray();
 #endif
         static int use = set.Length / 2;
+        static int[] sums = Enumerable.Range(1, set.Length).Select(i => set.Take(i).Sum()).ToArray();
         static readonly ConcurrentDictionary<(int tot, int last, int use), long> cache = new ConcurrentDictionary<(int tot, int last, int use), long>();
 
         static long W(int tot) => W(tot, set.Length - 1, use);
@@ -26,11 +27,15 @@ namespace _0201
             if (p.tot < 0 || p.last < 0 || p.use < 0) result = 0;
             else if (p.use == 0) result = p.tot == 0 ? 1 : 0;
             else if (p.last == 0) result = set[p.last] == p.tot && p.use == 1 ? 1 : 0;
+            else if (sums[p.last] < p.tot || p.use > p.last + 1 ) result = 0;
             else
             {
-                long wo = W(p.tot, p.last - 1, p.use);
-                long wi = W(p.tot - set[p.last], p.last - 1, p.use - 1);
-                result = wo + wi;
+                result = 0;
+                result +=  W(p.tot, p.last - 1, p.use);
+                if (result <= 1)
+                {
+                    result += W(p.tot - set[p.last], p.last - 1, p.use - 1);
+                }
             }
             return result;
         }
@@ -39,8 +44,7 @@ namespace _0201
             long tot = 0;
             var minSum = set.Take(use).Sum();
             var maxSum = set.Reverse().Take(use).Sum();
-            //Console.WriteLine(W(17));
-            for (int sum = minSum; sum <= maxSum; sum++)
+            for (int sum = maxSum; sum >= minSum; sum--)
             {
                 long wsum = W(sum);
                 Console.WriteLine($"W({sum}) = {wsum}");
