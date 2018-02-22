@@ -6,27 +6,54 @@ namespace _0202
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            long crosses = 1000001;// 11; //  12017639147;
+            long crosses = 1000001;// 27; // 11; //  12017639147;
             long row = (crosses + 3) / 2;
+            mpz_t prime = 2;
+            var primes = new List<long> { (long)prime };
+            while (primes.Count < row)
+            {
+                primes.Add((long)(prime = prime.NextPrimeGMP()));
+            }
+            Console.WriteLine("Made primes");
+            long getXStart(long _row) => 3 - (_row % 3);
+            long getHashCode(long _row, long _x)
+            {
+                unchecked
+                {
+                    long res = 0;
+                    for (long lrow = 1; lrow < row; lrow++)
+                    {
+                        long dx = ((_x * lrow) / _row);
+                        long seq = (getXStart(lrow) + dx) % 3;
+                        res += seq * primes[(int)lrow];
+                    }
+                    return res;
+                }
+            }
             mpz_t row_t = row;
-            long startx = 6 - 3 * (row % 2); //3 if row is odd, 6 if it's even.
             long tot = 0;
             long div = 2 - (row % 2); //2 for even rows, 1 for odd rows.
             long x;
-            var patterns = new HashSet<int>();
-            for (x = startx; x < row; x += 6)
+            var patterns = new HashSet<long>();
+                        
+            var xstart = getXStart(row);
+            long xupperexc = (row + row % 2) / 2;
+            for (x = xstart; x < xupperexc; x += 3)
             {
                 Console.Write($"{x}\r");
                 mpz_t gcd = mpz_t.Gcd(x /div, row_t);
                 if (gcd == 1)
                 {
-                    //var pattern = GetPattern((int)x, (int)row);
-                    //if (patterns.Add(pattern.GetHashCode()))
+                    var pattern = row / x;
+                    if (patterns.Add(getHashCode(row, x)))
                     {
                         tot++;
                     }
+                    else
+                        Console.WriteLine("\nFound a duplicate!");
                 }
             }
             Console.WriteLine();
