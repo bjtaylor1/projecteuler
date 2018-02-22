@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Mpir.NET;
 
 namespace _0202
@@ -8,23 +10,27 @@ namespace _0202
     {
         static void Main(string[] args)
         {
-            long crosses = 1000001;// 27; // 11; //  12017639147;
+            long crosses = 12017639147; // 1000001;// 27; // 11;;
             mpz_t row = (crosses + 3) / 2;
             long tot = 0;
-            long x;
             var patterns = new HashSet<long>();
                         
             var xstart = (long)(3 - (row % 3));
             long xupperexc = (long)((row + row % 2) / 2);
-            for (x = xstart; x < xupperexc; x += 3)
+            var sw = Stopwatch.StartNew();
+            Parallel.For(xstart, xupperexc, x =>
             {
+                //if (x / 10000 % 1000 == 0) Console.Write($"{x:0,000}\r");
                 mpz_t gcd = mpz_t.Gcd(x, row);
                 if (gcd == 1)
                 {
                     tot++;
                 }
-            }
-            Console.WriteLine(tot * 2);
+            });
+            sw.Stop();
+
+            Console.WriteLine($"\n{tot * 2}");
+            Console.WriteLine(sw.Elapsed);
         }
     }
 }
