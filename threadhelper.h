@@ -7,13 +7,13 @@
 #include <thread>
 #include <vector>
 
-template<class TRes, class TParam>
-TRes parallel_sum(TParam fromInc, TParam toExc, TRes(*func)(TParam, TParam))
+template<class TRes, class TParam, class TFunc>
+TRes parallel_sum(TParam fromInc, TParam toExc, TFunc func)
 {
 	std::atomic<TRes> res(0);
 	std::vector<std::thread> threads;
 	const int threadcount = 16;
-	const int revisits = 20; //average number of times each thread will have to loop. counts for the fact some ranges might involve more work than others
+	const int revisits = 10; //average number of times each thread will have to loop. counts for the fact some ranges might involve more work than others
 	TParam batchSize = (toExc - fromInc) / (threadcount * revisits);
 	if (batchSize <= 0) batchSize = 1;
 	std::atomic<TParam> currentstart = fromInc;
