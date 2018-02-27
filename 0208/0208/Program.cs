@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
 namespace _0208
 {
-    class Pos
+    public class Pos
     {
         public int X1 { get; }
         public int X2 { get; }
@@ -46,7 +44,7 @@ namespace _0208
 
         }
 
-        public static Pos operator+(Pos l, Pos r)
+        public static Pos operator +(Pos l, Pos r)
         {
             return new Pos(
                 l.X1 + r.X1,
@@ -88,22 +86,22 @@ namespace _0208
 
         static bool IsEquivalent((Pos pos, int facing, int left, int limit) a1, (Pos pos, int facing, int left, int limit) a2)
         {
-            if (a1.left != a2.left) return false;
+            //if (a1.left != a2.left) return false;
 
-            if (a1.pos == a2.pos && a1.facing == a2.facing) return true;
+            if (a1.pos.Equals(a2.pos) && a1.facing == a2.facing) return true;
 
             // are they xy mirror images?
             if (a1.pos.FlipX() == a2.pos && a1.facing == -a2.facing) return true;
 
             return false;
         }
-        
+
         static ConcurrentDictionary<(Pos pos, int facing, int left, int limit), long> cache = new ConcurrentDictionary<(Pos pos, int facing, int left, int limit), long>(
-            EqualityComparers.ExpressionEqualityComparer<(Pos pos, int facing, int left, int limit)>.Create((a1, a2) => IsEquivalent(a1,a2)));
+            EqualityComparers.ExpressionEqualityComparer<(Pos pos, int facing, int left, int limit)>.Create((a1, a2) => IsEquivalent(a1, a2)));
 
         static long W(int left)
         {
-            return 2* W(new Pos(0, 0, 0, 0), 0, left, left);
+            return 2 * W(new Pos(0, 0, 0, 0), 0, left, left);
         }
 
         static long W(Pos pos, int facing, int left, int limit)
@@ -111,14 +109,14 @@ namespace _0208
             return cache.GetOrAdd((pos, facing, left, limit), W);
         }
 
-        static long total = 0;
         static long W((Pos pos, int facing, int left, int limit) p)
         {
-            if (p.pos.IsZero() && p.left == 0)
+            if (p.pos.IsZero() && p.left < p.limit)
             {
-                if (++total % 1000 == 0)
-                    Console.Write($"{total}\r");
-                return 1;
+                if (p.left == 0)
+                {
+                    return 1; //not sure if it's possible to be back at the start not facing up, but could be. But only add one if all used up, as can't repeat loop
+                }
             }
             if (p.pos.Amplitude() > p.left * 4)
             {
@@ -132,30 +130,18 @@ namespace _0208
 
             var movesThis = moves[p.facing];
             var retval = 0L;
-            //Console.WriteLine($" {p.pos}");
-            //var key = Console.ReadKey().Key;
-            //if (key == ConsoleKey.LeftArrow)
+            retval += W(p.pos + movesThis.L, facingL, p.left - 1, p.limit);
+            if (p.left < p.limit)
             {
-                //Console.Write("Moving L to ");
-                retval += W(p.pos + movesThis.L, facingL, p.left - 1, p.limit);
+                retval += W(p.pos + movesThis.R, facingR, p.left - 1, p.limit);
             }
-            //else if (key == ConsoleKey.RightArrow)
-            {
-                //Console.Write("Moving R to ");
-                if(p.left < p.limit) retval += W(p.pos + movesThis.R, facingR, p.left - 1, p.limit);
-            }
-            //else throw new InvalidOperationException();
-            
+
             return retval;
         }
+
         static void Main(string[] args)
         {
-            var sumL1 = moves.Where(m => m.Key <= 0).Aggregate(new Pos(0, 0, 0, 0), (c, p) => c + p.Value.L);
-            var sumL2 = moves.Where(m => m.Key >= 0).Aggregate(new Pos(0, 0, 0, 0), (c, p) => c + p.Value.L);
-            var sumR1 = moves.Where(m => m.Key <= 0).Aggregate(new Pos(0, 0, 0, 0), (c, p) => c + p.Value.R);
-            var sumR2 = moves.Where(m => m.Key >= 0).Aggregate(new Pos(0, 0, 0, 0), (c, p) => c + p.Value.R);
-
-            Console.WriteLine(W(25));
+            Console.WriteLine(W(int.Parse(args[0])));
         }
     }
 }
