@@ -64,6 +64,11 @@ namespace _0208
         {
             return $"{X1}x1 + {X2}x2, {Y1}y1 + {Y2}y2";
         }
+
+        public Pos FlipX()
+        {
+            return new Pos(-X1, -X2, Y1, Y2);
+        }
     }
 
     class Program
@@ -81,25 +86,33 @@ namespace _0208
             {4, (new Pos(0, -1, -1, 1),new Pos(-1, 0, 1, 0)) }
         };
 
+        static bool IsEquivalent((Pos pos, int facing, int left, int limit) a1, (Pos pos, int facing, int left, int limit) a2)
+        {
+            if (a1.left != a2.left) return false;
+
+            if (a1.pos == a2.pos && a1.facing == a2.facing) return true;
+
+            // are they xy mirror images?
+            if (a1.pos.FlipX() == a2.pos && a1.facing == -a2.facing) return true;
+
+            return false;
+        }
         
-        static ConcurrentDictionary<(Pos pos, int facing, int left), long> cache = new ConcurrentDictionary<(Pos pos, int facing, int left), long>(
-            EqualityComparers.ExpressionEqualityComparer<(Pos pos, int facing, int left)>.Create((a1, a2) =>
-            a1.pos == a2.pos &&
-            a1.facing == a2.facing &&
-            a1.left == a2.left));
+        static ConcurrentDictionary<(Pos pos, int facing, int left, int limit), long> cache = new ConcurrentDictionary<(Pos pos, int facing, int left, int limit), long>(
+            EqualityComparers.ExpressionEqualityComparer<(Pos pos, int facing, int left, int limit)>.Create((a1, a2) => IsEquivalent(a1,a2)));
 
         static long W(int left)
         {
-            return W(new Pos(0, 0, 0, 0), 0, left);
+            return 2* W(new Pos(0, 0, 0, 0), 0, left, left);
         }
 
-        static long W(Pos pos, int facing, int left)
+        static long W(Pos pos, int facing, int left, int limit)
         {
-            return cache.GetOrAdd((pos, facing, left), W);
+            return cache.GetOrAdd((pos, facing, left, limit), W);
         }
 
         static long total = 0;
-        static long W((Pos pos, int facing, int left) p)
+        static long W((Pos pos, int facing, int left, int limit) p)
         {
             if (p.pos.IsZero() && p.left == 0)
             {
@@ -124,12 +137,12 @@ namespace _0208
             //if (key == ConsoleKey.LeftArrow)
             {
                 //Console.Write("Moving L to ");
-                retval += W(p.pos + movesThis.L, facingL, p.left - 1);
+                retval += W(p.pos + movesThis.L, facingL, p.left - 1, p.limit);
             }
             //else if (key == ConsoleKey.RightArrow)
             {
                 //Console.Write("Moving R to ");
-                retval += W(p.pos + movesThis.R, facingR, p.left - 1);
+                if(p.left < p.limit) retval += W(p.pos + movesThis.R, facingR, p.left - 1, p.limit);
             }
             //else throw new InvalidOperationException();
             
@@ -145,6 +158,4 @@ namespace _0208
             Console.WriteLine(W(25));
         }
     }
-
-
 }
