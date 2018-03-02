@@ -110,7 +110,7 @@ set<set<long>> getcombinations(long i, long count)
 	return combs;
 }
 
-int main()
+long main()
 {
 	auto combs5 = getcombinations(3, 3);
 	for (ull i = 0; i < maxnum; i++)
@@ -119,21 +119,28 @@ int main()
 		tts[i].second = getpartner(i);
 		exclusionmasks[i] = exmaskall & (~(1 << tts[i].first)) & (~(1 << tts[i].second));
 	}
-	ull totalexclude = parallel_sum<ull,ull>(0, maxnum, [](ull minInc, ull maxExc) -> ull
-	{
-		ull subtotalexclude = 0;
-		for (long i = minInc; i < maxExc; i++)
+	ull totalexclude = 0;
+	//ull totalexclude = parallel_sum<ull,ull>(0, maxnum, [](ull minInc, ull maxExc) -> ull
+	//{
+		//ull subtotalexclude = 0;
+		for (long i = maxnum - 1; i >= 0; i--)
 		{
 			ull exclude = 1 << bitcount(exclusionmasks[i]);
-			for (long count = 2, excludeOrInclude = -1; count <= maxnum - i; count++, excludeOrInclude *= -1)
+			long reinclusions = parallel_sum<ull, ull>(2, maxnum - i + 1, [i](ull minInc, ull maxExc)->long
 			{
-				ull inclusionmodifier = getexclusion(i, count);
-				exclude += excludeOrInclude * inclusionmodifier;
-			}
-			subtotalexclude += exclude;
+				long exclude = 0;
+				for (long count = minInc; count < maxExc; count++)
+				{
+					long excludeOrInclude = -1 + ((count % 2) * 2);
+					ull inclusionmodifier = getexclusion(i, count);
+					exclude += excludeOrInclude * inclusionmodifier;
+				}
+				return exclude;
+			});
+			totalexclude += exclude + reinclusions;
 		}
-		return subtotalexclude;
-	});
+		//return subtotalexclude;
+	//});
 
 	auto result = totnum - totalexclude;
 	cout << result << endl;
