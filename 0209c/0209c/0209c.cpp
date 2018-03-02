@@ -110,7 +110,7 @@ set<set<long>> getcombinations(long i, long count)
 	return combs;
 }
 
-long main()
+int main()
 {
 	auto combs5 = getcombinations(3, 3);
 	for (ull i = 0; i < maxnum; i++)
