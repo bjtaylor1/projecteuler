@@ -119,11 +119,10 @@ long main()
 		tts[i].second = getpartner(i);
 		exclusionmasks[i] = exmaskall & (~(1 << tts[i].first)) & (~(1 << tts[i].second));
 	}
-	ull totalexclude = 0;
-	//ull totalexclude = parallel_sum<ull,ull>(0, maxnum, [](ull minInc, ull maxExc) -> ull
-	//{
-		//ull subtotalexclude = 0;
-		for (long i = maxnum - 1; i >= 0; i--)
+	ull totalexclude = parallel_sum<ull,ull>(0, maxnum, [](ull minInc, ull maxExc) -> ull
+	{
+		ull subtotalexclude = 0;
+		for (long i = minInc; i < maxExc; i++)
 		{
 			ull exclude = 1 << bitcount(exclusionmasks[i]);
 			long reinclusions = parallel_sum<ull, ull>(2, maxnum - i + 1, [i](ull minInc, ull maxExc)->long
@@ -137,10 +136,10 @@ long main()
 				}
 				return exclude;
 			});
-			totalexclude += exclude + reinclusions;
+			subtotalexclude += exclude + reinclusions;
 		}
-		//return subtotalexclude;
-	//});
+		return subtotalexclude;
+	});
 
 	auto result = totnum - totalexclude;
 	cout << result << endl;
