@@ -4,8 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_0210vis"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" Margin="0"
         >
-    <Canvas x:Name="c" Margin="0 0 0 20"/>
+    <Grid>
+        <Canvas x:Name="c" Margin="0 0 0 20" Background="White"/>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <xctk:IntegerUpDown FontSize="20"
+                            Value="{Binding Max}" Increment="4"/>
+            <Button Content="Save" Command="{Binding SaveCommand}"/>
+        </StackPanel>
+        <TextBlock Text="{Binding Message}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+    </Grid>
 </Window>

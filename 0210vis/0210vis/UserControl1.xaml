@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="_0210vis.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:_0210vis"
+             mc:Ignorable="d" 
+             d:DesignHeight="1000" d:DesignWidth="1000">
+    <Canvas Width="1000" Height="1000">
+        <Ellipse Canvas.Left="490" Canvas.Top="490" Width="20" Height="20" Fill="Red"/>
+        <Path Data="M 500,500 L 700,300" StrokeThickness="2" Stroke="Black"/>
+        <Path Data="M 0,1 A 1,1 90 1 1 2,1" StrokeThickness="2" Stroke="Black">
+            <Path.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform X="0" Y="-50"/>
+                    <RotateTransform CenterX="0" CenterY="0" Angle="-45"/>
+                    <TranslateTransform X="500" Y="500"/>
+                    <ScaleTransform ScaleX="2.828" ScaleY="2.828" CenterX="500" CenterY="500"/>
+                </TransformGroup>
+            </Path.RenderTransform>
+        </Path>
+
+    </Canvas>
+</UserControl>
