@@ -12,6 +12,29 @@ namespace _0212
         static ConcurrentDictionary<mpz_t, mpz_t> sequenceCache = new ConcurrentDictionary<mpz_t, mpz_t>();
         static mpz_t S(mpz_t k) => sequenceCache.GetOrAdd(k, MakeS);
 
+        static ConcurrentDictionary<(int nMax, int count), int[][]> partitionsCache = new ConcurrentDictionary<(int nMax, int count), int[][]>();
+        static int[][] GetPartitions(int nMax, int count) => partitionsCache.GetOrAdd((nMax, count), MakePartitions);
+        static int[][] MakePartitions((int nMax, int count) p)
+        {
+            var current = new List<int>();
+            var all = new List<int[]>();
+            MakePartitions(0, p.nMax, p.count, current, all);
+            return all.ToArray();
+        }
+
+        static void MakePartitions(int nMin, int nMax, int count, List<int> current, List<int[]> all)
+        {
+            for(int n = nMin; n <= nMax; n++)
+            {
+                current.Add(n);
+                if (current.Count == count)
+                    all.Add(current.ToArray());
+                else
+                    MakePartitions(n + 1, nMax, count, current, all);
+                current.Remove(n);
+            }
+        }
+
         private static mpz_t MakeS(mpz_t k)
         {
             mpz_t s;
@@ -28,6 +51,8 @@ namespace _0212
 
         static void Main(string[] args)
         {
+            var p1 = GetPartitions(4, 3);
+
             var cuboids = new List<Cuboid>();
             var maxIntersectsWith = 0;
             for (var n = 1; n <= 50000; n++)
@@ -47,8 +72,8 @@ namespace _0212
             int i = 0;
             foreach(var c in cuboids)
             {
-                if (i++ % 1000 == 0) Console.Write($"\r{i}, {maxIntersectsWith}");
-                var intersectors = cuboidMasterSet.GetIntersectors(c).ToArray();
+                if (i++ % 1000 == 0) Console.Write($"\r{i}, {maxIntersectsWith}          ");
+                var intersectors = cuboidMasterSet.GetLowerIntersectors(c).ToArray();
                 if(intersectors.Length > maxIntersectsWith)
                 {
                     maxIntersectsWith = intersectors.Length;
@@ -91,10 +116,10 @@ namespace _0212
                 .ToImmutableHashSet();
         }
 
-        public Cuboid[] GetIntersectors(Cuboid cuboid)
+        public Cuboid[] GetLowerIntersectors(Cuboid cuboid)
         {
-            var intersectingPartitions = Partitions.Where(p => p.IntersectsWith(cuboid)).ToArray();
-            var intersectors = intersectingPartitions.SelectMany(p => p.Cuboids.Where(c => c.IntersectsWith(cuboid))).ToArray();
+            var intersectingPartitions = Partitions.Where(p => p.MinN < cuboid.N && p.IntersectsWith(cuboid)).ToArray();
+            var intersectors = intersectingPartitions.SelectMany(p => p.Cuboids.Where(c => c.N < cuboid.N && c.IntersectsWith(cuboid))).ToArray();
             return intersectors;
         }
     }
@@ -102,6 +127,7 @@ namespace _0212
     public class CuboidSet : Shape
     {
         public IImmutableSet<Cuboid> Cuboids { get; }
+        public int MinN { get; }
         public CuboidSet(IList<Cuboid> cuboids)
             : base(cuboids.Min(c => c.X), 
                   cuboids.Min(c => c.Y), 
@@ -111,6 +137,7 @@ namespace _0212
                   cuboids.Max(c => c.Z1) - cuboids.Min(c => c.Z))
         {
             Cuboids = cuboids.ToImmutableHashSet();
+            MinN = cuboids.Min(c => c.N);
         }
     }
 
