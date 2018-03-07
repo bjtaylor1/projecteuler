@@ -53,7 +53,7 @@ namespace _0212
         {
             var cuboids = new List<Cuboid>();
             var maxIntersectsWith = 0;
-            for (var n = 1; n <= 100; n++)
+            for (var n = 1; n <= 50000; n++)
             {
                 if (n % 100 == 0) Console.Write($"\r{n}   {maxIntersectsWith}");
                 var x = S(6 * n - 5).Mod(10000);
@@ -96,7 +96,7 @@ namespace _0212
                 {
                     maxIntersectsWith = intersectors.Length;
                     var mathStrings = new[] { c }.Concat(intersectors).Select(s => s.Mathematica());
-                    Console.WriteLine($"\nGraphics3D[{{{string.Join("\n  , ", mathStrings)}}}]");
+                    //Console.WriteLine($"\nGraphics3D[{{{string.Join("\n  , ", mathStrings)}}}]");
                     Console.WriteLine();
                 }
             }
