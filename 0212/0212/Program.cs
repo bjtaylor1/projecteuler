@@ -7,6 +7,13 @@ using Mpir.NET;
 
 namespace _0212
 {
+    static class Constants
+    {
+        public const int IndexBreadth = 10;
+        public const int IndexDepth = 4;
+        public const int NMAX = 50000;
+    }
+
     class Program
     {
         static ConcurrentDictionary<mpz_t, mpz_t> sequenceCache = new ConcurrentDictionary<mpz_t, mpz_t>();
@@ -52,10 +59,9 @@ namespace _0212
         static void Main(string[] args)
         {
             var cuboids = new List<Cuboid>();
-            var maxIntersectsWith = 0;
-            for (var n = 1; n <= 50000; n++)
+            for (var n = 1; n <= Constants.NMAX; n++)
             {
-                if (n % 100 == 0) Console.Write($"\r{n}   {maxIntersectsWith}");
+                if (n % 100 == 0) Console.Write($"\r{n}");
                 var x = S(6 * n - 5).Mod(10000);
                 var y = S(6 * n - 4).Mod(10000);
                 var z = S(6 * n - 3).Mod(10000);
@@ -67,11 +73,11 @@ namespace _0212
             }
 
             Cuboid[] sortedCuboids = cuboids.OrderBy(c => c.X).ThenBy(c => c.Y).ThenBy(c => c.Z).ToArray();
-            var cuboidMasterSet = new CuboidMasterSet(sortedCuboids);
+            var cuboidMasterSet = new CuboidMasterSet(sortedCuboids, Constants.IndexDepth);
 
             int i = 0;
             mpz_t totalVolume = 0;
-
+            Console.WriteLine();
             foreach (var c in sortedCuboids)
             {
                 if (i++ % 1000 == 0) Console.Write($"\r{i}");
@@ -80,24 +86,22 @@ namespace _0212
                 totalVolume += c.Volume;
 
                 int includeOrExclude = -1;
+                var path = new List<int>();
+                if (c.N == 32853)
+                {
+                    cuboidMasterSet.Find(22056, path);
+                    
+                }
                 for (int count = 1; count <= intersectors.Length; count++)
                 {
                     var partitions = GetPartitions(intersectors.Length - 1, count);
                     foreach (var partition in partitions)
                     {
                         var partitionShapes = new[] { c }.Concat(partition.Select(p => intersectors[p])).ToArray();
-                        var intersection = Shape.Intersection(partitionShapes);
+                        var intersection = Cuboid.Intersection(partitionShapes);
                         totalVolume += (includeOrExclude * intersection.Volume);
                     }
                     includeOrExclude *= -1;
-                }
-
-                if (intersectors.Length > maxIntersectsWith)
-                {
-                    maxIntersectsWith = intersectors.Length;
-                    var mathStrings = new[] { c }.Concat(intersectors).Select(s => s.Mathematica());
-                    //Console.WriteLine($"\nGraphics3D[{{{string.Join("\n  , ", mathStrings)}}}]");
-                    Console.WriteLine();
                 }
             }
             Console.WriteLine($"\n{totalVolume}");
@@ -105,52 +109,95 @@ namespace _0212
         }
     }
 
-    public class CuboidMasterSet
+    public class CuboidMasterSet : Cuboid, IIntersectionProvider
     {
-        public IImmutableSet<CuboidSet> Partitions { get; }
-        private const int p = 10;
-        public CuboidMasterSet(IEnumerable<Cuboid> cuboids)
+        public IImmutableSet<IIntersectionProvider> Partitions { get; }
+        public CuboidMasterSet(Cuboid[] cuboids, int depth) : this(cuboids, depth,
+            cuboids.Min(c => c.X),
+            cuboids.Max(c => c.X),
+            cuboids.Min(c => c.Y),
+            cuboids.Max(c => c.Y),
+            cuboids.Min(c => c.Z),
+            cuboids.Max(c => c.Z)
+            )
+            
         {
-            var cuboidPartitions = new List<Cuboid>[p + 1, p + 1, p + 1];
+        }
+
+        public CuboidMasterSet(Cuboid[] cuboids, int depth, mpz_t minX, mpz_t maxX, mpz_t minY, mpz_t maxY, mpz_t minZ, mpz_t maxZ)
+            : base(cuboids.Min(c => c.N), 
+                  minX,
+                  minY, 
+                  minZ, 
+                  maxX, 
+                  maxY, 
+                  maxZ,
+                  true)
+        {
+            var p = cuboids.Count() / 10;
+            if (p > 10) p = 10;
+            var cuboidPartitions = new List<Cuboid>[p+1,p+1,p+1];
             cuboids.ToImmutableArray();
             var cuboidSets = new List<Cuboid>();
-            var minX = cuboids.Min(c => c.X);
-            var maxX = cuboids.Max(c => c.X);
-            var minY = cuboids.Min(c => c.Y);
-            var maxY = cuboids.Max(c => c.Y);
-            var minZ = cuboids.Min(c => c.Z);
-            var maxZ = cuboids.Max(c => c.Z);
-
+            var rangeX = maxX - minX;
+            var rangeY = maxY - minY;
+            var rangeZ = maxZ - minZ;
+            if (rangeX == 0) rangeX = 1;
+            if (rangeY == 0) rangeY = 1;
+            if (rangeZ == 0) rangeZ = 1;
             foreach (var c in cuboids)
             {
-                int xp = (int)(((c.X - minX) * p) / (maxX - minX));
-                var yp = (int)(((c.Y - minY) * p) / (maxY - minY));
-                var zp = (int)(((c.Z - minY) * p) / (maxZ - minZ));
+                int xp = (int)(((c.X - minX) * p) / rangeX);
+                var yp = (int)(((c.Y - minY) * p) / rangeY);
+                var zp = (int)(((c.Z - minZ) * p) / rangeZ);
                 if (cuboidPartitions[xp, yp, zp] == null)
                 {
                     cuboidPartitions[xp, yp, zp] = new List<Cuboid>();
                 }
                 cuboidPartitions[xp, yp, zp].Add(c);
             }
-            Partitions = cuboidPartitions.Cast<List<Cuboid>>().Where(cp => cp != null)
-                .Select(cp => new CuboidSet(cp))
-                .ToImmutableHashSet();
+
+            var validPartitions = cuboidPartitions.Cast<List<Cuboid>>().Where(cp => cp != null).ToArray();
+            if (cuboids.Count() < 100)
+            {
+                Partitions = validPartitions.Select(cp => (IIntersectionProvider)new CuboidSet(cp)).ToImmutableHashSet();
+            }
+            else
+            {
+                Partitions = validPartitions.Select(cp => (IIntersectionProvider)new CuboidMasterSet(cp.ToArray(), depth - 1)).ToImmutableHashSet();
+            }
         }
 
         public Cuboid[] GetLowerIntersectors(Cuboid cuboid)
         {
             var intersectingPartitions = Partitions.Where(p => p.MinN < cuboid.N && p.IntersectsWith(cuboid)).ToArray();
-            var intersectors = intersectingPartitions.SelectMany(p => p.Cuboids.Where(c => c.N < cuboid.N && c.IntersectsWith(cuboid))).ToArray();
+            var intersectors = intersectingPartitions.SelectMany(p => p.GetLowerIntersectors(cuboid)).ToArray();
             return intersectors;
+        }
+
+        public bool Find(int id, List<int> path)
+        {
+            int i = 0;
+            foreach(var p in Partitions)
+            {
+                if(p.Find(id, path))
+                {
+                    path.Insert(0, i);
+                    return true;
+                }
+                i++;
+            }
+            return false;
         }
     }
 
-    public class CuboidSet : Shape
+    public class CuboidSet : Cuboid, IIntersectionProvider
     {
         public IImmutableSet<Cuboid> Cuboids { get; }
-        public int MinN { get; }
+
         public CuboidSet(IList<Cuboid> cuboids)
-            : base(cuboids.Min(c => c.X),
+            : base(cuboids.Min(c => c.N),
+                  cuboids.Min(c => c.X),
                   cuboids.Min(c => c.Y),
                   cuboids.Min(c => c.Z),
                   cuboids.Max(c => c.X1),
@@ -158,31 +205,43 @@ namespace _0212
                   cuboids.Max(c => c.Z1), true)
         {
             Cuboids = cuboids.ToImmutableHashSet();
-            MinN = cuboids.Min(c => c.N);
+        }
+
+        public Cuboid[] GetLowerIntersectors(Cuboid cuboid)
+        {
+            var interceptors = Cuboids.Where(c => c.N < cuboid.N && c.IntersectsWith(cuboid)).ToArray();
+            return interceptors;
+        }
+
+        public bool Find(int id, List<int> path)
+        {
+            int i = 0;
+            foreach(var c in Cuboids)
+            {
+                if (c.N == id)
+                {
+                    path.Insert(0, i);
+                    return true;
+                }
+                i++;
+            }
+            return false;
         }
     }
 
-    public class Cuboid : Shape
+    public interface IIntersectionProvider
     {
-        public Cuboid(int n, mpz_t x, mpz_t y, mpz_t z, mpz_t dX, mpz_t dY, mpz_t dZ) : base(x, y, z, dX, dY, dZ)
-        {
-            N = n;
-        }
+        Cuboid[] GetLowerIntersectors(Cuboid cuboid);
+        bool IntersectsWith(Cuboid cuboid);
+        int MinN { get; }
+        bool Find(int id, List<int> path);
+    }
 
+    public class Cuboid
+    {
         public int N { get; }
-        public override string ToString()
-        {
-            return $"{N}: {base.ToString()}";
-        }
 
-        public string Mathematica()
-        {
-            return $"Cuboid[{{{X}, {Y}, {Z}}}, {{{X1}, {Y1}, {Z1}}}]";
-        }
-    }
-
-    public class Shape
-    {
+        public virtual int MinN => N;
         public mpz_t X { get; }
         public mpz_t Y { get; }
         public mpz_t Z { get; }
@@ -194,8 +253,9 @@ namespace _0212
         public mpz_t Z1 => Z + DZ;
         public mpz_t Volume => DX * DY * DZ;
 
-        public Shape(mpz_t x, mpz_t y, mpz_t z, mpz_t dX, mpz_t dY, mpz_t dZ, bool isMax = false)
+        public Cuboid(int n, mpz_t x, mpz_t y, mpz_t z, mpz_t dX, mpz_t dY, mpz_t dZ, bool isMax = false)
         {
+            N = n;
             X = x;
             Y = y;
             Z = z;
@@ -210,9 +270,9 @@ namespace _0212
             }
         }
 
-        public static Shape Intersection(Shape[] cuboids)
+        public static Cuboid Intersection(Cuboid[] cuboids)
         {
-            Shape retval = new Shape(cuboids[0].X, cuboids[0].Y, cuboids[0].Z, cuboids[0].DX, cuboids[0].DY, cuboids[0].DZ);
+            Cuboid retval = new Cuboid(cuboids[0].N, cuboids[0].X, cuboids[0].Y, cuboids[0].Z, cuboids[0].DX, cuboids[0].DY, cuboids[0].DZ);
             for (int i = 1; i < cuboids.Length; i++)
             {
                 retval = retval.Intersection(cuboids[i]);
@@ -233,7 +293,7 @@ namespace _0212
             return minpos;
         }
 
-        public Shape Intersection(Shape other)
+        public Cuboid Intersection(Cuboid other)
         {
             var x = Max(X, other.X);
             var y = Max(Y, other.Y);
@@ -244,12 +304,13 @@ namespace _0212
             var dx = Max(x1 - x, 0);
             var dy = Max(y1 - y, 0);
             var dz = Max(z1 - z, 0);
-            var intersection = new Shape(x, y, z, dx, dy, dz);
+            var n = N < other.N ? N : other.N;
+            var intersection = new Cuboid(n, x, y, z, dx, dy, dz);
             return intersection;
         }
 
 
-        public bool IntersectsWith(Shape other)
+        public bool IntersectsWith(Cuboid other)
         {
             var doesntIntersect = X1 <= other.X || other.X1 <= X
                                 || Y1 <= other.Y || other.Y1 <= Y
@@ -259,7 +320,7 @@ namespace _0212
 
         public override bool Equals(object obj)
         {
-            return obj is Shape cuboid &&
+            return obj is Cuboid cuboid &&
                    X == cuboid.X &&
                    Y == cuboid.Y &&
                    Z == cuboid.Z &&
@@ -285,7 +346,12 @@ namespace _0212
 
         public override string ToString()
         {
-            return $"[{{{X},{Y},{Z})}} {{{DX},{DY},{DZ}}}]";
+            return $"{N}: ({{{X},{Y},{Z})}} {{{DX},{DY},{DZ}}})";
+        }
+
+        public string Mathematica()
+        {
+            return $"Cuboid[{{{X}, {Y}, {Z}}}, {{{X1}, {Y1}, {Z1}}}]";
         }
     }
 
