@@ -51,8 +51,6 @@ namespace _0212
 
         static void Main(string[] args)
         {
-            var p1 = GetPartitions(4, 3);
-
             var cuboids = new List<Cuboid>();
             var maxIntersectsWith = 0;
             for (var n = 1; n <= 50000; n++)
@@ -67,16 +65,21 @@ namespace _0212
                 var cuboid = new Cuboid(n, x, y, z, dx, dy, dz);
                 cuboids.Add(cuboid);
             }
-            var cuboidMasterSet = new CuboidMasterSet(cuboids);
+
+            Cuboid[] sortedCuboids = cuboids.OrderBy(c => c.X).ThenBy(c => c.Y).ThenBy(c => c.Z).ToArray();
+            var cuboidMasterSet = new CuboidMasterSet(sortedCuboids);
 
             int i = 0;
-            foreach(var c in cuboids)
+            foreach(var c in sortedCuboids)
             {
                 if (i++ % 1000 == 0) Console.Write($"\r{i}, {maxIntersectsWith}          ");
                 var intersectors = cuboidMasterSet.GetLowerIntersectors(c).ToArray();
                 if(intersectors.Length > maxIntersectsWith)
                 {
                     maxIntersectsWith = intersectors.Length;
+                    var mathStrings = new[] { c }.Concat(intersectors).Select(s => s.Math());
+                    Console.WriteLine($"\nGraphics3D[{{{string.Join("\n  , ", mathStrings)}}}]");
+                    Console.WriteLine();
                 }
             }
             Console.WriteLine($"\n{maxIntersectsWith}");
@@ -153,6 +156,11 @@ namespace _0212
         public override string ToString()
         {
             return $"{N}: {base.ToString()}";
+        }
+
+        public string Math()
+        {
+            return $"Cuboid[{{{X}, {Y}, {Z}}}, {{{X1}, {Y1}, {Z1}}}]";
         }
     }
 
