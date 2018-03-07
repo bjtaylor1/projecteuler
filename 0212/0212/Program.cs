@@ -10,7 +10,6 @@ namespace _0212
 {
     static class Constants
     {
-        public const int IndexBreadth = 10;
         public const int NMAX = 50000;
     }
 
@@ -177,21 +176,6 @@ namespace _0212
             var intersectors = intersectingPartitions.SelectMany(p => p.GetLowerIntersectors(cuboid)).ToArray();
             return intersectors;
         }
-
-        public bool Find(int id, List<int> path)
-        {
-            int i = 0;
-            foreach(var p in Partitions)
-            {
-                if(p.Find(id, path))
-                {
-                    path.Insert(0, i);
-                    return true;
-                }
-                i++;
-            }
-            return false;
-        }
     }
 
     public class CuboidSet : Cuboid, IIntersectionProvider
@@ -215,21 +199,6 @@ namespace _0212
             var interceptors = Cuboids.Where(c => c.N < cuboid.N && c.IntersectsWith(cuboid)).ToArray();
             return interceptors;
         }
-
-        public bool Find(int id, List<int> path)
-        {
-            int i = 0;
-            foreach(var c in Cuboids)
-            {
-                if (c.N == id)
-                {
-                    path.Insert(0, i);
-                    return true;
-                }
-                i++;
-            }
-            return false;
-        }
     }
 
     public interface IIntersectionProvider
@@ -237,7 +206,6 @@ namespace _0212
         Cuboid[] GetLowerIntersectors(Cuboid cuboid);
         bool IntersectsWith(Cuboid cuboid);
         int MinN { get; }
-        bool Find(int id, List<int> path);
     }
 
     public class Cuboid
