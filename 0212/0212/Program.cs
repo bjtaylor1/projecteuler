@@ -70,19 +70,37 @@ namespace _0212
             var cuboidMasterSet = new CuboidMasterSet(sortedCuboids);
 
             int i = 0;
+            mpz_t totalVolume = 0;
+
             foreach(var c in sortedCuboids)
             {
-                if (i++ % 1000 == 0) Console.Write($"\r{i}, {maxIntersectsWith}          ");
+                if (i++ % 1000 == 0) Console.Write($"\r{i}");
                 var intersectors = cuboidMasterSet.GetLowerIntersectors(c).ToArray();
+
+                totalVolume += c.Volume;
+                
+                int includeOrExclude = -1;
+                for(int count = 1; count < intersectors.Length; count++)
+                {
+                    var partitions = GetPartitions(intersectors.Length - 1, count);
+                    foreach(var partition in partitions)
+                    {
+                        var partitionShapes = partition.Select(p => intersectors[p]).ToArray();
+                        var intersection = Shape.Intersection(partitionShapes);
+                        totalVolume += (includeOrExclude * intersection.Volume);
+                    }
+                    includeOrExclude *= -1;
+                }
+
                 if(intersectors.Length > maxIntersectsWith)
                 {
                     maxIntersectsWith = intersectors.Length;
-                    var mathStrings = new[] { c }.Concat(intersectors).Select(s => s.Math());
+                    var mathStrings = new[] { c }.Concat(intersectors).Select(s => s.Mathematica());
                     Console.WriteLine($"\nGraphics3D[{{{string.Join("\n  , ", mathStrings)}}}]");
                     Console.WriteLine();
                 }
             }
-            Console.WriteLine($"\n{maxIntersectsWith}");
+            Console.WriteLine($"\n{totalVolume}");
             
         }
     }
@@ -135,9 +153,9 @@ namespace _0212
             : base(cuboids.Min(c => c.X), 
                   cuboids.Min(c => c.Y), 
                   cuboids.Min(c => c.Z),
-                  cuboids.Max(c => c.X1) - cuboids.Min(c => c.X),
-                  cuboids.Max(c => c.Y1) - cuboids.Min(c => c.Y),
-                  cuboids.Max(c => c.Z1) - cuboids.Min(c => c.Z))
+                  cuboids.Max(c => c.X1),
+                  cuboids.Max(c => c.Y1),
+                  cuboids.Max(c => c.Z1), true)
         {
             Cuboids = cuboids.ToImmutableHashSet();
             MinN = cuboids.Min(c => c.N);
@@ -146,7 +164,6 @@ namespace _0212
 
     public class Cuboid : Shape
     {
-
         public Cuboid(int n, mpz_t x, mpz_t y, mpz_t z, mpz_t dX, mpz_t dY, mpz_t dZ) : base(x, y, z, dX, dY, dZ)
         {
             N = n;
@@ -158,13 +175,13 @@ namespace _0212
             return $"{N}: {base.ToString()}";
         }
 
-        public string Math()
+        public string Mathematica()
         {
             return $"Cuboid[{{{X}, {Y}, {Z}}}, {{{X1}, {Y1}, {Z1}}}]";
         }
     }
 
-    public abstract class Shape
+    public class Shape
     {
         public mpz_t X { get; }
         public mpz_t Y { get; }
@@ -175,8 +192,9 @@ namespace _0212
         public mpz_t X1 => X + DX;
         public mpz_t Y1 => Y + DY;
         public mpz_t Z1 => Z + DZ;
+        public mpz_t Volume => DX * DY * DZ;
 
-        public Shape(mpz_t x, mpz_t y, mpz_t z, mpz_t dX, mpz_t dY, mpz_t dZ)
+        public Shape(mpz_t x, mpz_t y, mpz_t z, mpz_t dX, mpz_t dY, mpz_t dZ, bool isMax = false)
         {
             X = x;
             Y = y;
@@ -184,8 +202,52 @@ namespace _0212
             DX = dX;
             DY = dY;
             DZ = dZ;
+            if(isMax)
+            {
+                DX -= X;
+                DY -= Y;
+                DZ -= Z;
+            }
         }
-       
+
+        public static Shape Intersection(Shape[] cuboids)
+        {
+            Shape retval = cuboids[0];
+            for (int i = 1; i < cuboids.Length; i++)
+            {
+                retval = retval.Intersection(cuboids[i]);
+                if (retval.DX == 0 || retval.DY == 0 || retval.DZ == 0) break;
+            }
+            return retval;
+        }
+
+        private static mpz_t Min(mpz_t l, mpz_t r)
+        {
+            var minpos = l < r ? l : r;
+            return minpos;
+        }
+
+        private static mpz_t Max(mpz_t l, mpz_t r)
+        {
+            var minpos = l > r ? l : r;
+            return minpos;
+        }
+
+        public Shape Intersection(Shape other)
+        {
+            var x = Max(X, other.X);
+            var y = Max(Y, other.Y);
+            var z = Max(Z, other.Z);
+            var x1 = Min(X1, other.X1);
+            var y1 = Min(Y1, other.Y1);
+            var z1 = Min(Z1, other.Z1);
+            var dx = Max(x1 - x, 0);
+            var dy = Max(y1 - y, 0);
+            var dz = Max(z1 - z, 0);
+            var intersection = new Shape(x, y, z, dx, dy, dz);
+            return intersection;
+        }
+
 
         public bool IntersectsWith(Shape other)
         {
