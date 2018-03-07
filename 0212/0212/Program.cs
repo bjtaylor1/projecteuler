@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Mpir.NET;
 
 namespace _0212
@@ -76,14 +77,14 @@ namespace _0212
             var cuboidMasterSet = new CuboidMasterSet(sortedCuboids);
 
             int i = 0;
-            mpz_t totalVolume = 0;
+            
             Console.WriteLine();
-            foreach (var c in sortedCuboids)
+            mpz_t totalVolume = sortedCuboids.AsParallel().Aggregate(new mpz_t(0), (st,c) => 
             {
                 if (i++ % 1000 == 0) Console.Write($"\r{i}");
                 var intersectors = cuboidMasterSet.GetLowerIntersectors(c).ToArray();
 
-                totalVolume += c.Volume;
+                var subTotalVolume = c.Volume;
 
                 int includeOrExclude = -1;
                 var path = new List<int>();
@@ -95,11 +96,12 @@ namespace _0212
                     {
                         var partitionShapes = new[] { c }.Concat(partition.Select(p => intersectors[p])).ToArray();
                         var intersection = Cuboid.Intersection(partitionShapes);
-                        totalVolume += (includeOrExclude * intersection.Volume);
+                        subTotalVolume += (includeOrExclude * intersection.Volume);
                     }
                     includeOrExclude *= -1;
                 }
-            }
+                return st + subTotalVolume;
+            });
             sw.Stop();
             Console.WriteLine($"\n{totalVolume}\n{sw.Elapsed}");
 
