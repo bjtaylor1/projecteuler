@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using Mpir.NET;
 
@@ -10,7 +11,6 @@ namespace _0212
     static class Constants
     {
         public const int IndexBreadth = 10;
-        public const int IndexDepth = 4;
         public const int NMAX = 50000;
     }
 
@@ -58,6 +58,7 @@ namespace _0212
 
         static void Main(string[] args)
         {
+            var sw = Stopwatch.StartNew();
             var cuboids = new List<Cuboid>();
             for (var n = 1; n <= Constants.NMAX; n++)
             {
@@ -73,7 +74,7 @@ namespace _0212
             }
 
             Cuboid[] sortedCuboids = cuboids.OrderBy(c => c.X).ThenBy(c => c.Y).ThenBy(c => c.Z).ToArray();
-            var cuboidMasterSet = new CuboidMasterSet(sortedCuboids, Constants.IndexDepth);
+            var cuboidMasterSet = new CuboidMasterSet(sortedCuboids);
 
             int i = 0;
             mpz_t totalVolume = 0;
@@ -87,11 +88,7 @@ namespace _0212
 
                 int includeOrExclude = -1;
                 var path = new List<int>();
-                if (c.N == 32853)
-                {
-                    cuboidMasterSet.Find(22056, path);
-                    
-                }
+
                 for (int count = 1; count <= intersectors.Length; count++)
                 {
                     var partitions = GetPartitions(intersectors.Length - 1, count);
@@ -104,7 +101,8 @@ namespace _0212
                     includeOrExclude *= -1;
                 }
             }
-            Console.WriteLine($"\n{totalVolume}");
+            sw.Stop();
+            Console.WriteLine($"\n{totalVolume}\n{sw.Elapsed}");
 
         }
     }
@@ -112,19 +110,19 @@ namespace _0212
     public class CuboidMasterSet : Cuboid, IIntersectionProvider
     {
         public IImmutableSet<IIntersectionProvider> Partitions { get; }
-        public CuboidMasterSet(Cuboid[] cuboids, int depth) : this(cuboids, depth,
+        public CuboidMasterSet(Cuboid[] cuboids) : this(cuboids,
             cuboids.Min(c => c.X),
-            cuboids.Max(c => c.X),
+            cuboids.Max(c => c.X1),
             cuboids.Min(c => c.Y),
-            cuboids.Max(c => c.Y),
+            cuboids.Max(c => c.Y1),
             cuboids.Min(c => c.Z),
-            cuboids.Max(c => c.Z)
+            cuboids.Max(c => c.Z1)
             )
             
         {
         }
 
-        public CuboidMasterSet(Cuboid[] cuboids, int depth, mpz_t minX, mpz_t maxX, mpz_t minY, mpz_t maxY, mpz_t minZ, mpz_t maxZ)
+        public CuboidMasterSet(Cuboid[] cuboids, mpz_t minX, mpz_t maxX, mpz_t minY, mpz_t maxY, mpz_t minZ, mpz_t maxZ)
             : base(cuboids.Min(c => c.N), 
                   minX,
                   minY, 
@@ -135,7 +133,7 @@ namespace _0212
                   true)
         {
             var p = cuboids.Count() / 10;
-            if (p > 10) p = 10;
+            if (p > 5) p = 5;
             var cuboidPartitions = new List<Cuboid>[p+1,p+1,p+1];
             cuboids.ToImmutableArray();
             var cuboidSets = new List<Cuboid>();
@@ -164,13 +162,18 @@ namespace _0212
             }
             else
             {
-                Partitions = validPartitions.Select(cp => (IIntersectionProvider)new CuboidMasterSet(cp.ToArray(), depth - 1)).ToImmutableHashSet();
+                Partitions = validPartitions.Select(cp => (IIntersectionProvider)new CuboidMasterSet(cp.ToArray())).ToImmutableHashSet();
             }
         }
 
         public Cuboid[] GetLowerIntersectors(Cuboid cuboid)
         {
             var intersectingPartitions = Partitions.Where(p => p.MinN < cuboid.N && p.IntersectsWith(cuboid)).ToArray();
+            var p5859 = Partitions.Where(p => p.MinN == 5859).FirstOrDefault();
+            if(p5859 != null)
+            {
+                var iii = p5859.IntersectsWith(cuboid);
+            }
             var intersectors = intersectingPartitions.SelectMany(p => p.GetLowerIntersectors(cuboid)).ToArray();
             return intersectors;
         }
