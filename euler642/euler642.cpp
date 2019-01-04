@@ -6,8 +6,7 @@
 
 mpz_class sum_of_primes(const mpz_class& n)
 {
-    mpz_class r;
-    mpz_sqrt(r.get_mpz_t(), n.get_mpz_t());
+    mpz_class r = mpzfuncs::sqrt(n);
     std::vector<mpz_class> V;
     for (mpz_class i(1); i <= r; i++)
     {
@@ -30,10 +29,6 @@ mpz_class sum_of_primes(const mpz_class& n)
             mpz_class p2 = p * p;
             for (auto v : V)
             {
-                //if (v == 100)
-                {
-                    std::cout << p << ": S[" << v << "] -= " << p << " * S[" << (v / p) << "] - " << sp << std::endl;
-                }
                 if (v < p2) break;
                 S[v] -= p * (S[v / p] - sp);
             }
@@ -44,7 +39,6 @@ mpz_class sum_of_primes(const mpz_class& n)
 
 
 std::map<mpz_class, mpz_class> psmoothcache;
-gmp_randstate_t randstate;
 mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
 {
     auto existing = psmoothcache.find(p);
@@ -58,14 +52,12 @@ mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
         mpz_class cp = p, np, pnp;
         do
         {
-            mpz_next_prime_candidate(np.get_mpz_t(), cp.get_mpz_t(), randstate);
-            cp = np;
+            cp = mpzfuncs::nextprime(cp);
             pnp = p * np;
             if (pnp > n) break;
             val -= count_psmooth(pnp, n);
         } while (true);
 
-        std::cout << "count_psmooth(" << p << ", " << n << ") = " << val << std::endl;
         psmoothcache.insert(std::pair<mpz_class, mpz_class>(p, val));
         return val;
     }
@@ -73,8 +65,16 @@ mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
 
 int main()
 {
-    std::cout << count_psmooth(5, 100);
-    //mpz_class N(201820182018);
+    mpz_class N(201820182018);
+    mpz_class r = mpzfuncs::sqrt(N);
+    mpz_class tot(0);
+    for (mpz_class small = 2; small <= r; )
+    {
+        auto occurrences = count_psmooth(small, N);
+        tot += small * occurrences;
+    }
+
+    
     //
     //gmp_randinit_default(randstate);
 

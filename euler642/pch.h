@@ -11,4 +11,6 @@
 #include <mpirxx.h>
 #include <vector>
 #include <map>
+#include <mpzfuncs.h>
+
 #endif //PCH_H
