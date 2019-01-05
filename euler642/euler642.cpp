@@ -12,7 +12,7 @@ mpz_class sum_of_primes(const mpz_class& n)
     {
         V.push_back(n / i);
     }
-    for (mpz_class i(r - 1); i > 0; i--)
+    for (mpz_class i(*V.rbegin() - 1); i > 0; i--)
     {
         V.push_back(i);
     }
@@ -21,6 +21,7 @@ mpz_class sum_of_primes(const mpz_class& n)
     {
         S.insert(std::pair<mpz_class, mpz_class>(i, i*(i + 1) / 2 - 1));
     }
+
     for (mpz_class p = 2; p <= r + 1; p++)
     {
         if (S[p] > S[p - 1])
@@ -55,7 +56,7 @@ void count_psmooth_r(const mpz_class& n, const mpz_class& p, const mpz_class& pr
 }
 
 std::map<mpz_class, mpz_class> psmoothcache;
-mpz_class count_psmooth(const mpz_class& p, const mpz_class n, int depth)
+mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
 {
     auto existing = psmoothcache.find(p);
     if (existing != psmoothcache.end())
@@ -66,25 +67,33 @@ mpz_class count_psmooth(const mpz_class& p, const mpz_class n, int depth)
     {
         mpz_class val;
         count_psmooth_r(n, p, p, val, 1);
-        std::cout << "psmooth(" << p << ") = " << val << std::endl;
         return val;
     }
 }
 
-
-
 int main()
 {
-    mpz_class N(100);
+    long N(100);
     mpz_class r = mpzfuncs::sqrt(N);
     mpz_class tot(0);
     for (mpz_class small = 2; small <= r; small = mpzfuncs::nextprime(small))
     {
-        auto occurrences = count_psmooth(small, N, 0);
+        auto occurrences = count_psmooth(small, N);
         tot += small * occurrences;
     }
 
+    long lbound = mpzfuncs::nextprime(r).get_ui();
+    while(lbound <= N)
+    {
+        auto occurrences = N / lbound; // it's rounded off
+        auto ubound = mpzfuncs::nextprime(N / occurrences).get_ui();  // it's rounded off - so it's not the same as lbound
+        auto totprimes = sum_of_primes(ubound).get_ui() - sum_of_primes(lbound).get_ui() + lbound - ubound;
+        auto subtot = totprimes * occurrences;
+        tot += subtot;
+        lbound = ubound;
+    }
     
+    std::cout << tot << std::endl;
     //
     //gmp_randinit_default(randstate);
 
