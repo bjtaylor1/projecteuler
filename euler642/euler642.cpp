@@ -37,9 +37,25 @@ mpz_class sum_of_primes(const mpz_class& n)
     return S[n];
 }
 
+void count_psmooth_r(const mpz_class& n, const mpz_class& p, const mpz_class& prod, mpz_class& tot, int f)
+{
+    //e.g.                          100                   2                   2                50       -1
+    auto amount = n / prod;
+    if (amount > 0)
+    {
+        
+        tot += f * amount;
+        for (mpz_class np = mpzfuncs::nextprime(p); np < n; np = mpzfuncs::nextprime(np))
+        {
+            mpz_class nprod = np * p;
+            count_psmooth_r(n, np, np * prod, tot, f * -1);
+
+        }
+    }
+}
 
 std::map<mpz_class, mpz_class> psmoothcache;
-mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
+mpz_class count_psmooth(const mpz_class& p, const mpz_class n, int depth)
 {
     auto existing = psmoothcache.find(p);
     if (existing != psmoothcache.end())
@@ -48,29 +64,23 @@ mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
     }
     else
     {
-        mpz_class val = n / p;
-        mpz_class cp = p, np, pnp;
-        do
-        {
-            cp = mpzfuncs::nextprime(cp);
-            pnp = p * np;
-            if (pnp > n) break;
-            val -= count_psmooth(pnp, n);
-        } while (true);
-
-        psmoothcache.insert(std::pair<mpz_class, mpz_class>(p, val));
+        mpz_class val;
+        count_psmooth_r(n, p, p, val, 1);
+        std::cout << "psmooth(" << p << ") = " << val << std::endl;
         return val;
     }
 }
 
+
+
 int main()
 {
-    mpz_class N(201820182018);
+    mpz_class N(100);
     mpz_class r = mpzfuncs::sqrt(N);
     mpz_class tot(0);
-    for (mpz_class small = 2; small <= r; )
+    for (mpz_class small = 2; small <= r; small = mpzfuncs::nextprime(small))
     {
-        auto occurrences = count_psmooth(small, N);
+        auto occurrences = count_psmooth(small, N, 0);
         tot += small * occurrences;
     }
 
