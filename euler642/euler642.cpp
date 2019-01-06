@@ -86,7 +86,12 @@ class small_aggregator : public threadedaggregator<mpz_class, mpz_class>
 public:
     virtual mpz_class calculate_component(const mpz_class& lowerboundinc, const mpz_class& upperboundexc)
     {
-        return 0;
+        mpz_class tot;
+        for (mpz_class val = lowerboundinc; val < upperboundexc; val++)
+        {
+            tot + val;
+        }
+        return tot;
     }
 };
 
@@ -99,7 +104,7 @@ int main()
     }
 
     small_aggregator s;
-    s.calculate(2, 10);
+    s.calculate(1, 11);
 
 
     mpz_class totsmall(0), totlarge(0);

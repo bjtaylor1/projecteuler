@@ -12,4 +12,7 @@
 #include <mpir.h>
 #include <mpirxx.h>
 #include <thread>
+#include <vector>
+#include <mutex>
+#include <shared_mutex>
 // reference additional headers your program requires here
