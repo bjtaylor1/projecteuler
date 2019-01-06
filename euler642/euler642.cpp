@@ -81,6 +81,15 @@ mpz_class count_psmooth(int primeindex)
     return retval;
 }
 
+class small_aggregator : public threadedaggregator<mpz_class, mpz_class>
+{
+public:
+    virtual mpz_class calculate_component(const mpz_class& lowerboundinc, const mpz_class& upperboundexc)
+    {
+        return 0;
+    }
+};
+
 int main()
 {
     mpz_class r = mpzfuncs::sqrt(N);
@@ -88,6 +97,10 @@ int main()
     {
         primes.push_back(prime);
     }
+
+    small_aggregator s;
+    s.calculate(2, 10);
+
 
     mpz_class totsmall(0), totlarge(0);
     std::cout << "r = " << r << std::endl;

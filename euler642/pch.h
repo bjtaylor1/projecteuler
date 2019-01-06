@@ -13,4 +13,5 @@
 #include <map>
 #include <mpzfuncs.h>
 #include <iomanip>
+#include <threadedaggregator.h>
 #endif //PCH_H
