@@ -38,61 +38,94 @@ mpz_class sum_of_primes(const mpz_class& n)
     return S[n];
 }
 
-bool count_psmooth_r(const mpz_class& n, const mpz_class& p, const mpz_class& prod, mpz_class& tot, int f)
-{
-    //e.g.                          100                   2                   2                50       -1
-    auto amount = n / prod;
-    if (amount > 0)
-    {
-        tot += f * amount;
-        for (mpz_class np = mpzfuncs::nextprime(p); np < n; np = mpzfuncs::nextprime(np))
-        {
-            mpz_class nprod = np * p;
-            if (!count_psmooth_r(n, np, np * prod, tot, f * -1)) break;
-        }
-        return true;
-    }
-    else return false;
-}
+mpz_class N(10000);
+//bool count_psmooth_r(const mpz_class& p, const mpz_class& prod, mpz_class& tot, int f, int depth)
+//{
+//    //e.g.                          100                   2                   2                50       -1
+//    auto amount = N / prod;
+//    if (amount > 0)
+//    {
+//        tot += f * amount;
+//        for (mpz_class np = mpzfuncs::nextprime(p); np < N; np = mpzfuncs::nextprime(np))
+//        {
+//            if (depth == 0) std::cout << p << std::endl;
+//            if (depth == 1) std::cout << " " << p << std::endl;
+//            if (depth == 2) std::cout << "  " << p << std::endl;
+//            if (depth == 3) std::cout << "   " << p << std::endl;
+//            if (depth == 4) std::cout << "    " << p << std::endl;
+//            mpz_class nprod = np * p;
+//            if (!count_psmooth_r(np, np * prod, tot, f * -1, depth+1)) break;
+//        }
+//
+//        return true;
+//    }
+//    else return false;
+//}
+//
+//std::map<mpz_class, mpz_class> psmoothcache;
+std::vector<mpz_class> primes;
 
-std::map<mpz_class, mpz_class> psmoothcache;
-mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
+mpz_class count_psmooth(const mpz_class& n, const int& primeindex)
 {
-    auto existing = psmoothcache.find(p);
-    if (existing != psmoothcache.end())
+    if (primeindex == 0)
     {
-        return existing->second;
+        mpz_class ret = mpz_sizeinbase(n.get_mpz_t(), 2); // should be -1, but count 1 as well
+        return ret;
+    }
+    else if (n == 0)
+    {
+        return 0;
     }
     else
     {
-        mpz_class val;
-        count_psmooth_r(n, p, p, val, 1);
-        return val;
+        mpz_class l = count_psmooth(n, primeindex - 1);
+        mpz_class r = count_psmooth(n / primes[primeindex], primeindex);
+        mpz_class ret = l + r;
+        return ret;
     }
 }
 
+//mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
+//{
+//    auto existing = psmoothcache.find(p);
+//    if (existing != psmoothcache.end())
+//    {
+//        return existing->second;
+//    }
+//    else
+//    {
+//        mpz_class val;
+//        count_psmooth_r(p, p, val, 1, 0);
+//        return val;
+//    }
+//}
+
 int main()
 {
-    mpz_class N(201820182018);
     mpz_class r = mpzfuncs::sqrt(N);
+    for (mpz_class prime(2); prime <= r; prime = mpzfuncs::nextprime(prime))
+    {
+        primes.push_back(prime);
+    }
+
     mpz_class totsmall(0), totlarge(0);
     std::cout << "r = " << r << std::endl;
     std::cout << "small:" << std::endl;
-    for (mpz_class small = 2; small <= r; small = mpzfuncs::nextprime(small))
+    for (int primeindex = 0; primeindex < primes.size(); primeindex++)
     {
-        mpz_class occurrences = count_psmooth(small, N);
-        std::cout << small << "\r";
+        mpz_class occurrences = count_psmooth(N, primeindex);
+        std::cout << primes[primeindex] << "\r";
 #if _DEBUG
         std::cout << small << ": " << occurrences << " = " << (small * occurrences) << std::endl;
 #endif
-        totsmall += small * occurrences;
+        totsmall += primes[primeindex] * occurrences;
     }
 
     std::cout << "total small: " << totsmall << std::endl;
     std::cout << std::endl << "large:" << std::endl;
 
     auto lbound = mpzfuncs::nextprime(r);
-    while(lbound <= N)
+    while (lbound <= N)
     {
         std::cout << lbound << "\r";
         mpz_class occurrences = N / lbound; // it's rounded off
