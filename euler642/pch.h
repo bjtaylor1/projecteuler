@@ -14,4 +14,5 @@
 #include <mpzfuncs.h>
 #include <iomanip>
 #include <threadedaggregator.h>
+#include <sstream>
 #endif //PCH_H

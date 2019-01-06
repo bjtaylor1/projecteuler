@@ -38,7 +38,8 @@ mpz_class sum_of_primes(const mpz_class& n)
     return S[n];
 }
 
-mpz_class N(201820182018);
+mpz_class N(10000);
+mpz_class r = mpzfuncs::sqrt(N);
 
 std::vector<mpz_class> primes;
 typedef std::pair<mpz_class, int> hammingcachekey;
@@ -81,53 +82,32 @@ mpz_class count_psmooth(int primeindex)
     return retval;
 }
 
-class small_aggregator : public threadedaggregator<mpz_class, mpz_class>
+mpz_class totsmall(0), totlarge(0);
+
+void calcsmall()
 {
-public:
-    virtual mpz_class calculate_component(const mpz_class& lowerboundinc, const mpz_class& upperboundexc)
-    {
-        mpz_class tot;
-        for (mpz_class val = lowerboundinc; val < upperboundexc; val++)
-        {
-            tot + val;
-        }
-        return tot;
-    }
-};
-
-int main()
-{
-    mpz_class r = mpzfuncs::sqrt(N);
-    for (mpz_class prime(2); prime <= r; prime = mpzfuncs::nextprime(prime))
-    {
-        primes.push_back(prime);
-    }
-
-    small_aggregator s;
-    s.calculate(1, 11);
-
-
-    mpz_class totsmall(0), totlarge(0);
-    std::cout << "r = " << r << std::endl;
-    std::cout << "small:" << std::endl;
     for (int primeindex = 0; primeindex < primes.size(); primeindex++)
     {
         mpz_class occurrences = count_psmooth(primeindex);
         mpz_class small = primes[primeindex];
-        std::cout << small << "\r";
+        std::stringstream s;
+        s << "S:" << small << std::endl;
+        std::cout << s.str();
 #if _DEBUG
         std::cout << small << ": " << occurrences << " = " << (small * occurrences) << std::endl;
 #endif
         totsmall += primes[primeindex] * occurrences;
     }
+}
 
-    std::cout << "total small: " << totsmall << std::endl;
-    std::cout << std::endl << "large:" << std::endl;
-
+void calclarge()
+{
     auto lbound = mpzfuncs::nextprime(r);
     while (lbound <= N)
     {
-        std::cout << lbound << "\r";
+        std::stringstream s;
+        s << "L:" << lbound << std::endl;
+        std::cout << s.str();
         mpz_class occurrences = N / lbound; // it's rounded off
         mpz_class ubound = mpzfuncs::nextprime(N / occurrences);  // it's rounded off - so it's not the same as lbound
         mpz_class totprimes = sum_of_primes(ubound) - sum_of_primes(lbound) + lbound - ubound;
@@ -135,8 +115,24 @@ int main()
         totlarge += subtot;
         lbound = ubound;
     }
+}
 
+int main()
+{
+    for (mpz_class prime(2); prime <= r; prime = mpzfuncs::nextprime(prime))
+    {
+        primes.push_back(prime);
+    }
+    std::cout << "r = " << r << std::endl;
+
+    std::thread tsmall(calcsmall);
+    std::thread tlarge(calclarge);
+
+    tsmall.join();
+    tlarge.join();
+
+    std::cout << "total small: " << totsmall << std::endl;
     std::cout << "total large: " << totlarge << std::endl;
     mpz_class tot = totlarge + totsmall;
-    std::cout << std::endl << tot << std::endl;
+    std::cout << tot << std::endl;
 }
