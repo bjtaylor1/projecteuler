@@ -65,7 +65,7 @@ mpz_class N(10000);
 //std::map<mpz_class, mpz_class> psmoothcache;
 std::vector<mpz_class> primes;
 
-mpz_class count_psmooth(const mpz_class& n, const int& primeindex)
+mpz_class hamming(const mpz_class& n, const int& primeindex)
 {
     if (primeindex == 0)
     {
@@ -78,11 +78,19 @@ mpz_class count_psmooth(const mpz_class& n, const int& primeindex)
     }
     else
     {
-        mpz_class l = count_psmooth(n, primeindex - 1);
-        mpz_class r = count_psmooth(n / primes[primeindex], primeindex);
+        mpz_class l = hamming(n, primeindex - 1);
+        mpz_class r = hamming(n / primes[primeindex], primeindex);
         mpz_class ret = l + r;
         return ret;
     }
+}
+
+mpz_class count_psmooth(int primeindex)
+{
+    mpz_class l = hamming(N, primeindex);
+    mpz_class r = primeindex == 0 ? 1 : hamming(N, primeindex - 1);
+    mpz_class retval = l - r;
+    return retval;
 }
 
 //mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
@@ -108,13 +116,16 @@ int main()
         primes.push_back(prime);
     }
 
+    std::cout << "hamming: " << hamming(1000000000, primes.size() - 1) << std::endl;
+
     mpz_class totsmall(0), totlarge(0);
     std::cout << "r = " << r << std::endl;
     std::cout << "small:" << std::endl;
     for (int primeindex = 0; primeindex < primes.size(); primeindex++)
     {
-        mpz_class occurrences = count_psmooth(N, primeindex);
-        std::cout << primes[primeindex] << "\r";
+        mpz_class occurrences = count_psmooth(primeindex);
+        mpz_class small = primes[primeindex];
+        std::cout << small << "\r";
 #if _DEBUG
         std::cout << small << ": " << occurrences << " = " << (small * occurrences) << std::endl;
 #endif
