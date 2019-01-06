@@ -73,18 +73,22 @@ mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
 
 int main()
 {
-    long N(100000);
+    mpz_class N(201820182018);
     mpz_class r = mpzfuncs::sqrt(N);
-    mpz_class tot(0);
+    mpz_class totsmall(0), totlarge(0);
     std::cout << "r = " << r << std::endl;
     std::cout << "small:" << std::endl;
     for (mpz_class small = 2; small <= r; small = mpzfuncs::nextprime(small))
     {
         mpz_class occurrences = count_psmooth(small, N);
         std::cout << small << "\r";
-        tot += small * occurrences;
+#if _DEBUG
+        std::cout << small << ": " << occurrences << " = " << (small * occurrences) << std::endl;
+#endif
+        totsmall += small * occurrences;
     }
 
+    std::cout << "total small: " << totsmall << std::endl;
     std::cout << std::endl << "large:" << std::endl;
 
     auto lbound = mpzfuncs::nextprime(r);
@@ -95,9 +99,11 @@ int main()
         mpz_class ubound = mpzfuncs::nextprime(N / occurrences);  // it's rounded off - so it's not the same as lbound
         mpz_class totprimes = sum_of_primes(ubound) - sum_of_primes(lbound) + lbound - ubound;
         mpz_class subtot = totprimes * occurrences;
-        tot += subtot;
+        totlarge += subtot;
         lbound = ubound;
     }
-    
+
+    std::cout << "total large: " << totlarge << std::endl;
+    mpz_class tot = totlarge + totsmall;
     std::cout << std::endl << tot << std::endl;
 }
