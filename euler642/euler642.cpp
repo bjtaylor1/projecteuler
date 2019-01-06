@@ -39,48 +39,36 @@ mpz_class sum_of_primes(const mpz_class& n)
 }
 
 mpz_class N(10000);
-//bool count_psmooth_r(const mpz_class& p, const mpz_class& prod, mpz_class& tot, int f, int depth)
-//{
-//    //e.g.                          100                   2                   2                50       -1
-//    auto amount = N / prod;
-//    if (amount > 0)
-//    {
-//        tot += f * amount;
-//        for (mpz_class np = mpzfuncs::nextprime(p); np < N; np = mpzfuncs::nextprime(np))
-//        {
-//            if (depth == 0) std::cout << p << std::endl;
-//            if (depth == 1) std::cout << " " << p << std::endl;
-//            if (depth == 2) std::cout << "  " << p << std::endl;
-//            if (depth == 3) std::cout << "   " << p << std::endl;
-//            if (depth == 4) std::cout << "    " << p << std::endl;
-//            mpz_class nprod = np * p;
-//            if (!count_psmooth_r(np, np * prod, tot, f * -1, depth+1)) break;
-//        }
-//
-//        return true;
-//    }
-//    else return false;
-//}
-//
-//std::map<mpz_class, mpz_class> psmoothcache;
-std::vector<mpz_class> primes;
 
+std::vector<mpz_class> primes;
+typedef std::pair<mpz_class, int> hammingcachekey;
+std::map<std::pair<mpz_class, int>, mpz_class> hammingcache;
 mpz_class hamming(const mpz_class& n, const int& primeindex)
 {
-    if (primeindex == 0)
+    hammingcachekey hck(n, primeindex);
+    auto existing = hammingcache.find(hck);
+    if (existing != hammingcache.end())
     {
-        mpz_class ret = mpz_sizeinbase(n.get_mpz_t(), 2); // should be -1, but count 1 as well
-        return ret;
-    }
-    else if (n == 0)
-    {
-        return 0;
+        return existing->second;
     }
     else
     {
-        mpz_class l = hamming(n, primeindex - 1);
-        mpz_class r = hamming(n / primes[primeindex], primeindex);
-        mpz_class ret = l + r;
+        mpz_class ret;
+        if (primeindex == 0)
+        {
+            ret = mpz_sizeinbase(n.get_mpz_t(), 2); // should be -1, but count 1 as well
+        }
+        else if (n == 0)
+        {
+            ret = 0;
+        }
+        else
+        {
+            mpz_class l = hamming(n, primeindex - 1);
+            mpz_class r = hamming(n / primes[primeindex], primeindex);
+            ret = l + r;
+        }
+        hammingcache.insert(std::pair<hammingcachekey, mpz_class>(hck, ret));
         return ret;
     }
 }
@@ -92,21 +80,6 @@ mpz_class count_psmooth(int primeindex)
     mpz_class retval = l - r;
     return retval;
 }
-
-//mpz_class count_psmooth(const mpz_class& p, const mpz_class n)
-//{
-//    auto existing = psmoothcache.find(p);
-//    if (existing != psmoothcache.end())
-//    {
-//        return existing->second;
-//    }
-//    else
-//    {
-//        mpz_class val;
-//        count_psmooth_r(p, p, val, 1, 0);
-//        return val;
-//    }
-//}
 
 int main()
 {
