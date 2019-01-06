@@ -38,7 +38,7 @@ mpz_class sum_of_primes(const mpz_class& n)
     return S[n];
 }
 
-mpz_class N(10000);
+mpz_class N(201820182018);
 
 std::vector<mpz_class> primes;
 typedef std::pair<mpz_class, int> hammingcachekey;
@@ -88,8 +88,6 @@ int main()
     {
         primes.push_back(prime);
     }
-
-    std::cout << "hamming: " << hamming(1000000000, primes.size() - 1) << std::endl;
 
     mpz_class totsmall(0), totlarge(0);
     std::cout << "r = " << r << std::endl;
