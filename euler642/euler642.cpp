@@ -38,7 +38,7 @@ mpz_class sum_of_primes(const mpz_class& n)
     return S[n];
 }
 
-mpz_class N(10000);
+mpz_class N(201820182018);
 mpz_class r = mpzfuncs::sqrt(N);
 
 std::vector<mpz_class> primes;
@@ -59,12 +59,14 @@ mpz_class hamming(const mpz_class& n, const int& primeindex)
         {
             ret = mpz_sizeinbase(n.get_mpz_t(), 2); // should be -1, but count 1 as well
         }
-        else if (n == 0)
+        else if (n <= 1)
         {
-            ret = 0;
+            ret = n;
         }
         else
         {
+            std::cout << n << "," << primeindex << "," << n << "," << primeindex - 1 << std::endl;
+            std::cout << n << "," << primeindex << "," << n / primes[primeindex] << "," << primeindex << std::endl;
             mpz_class l = hamming(n, primeindex - 1);
             mpz_class r = hamming(n / primes[primeindex], primeindex);
             ret = l + r;
@@ -72,6 +74,39 @@ mpz_class hamming(const mpz_class& n, const int& primeindex)
         hammingcache.insert(std::pair<hammingcachekey, mpz_class>(hck, ret));
         return ret;
     }
+}
+
+mpz_class hamming3(mpz_class n, int j) {
+    
+    mpz_class result = 0;
+    if (j == 0) result = mpz_sizeinbase(n.get_mpz_t(), 2);
+    else
+    {
+        while (n > 0)
+        {
+            mpz_class lower = hamming3(n, j - 1);
+            result += lower;
+            n = n / primes[j];
+        }
+        return result;
+    }
+}
+
+mpz_class hamming_c(const mpz_class& n, int pi)
+{
+    mpz_class result;
+    if (n <= 1)
+        result = n;
+    else if (pi == 0)
+        result = mpz_sizeinbase(n.get_mpz_t(), 2);
+    else
+    {
+        auto cached = hammingcache.find(hammingcachekey(n, pi));
+        if (cached == hammingcache.end())
+            throw std::runtime_error("Value not cached");
+        result = cached->second;
+    }
+    return result;
 }
 
 mpz_class count_psmooth(int primeindex)
@@ -117,14 +152,32 @@ void calclarge()
     }
 }
 
+void make_n_worklist(std::set<mpz_class>& worklist, int pmin, mpz_class w)
+{
+    for (int i = pmin; i < primes.size(); i++)
+    {
+        mpz_class wnew = w / primes[i];
+        if (wnew > 1)
+        {
+            worklist.insert(wnew);
+            make_n_worklist(worklist, i, wnew);
+        }
+        else break;
+    }
+}
+
 int main()
 {
     for (mpz_class prime(2); prime <= r; prime = mpzfuncs::nextprime(prime))
     {
         primes.push_back(prime);
     }
-    std::cout << "r = " << r << std::endl;
 
+
+    std::cout << "r = " << r << std::endl;
+    std::cout << "H(" << N << "," << primes.size() - 1 << ") = " << hamming3(N, primes.size() - 1) << std::endl;
+
+    return 1;
     std::thread tsmall(calcsmall);
     std::thread tlarge(calclarge);
 

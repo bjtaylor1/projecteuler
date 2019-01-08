@@ -15,4 +15,5 @@
 #include <iomanip>
 #include <threadedaggregator.h>
 #include <sstream>
+#include <set>
 #endif //PCH_H
