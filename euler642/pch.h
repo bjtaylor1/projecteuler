@@ -16,4 +16,6 @@
 #include <threadedaggregator.h>
 #include <sstream>
 #include <set>
+#include <fstream>
+
 #endif //PCH_H
