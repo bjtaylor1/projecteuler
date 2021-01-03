@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "cwchar": "cpp",
+        "string": "cpp",
+        "exception": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "type_traits": "cpp",
+        "*.tcc": "cpp",
+        "unordered_map": "cpp",
+        "functional": "cpp",
+        "string_view": "cpp"
+    }
+}

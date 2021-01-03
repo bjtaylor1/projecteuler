@@ -3,6 +3,8 @@
 
 #include "primes.h"
 #include "outputhelpers.h"
+#include "counter.h"
+#include "constants.h"
 
 class solver
 { 
@@ -14,21 +16,18 @@ public:
     {
         isprime = new bool[n+1];
         primes = makeprimes(n+1, isprime);
-        std::cout << "primes = ";
-        writecsv(primes, std::cout) << std::endl;
     }
     ~solver() { delete[] isprime; }
 
-    void make(std::set<int>& tuple, const std::set<int>::const_iterator first, int bits, mpz_class& count, int depth)
+    void make(counter<int>& tuple, const std::set<int>::const_iterator first, int bits, mpz_class& count, int depth)
     {
         for(std::set<int>::const_iterator it = first; it != primes.end(); it++)
         {
             int val = *it;
             int newbits = bits | val;
 
-            tuple.insert(val);
+            tuple.add(val);
 
-            int s = tuple.size();
             // if(isprime[newbits])
             // {
             //     mpz_class permutations_given, permutations_remaining;
@@ -37,19 +36,24 @@ public:
             //     mpz_pow_ui(permutations_remaining.get_mpz_t(), S.get_mpz_t(), k - s);
             //     count = (count + permutations_given * permutations_remaining) % 1000000007;
             // }
-            
-            if(s < k)
+            if(tuple.total == k && newbits <= n && isprime[newbits])
+            {
+                //tuple.writeverbose(std::cout) << std::endl;
+                count = (count + tuple.get_permutations()) % BILL7;
+            }
+       
+            if(tuple.total < k)
             {
                 make(tuple, std::next(it), newbits, count, depth+1);
             }
-            tuple.erase(val);
+            tuple.remove(val);
         }
     }
 
     mpz_class solve()
     {
         mpz_class retval = 0;
-        std::set<int> tuple;
+        counter<int> tuple;
         make(tuple, primes.begin(), 0, retval, 0);
         return retval;
     }
@@ -63,6 +67,5 @@ int main(int argc, char** argv)
     int k = std::stoi(argv[2]);
     solver s(n, k);
     std::cout << s.solve() << std::endl;
-
     return 0;
 }
