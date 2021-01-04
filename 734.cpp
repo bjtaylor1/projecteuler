@@ -1,6 +1,7 @@
 #include <iostream>
 #include <mpirxx.h>
-
+#include <set>
+#include <vector>
 #include "primes.h"
 #include "outputhelpers.h"
 #include "counter.h"
@@ -59,13 +60,64 @@ public:
     }
 };
 
+mpz_class setcount(int n, int k);
+mpz_class setcount(int n, int k, int m)
+{
+    if(m == 1) return k;
+    return k * setcount(n, k-1);
+}
+
+mpz_class setcount(int n, int k)
+{
+    mpz_class res;
+    if(k == 1)
+    {
+        res = 1;
+    }
+    else if(n==k)
+    {
+        mpz_fac_ui(res.get_mpz_t(), n);
+    }
+    else
+    {
+        res = (setcount(n-1, k) + setcount(n-1, k-1));
+        res = res * k;
+    }   
+    return res;
+}
+
+void makesetcount(int n, int k)
+{
+    std::cout << setcount(n,k) << std::endl;
+}
+
 
 int main(int argc, char** argv)
 {
-    if(argc < 3) throw std::runtime_error("Usage: 734 n k");
+    // if(argc < 3) throw std::runtime_error("Usage: 734 n k");
+    // int p = std::stoi(argv[1]);
+    // int k = std::stoi(argv[2]);
+    // solver s(n, k);
+    // std::cout << s.solve() << std::endl;
+
+    // int n = std::stoi(argv[1]);
+    // bool* isprime = new bool[n+1];
+    // std::set<int> primes = makeprimes(n+1, isprime);
+    // std::cout << primes.size() << std::endl;
+    // mpz_class t(0);
+    // for(std::set<int>::const_iterator it1 = primes.begin(); it1 != primes.end(); it1++)
+    // {
+    //     int subprimes = 0;
+    //     for(std::set<int>::const_iterator it2 = primes.begin(); *it2 < *it1; it2++)
+    //     {
+    //         if((*it1) == ((*it1) | (*it2))) subprimes++;
+    //     }
+    //     std::cout << "p=" << (*it1) << ", subprimes = " << subprimes << std::endl;
+    // }
+    // std::cout << t << std::endl;
+
     int n = std::stoi(argv[1]);
     int k = std::stoi(argv[2]);
-    solver s(n, k);
-    std::cout << s.solve() << std::endl;
+    makesetcount(n, k);
     return 0;
 }
