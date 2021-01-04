@@ -12,16 +12,20 @@ class solver
 public:
     int n, k;
     bool* isprime;
-    int* composites;
+    int* c;
     std::set<int> primes;
     solver(int n, int k) :n(n), k(k)
     {
         isprime = new bool[n+1];
-        composites = new int[n+1];
-        memset(composites, 0, (n+1)*sizeof(int));
+        c = new int[n+1]; // number of composites for each prime of at least two DIFFERENT primes. e.g. 2|5=7, but not 2|7=7
+        memset(c, 0, (n+1)*sizeof(int));
         primes = makeprimes(n+1, isprime);
+        for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
+        {
+            c[*it] = 1;
+        }
     }
-    ~solver() { delete[] isprime; delete[] composites; }
+    ~solver() { delete[] isprime; delete[] c; }
 
     void make(std::set<int>& tuple, const std::set<int>::const_iterator first, int bits, mpz_class& count, int depth)
     {
@@ -65,14 +69,17 @@ public:
         // calculate the number of primes that 'fit into' each prime
         for(std::set<int>::const_iterator it1 = primes.begin(); it1 != primes.end(); it1++)
         {
-            int subprimes = 0;
-            for(std::set<int>::const_iterator it2 = primes.begin(); *it2 < *it1; it2++)
+            for(std::set<int>::const_iterator it2 = std::next(it1); it2 != primes.end(); it2++)
             {
                 int p1 = *it1, p2 = *it2;
-                if(p1 == (p1 | p2)) 
+                int pc = p1 | p2; // p2 > p1 always
+                if(pc <= n && isprime[pc])
                 {
-                    composites[p1|p2] += composites[p1] + composites[p2] + 1;
-                    std::cout << p1 << " | " << p2 << " = " << (p1|p2) << ", c[" << (p1|p2) <<"] = " << composites[p1|p2] << std::endl;
+                    int toadd = pc > p2 ? 2*c[p1]*c[p2] : c[p1];
+                    // the 2* is because if the OR doesn't include pc, we need the combination of p1 and p2, once with pc, and once without it.
+                    // if pc == p2, then we have just found another c[p1] ways of making it.
+                    c[pc] += toadd;
+                    std::cout << p1<<"|"<<p2<<"="<<pc << ", c[p1]=" << c[p1] << ", c[p2]=" << c[p2] << ", toadd=" << toadd << std::endl;
                 }
             }
         }
@@ -80,7 +87,7 @@ public:
         std::cout << std::endl;
         for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
-            std::cout << "c[" << (*it) << "] = " << composites[(*it)] << std::endl;
+            std::cout << "c[" << (*it) << "] = " << c[(*it)] << std::endl;
         }
 
         return retval;
