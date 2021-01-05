@@ -17,8 +17,10 @@ public:
     solver(int n, int k) :n(n), k(k)
     {
         isprime = new bool[n+1];
-        c = new int[n+1]; // number of composites for each prime of at least two DIFFERENT primes. e.g. 2|5=7, but not 2|7=7
+        c = new int[n+1]; // simply the number of ways of making each prime, regardless of whether they include the prime itself, e.g. 2|7=7, 2|5=7.
+        d = new int[n+1]; // number of composites for each prime of at least two DIFFERENT primes. e.g. 2|5=7, but not 2|7=7
         memset(c, 0, (n+1)*sizeof(int));
+
         primes = makeprimes(n+1, isprime);
         for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
@@ -46,7 +48,8 @@ public:
             // }
             if(newbits <= n && isprime[newbits])
             {
-                writecsv(tuple, std::cout) << "   =" << newbits << std::endl;
+                for(auto t : tuple) std::cout << " " << t;
+                std::cout << " =" << newbits << std::endl;
                 count++; // for now
             }
        
