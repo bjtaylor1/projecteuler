@@ -7,28 +7,27 @@
 #include "counter.h"
 #include "constants.h"
 
+inline int twotothe(int n) { return n == 0 ? 1 : 2<<(n-1); }
+
 class solver
 { 
 public:
     int n, k;
     bool* isprime;
-    int* c;
     int* d;
+    int* f; // number of primes that 'fit into' each higher prime (not including itself)
+    
     std::set<int> primes;
     solver(int n, int k) :n(n), k(k)
     {
         isprime = new bool[n+1];
-        c = new int[n+1]; // simply the number of ways of making each prime, regardless of whether they include the prime itself, e.g. 2|7=7, 2|5=7.
-        d = new int[n+1]; // number of composites for each prime of at least two DIFFERENT primes. e.g. 2|5=7, but not 2|7=7
-        memset(c, 0, (n+1)*sizeof(int));
-
+        d = new int[n+1]; // simply the number of ways of making each prime, regardless of whether they include the prime itself, e.g. 2|7=7, 2|5=7.
+        f = new int[n+1];
+        memset(d, 0, (n+1)*sizeof(int));
+        memset(f, 0, (n+1)*sizeof(int));
         primes = makeprimes(n+1, isprime);
-        for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
-        {
-            c[*it] = 1;
-        }
     }
-    ~solver() { delete[] isprime; delete[] c; delete[] d; }
+    ~solver() { delete[] isprime; delete[] d; delete[] f; }
 
     void make(std::set<int>& tuple, const std::set<int>::const_iterator first, int bits, mpz_class& count, int depth)
     {
@@ -71,26 +70,34 @@ public:
         std::cout << std::endl;
 
         // calculate the number of primes that 'fit into' each prime
-        for(std::set<int>::const_iterator it1 = primes.begin(); it1 != primes.end(); it1++)
+        for(int x = 2; x <= n; x++) //if(isprime[x]) // for now - may need to 'relax' this to find all composites?
         {
-            for(std::set<int>::const_iterator it2 = std::next(it1); it2 != primes.end(); it2++)
+            for(int y = x+1; y <= n; y++) //if(isprime[y])
             {
-                int p1 = *it1, p2 = *it2;
-                int pc = p1 | p2; // p2 > p1 always
-                if(pc <= n && isprime[pc])
+                int pc = x|y;
+                if(pc <= n)
                 {
-                    int toadd = pc > p2 ? 2*c[p1]*c[p2] : c[p1];
-
-                    // the 2* is because if the OR doesn't include pc, we need the combination of p1 and p2, once with pc, and once without it.
-                    // if pc == p2, then we have just found another c[p1] ways of making it.
-                    c[pc] += toadd;
-                    if(pc > p2)
+                    std::cout << x<<"|"<<y<<"="<<pc << ": ";
+                    if(pc == y)
                     {
-                        int toaddD = c[p1]*c[p2];
-                        d[pc] += toaddD;
-                        std::cout << std::endl << "  d[" << pc << "] += " << toaddD << " = " << d[pc] << std::endl;
+                        if(isprime[x] && isprime[y])
+                        {
+                            // not distinct - found another one (x) that 'fits into' y
+                            f[pc]++;
+                            std::cout << "f[" << pc << "]++ = " << f[y] << std::endl;
+                        }
                     }
-                    std::cout << p1<<"|"<<p2<<"="<<pc << ", c[p1]=" << c[p1] << ", c[p2]=" << c[p2] << ", toadd=" << toadd << ", d[p1]=" << d[p1] << ", d[p2]=" << d[p2] << std::endl;
+                    else
+                    {
+                        // distinct
+                        if( (isprime[x]||d[x]>0) && (isprime[y]||d[y] > 0))
+                        {
+                            int toadd = (f[x]+1)*(f[y]+1);
+                            d[pc] += toadd;
+                            std::cout << "d[" << pc << "]+= " << (f[x]+1) << "x" << (f[y]+1) << "=" << toadd << " = " << d[pc] << std::endl;
+                        }
+                    }
+                    
                 }
             }
         }
@@ -98,7 +105,10 @@ public:
         std::cout << std::endl;
         for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
-            std::cout << "c[" << (*it) << "] = " << c[(*it)] << std::endl;
+            int p = *it;
+            int sets = twotothe(f[p]) - 1; // i.e. 2^f[p] - 1  https://math.stackexchange.com/questions/161565/what-is-the-total-number-of-combinations-of-5-items-together-when-there-are-no-d
+            int total = d[p] + sets + 1;
+            std::cout << p << ": f=" << f[p] << ", sets=" << sets << ", d=" << d[p] << ", total = " << total << std::endl;
         }
 
         return retval;
