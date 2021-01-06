@@ -13,6 +13,7 @@ public:
     int n, k;
     bool* isprime;
     int* c;
+    int* d;
     std::set<int> primes;
     solver(int n, int k) :n(n), k(k)
     {
@@ -27,7 +28,7 @@ public:
             c[*it] = 1;
         }
     }
-    ~solver() { delete[] isprime; delete[] c; }
+    ~solver() { delete[] isprime; delete[] c; delete[] d; }
 
     void make(std::set<int>& tuple, const std::set<int>::const_iterator first, int bits, mpz_class& count, int depth)
     {
@@ -49,7 +50,7 @@ public:
             if(newbits <= n && isprime[newbits])
             {
                 for(auto t : tuple) std::cout << " " << t;
-                std::cout << " =" << newbits << std::endl;
+                std::cout << " ==" << newbits << std::endl;
                 count++; // for now
             }
        
@@ -79,10 +80,17 @@ public:
                 if(pc <= n && isprime[pc])
                 {
                     int toadd = pc > p2 ? 2*c[p1]*c[p2] : c[p1];
+
                     // the 2* is because if the OR doesn't include pc, we need the combination of p1 and p2, once with pc, and once without it.
                     // if pc == p2, then we have just found another c[p1] ways of making it.
                     c[pc] += toadd;
-                    std::cout << p1<<"|"<<p2<<"="<<pc << ", c[p1]=" << c[p1] << ", c[p2]=" << c[p2] << ", toadd=" << toadd << std::endl;
+                    if(pc > p2)
+                    {
+                        int toaddD = c[p1]*c[p2];
+                        d[pc] += toaddD;
+                        std::cout << std::endl << "  d[" << pc << "] += " << toaddD << " = " << d[pc] << std::endl;
+                    }
+                    std::cout << p1<<"|"<<p2<<"="<<pc << ", c[p1]=" << c[p1] << ", c[p2]=" << c[p2] << ", toadd=" << toadd << ", d[p1]=" << d[p1] << ", d[p2]=" << d[p2] << std::endl;
                 }
             }
         }
