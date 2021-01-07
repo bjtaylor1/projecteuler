@@ -9,6 +9,11 @@
 
 inline int twotothe(int n) { return n == 0 ? 1 : 2<<(n-1); }
 
+class primefit //list of 
+{
+
+};
+
 class solver
 { 
 public:
@@ -22,10 +27,11 @@ public:
     {
         isprime = new bool[n+1];
         d = new int[n+1]; // simply the number of ways of making each prime, regardless of whether they include the prime itself, e.g. 2|7=7, 2|5=7.
-        f = new int[n+1];
+        f = new int[n+1]; // number of primes that 'fit into' each prime. including the prime itself (so always starts off as 1)
         memset(d, 0, (n+1)*sizeof(int));
         memset(f, 0, (n+1)*sizeof(int));
         primes = makeprimes(n+1, isprime);
+        for(int p = 2; p<=n; p++) f[p]=1;
     }
     ~solver() { delete[] isprime; delete[] d; delete[] f; }
 
@@ -55,9 +61,9 @@ public:
                         // distinct
                         if( (isprime[x]||d[x]>0) && (isprime[y]||d[y] > 0))
                         {
-                            int toadd = (f[x]+1)*(f[y]+1);
+                            int toadd = f[x]*f[y];
                             d[pc] += toadd;
-                            std::cout << x<<"|"<<y<<"="<<pc << ": " << "d[" << pc << "]+= " << (f[x]+1) << "x" << (f[y]+1) << "=" << toadd << " = " << d[pc] << std::endl;
+                            std::cout << x<<"|"<<y<<"="<<pc << ": " << "d[" << pc << "]+= " << (f[x]) << "x" << (f[y]) << "=" << toadd << " = " << d[pc] << std::endl;
                         }
                     }
                     
@@ -69,7 +75,7 @@ public:
         for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
             int p = *it;
-            int sets = twotothe(f[p]) - 1; // i.e. 2^f[p] - 1  https://math.stackexchange.com/questions/161565/what-is-the-total-number-of-combinations-of-5-items-together-when-there-are-no-d
+            int sets = twotothe(f[p]-1) - 1; // i.e. 2^f[p] - 1  https://math.stackexchange.com/questions/161565/what-is-the-total-number-of-combinations-of-5-items-together-when-there-are-no-d
             int total = d[p] + sets + 1;
             std::cout << p << ": f=" << f[p] << ", sets=" << sets << ", d=" << d[p] << ", total = " << total << std::endl;
         }
