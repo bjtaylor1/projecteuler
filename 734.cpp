@@ -9,9 +9,21 @@
 
 inline int twotothe(int n) { return n == 0 ? 1 : 2<<(n-1); }
 
-class primefit //list of 
+class fit //list of primes that 'fit into' each prime
 {
+public:
+    int p;
+    std::set<int> primes;
 
+    void init(const int& p){this.p = p; primes.insert(p);}
+};
+
+class distinct // list of ways of making a number other numbers, not including the number itself
+{
+public:
+    int p;
+    void init(const int& p) { this.p = p;}
+    std::set<std::set<int> > sets;
 };
 
 class solver
@@ -21,19 +33,37 @@ public:
     bool* isprime;
     int* d;
     int* f; // number of primes that 'fit into' each higher prime (not including itself)
-    
+    fit* fD;
+    distinct* dD;
+
     std::set<int> primes;
     solver(int n, int k) :n(n), k(k)
     {
         isprime = new bool[n+1];
         d = new int[n+1]; // simply the number of ways of making each prime, regardless of whether they include the prime itself, e.g. 2|7=7, 2|5=7.
+        
+        //dD = new distinct[n+1];
+
         f = new int[n+1]; // number of primes that 'fit into' each prime. including the prime itself (so always starts off as 1)
         memset(d, 0, (n+1)*sizeof(int));
         memset(f, 0, (n+1)*sizeof(int));
         primes = makeprimes(n+1, isprime);
-        for(int p = 2; p<=n; p++) f[p]=1;
+
+        for(int p = 2; p<=n; p++)
+        {
+            f[p]=1;
+            fD[p].init(p);
+            dD[p].init(p);
+        }
     }
-    ~solver() { delete[] isprime; delete[] d; delete[] f; }
+    ~solver()
+    {
+        delete[] isprime;
+        delete[] d;
+        delete[] f;
+        delete[] fD;
+        delete[] dD;
+    }
 
     mpz_class solve()
     {
@@ -119,12 +149,24 @@ void makesetcount(int n, int k)
 
 int main(int argc, char** argv)
 {
+    fit* sets = new fit[2];
+    sets[0].primes.insert(1);
+    sets[1].primes.insert(2);
+    for(int i = 0; i < 2; i++)
+    {
+        for(std::set<int>::const_iterator it = sets[i].primes.begin(); it != sets[i].primes.end(); it++) std::cout << (*it);
+
+        std::cout << std::endl;
+    }
+    delete[] sets;
+
     if(argc < 3) throw std::runtime_error("Usage: 734 n k");
     int n = std::stoi(argv[1]);
     int k = std::stoi(argv[2]);
     solver s(n, k);
     std::cout << s.solve() << std::endl;
 
+    //
     // int n = std::stoi(argv[1]);
     // bool* isprime = new bool[n+1];
     // std::set<int> primes = makeprimes(n+1, isprime);
