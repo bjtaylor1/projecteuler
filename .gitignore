@@ -1,1 +1,7 @@
+#ignore files without extension:
+*
+!/**/
+!*.*
+
+
 bin/
