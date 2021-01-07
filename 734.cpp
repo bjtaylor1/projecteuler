@@ -77,14 +77,13 @@ public:
                 int pc = x|y;
                 if(pc <= n)
                 {
-                    std::cout << x<<"|"<<y<<"="<<pc << ": ";
                     if(pc == y)
                     {
                         if(isprime[x] && isprime[y])
                         {
                             // not distinct - found another one (x) that 'fits into' y
                             f[pc]++;
-                            std::cout << "f[" << pc << "]++ = " << f[y] << std::endl;
+                            std::cout << x<<"|"<<y<<"="<<pc << ": " << "f[" << pc << "]++ = " << f[y] << std::endl;
                         }
                     }
                     else
@@ -94,7 +93,7 @@ public:
                         {
                             int toadd = (f[x]+1)*(f[y]+1);
                             d[pc] += toadd;
-                            std::cout << "d[" << pc << "]+= " << (f[x]+1) << "x" << (f[y]+1) << "=" << toadd << " = " << d[pc] << std::endl;
+                            std::cout << x<<"|"<<y<<"="<<pc << ": " << "d[" << pc << "]+= " << (f[x]+1) << "x" << (f[y]+1) << "=" << toadd << " = " << d[pc] << std::endl;
                         }
                     }
                     
