@@ -15,8 +15,39 @@ public:
     int p;
     std::set<int> primes;
 
-    void init(const int& _p){p = _p; primes.insert(p);}
+    void init(const int& _p){p = _p; }
 };
+
+template<typename T>
+std::set<std::set<T> > combinations(const std::set<T>& items)
+{
+    if(items.size() >=63)
+    {
+        std::cerr << "Cannot call this method with 63 items or more!" << std::endl;
+        throw std::runtime_error("Failed.");
+    }
+
+    T* array = new T[items.size()];
+    int i = 0;
+    for(typename std::set<T>::const_iterator it = items.begin(); it != items.end(); it++)
+    {
+        array[i++] = *it;
+    }
+
+    std::set<std::set<T> > retval;
+    for(int i = 1; i < (1<<items.size()); i++)
+    {
+        std::set<T> item;
+        for(int b = 0; (1<<b)<=i; b++)
+        {
+            if((i&(1<<b)) != 0) item.insert(array[b]);
+        }
+        retval.insert(item);
+    }
+    delete[] array;
+
+    return retval;
+}
 
 class distinct // list of ways of making a number other numbers, not including the number itself
 {
@@ -24,7 +55,33 @@ public:
     int p;
     void init(const int& _p) { p = _p;}
     std::set<std::set<int> > sets;
+
+    void add_combination(const fit& f1, const fit& f2)
+    {
+
+    }
 };
+
+
+
+inline int distinct_combinations_calc(const int& a, const int& b)
+{
+    if(a == 0 || b == 0) return 1;
+    if(a == 1) return b;
+    if(b == 1) return a;
+    return twotothe(a) + twotothe(b) - 3;
+    //i.e.
+    //(2^a - 1) + (2^b - 1) - 1
+    //= all the combinations of each one, with ALL of the other
+    //minus 1 for counting them all twice
+}
+
+inline int distinct_combinations(const int& a, const int& b)
+{
+    int res = distinct_combinations_calc(a, b);
+    //std::cout << std::endl << "  dc(" << a << "," << b << ") = " << res << std::endl;
+    return res;
+}
 
 class solver
 { 
@@ -44,7 +101,7 @@ public:
         
         //dD = new distinct[n+1];
 
-        f = new int[n+1]; // number of primes that 'fit into' each prime. including the prime itself (so always starts off as 1)
+        f = new int[n+1]; // number of primes that 'fit into' each prime. NOT including the prime itself. (for reasons associated with avoiding double counting)
         memset(d, 0, (n+1)*sizeof(int));
         memset(f, 0, (n+1)*sizeof(int));
         primes = makeprimes(n+1, isprime);
@@ -53,7 +110,7 @@ public:
         dD = new distinct[n+1];
         for(int p = 2; p<=n; p++)
         {
-            f[p]=1;
+            f[p]=0;
             fD[p].init(p);
             dD[p].init(p);
         }
@@ -85,6 +142,14 @@ public:
                         {
                             // not distinct - found another one (x) that 'fits into' y
                             f[pc]++;
+                            fD[pc].primes.insert(x);
+
+                            if(fD[pc].primes.size() != f[pc])
+                            {
+                                std::cerr << "fD != f - consistency check failed!" << std::endl;
+                                throw std::runtime_error("Failed");
+                            }
+
                             std::cout << x<<"|"<<y<<"="<<pc << ": " << "f[" << pc << "]++ = " << f[y] << std::endl;
                         }
                     }
@@ -93,9 +158,11 @@ public:
                         // distinct
                         if( (isprime[x]||d[x]>0) && (isprime[y]||d[y] > 0))
                         {
-                            int toadd = f[x]*f[y];
+                            int toadd = distinct_combinations(f[x]+1, f[y]+1);
+
                             d[pc] += toadd;
-                            std::cout << x<<"|"<<y<<"="<<pc << ": " << "d[" << pc << "]+= " << (f[x]) << "x" << (f[y]) << "=" << toadd << " = " << d[pc] << std::endl;
+
+                            std::cout << x<<"|"<<y<<"="<<pc << ": " << "d[" << pc << "]+= " << (f[x]+1) << "x" << (f[y]+1) << "=" << toadd << " = " << d[pc] << std::endl;
                         }
                     }
                     
@@ -107,7 +174,7 @@ public:
         for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
             int p = *it;
-            int sets = twotothe(f[p]-1) - 1; // i.e. 2^f[p] - 1  https://math.stackexchange.com/questions/161565/what-is-the-total-number-of-combinations-of-5-items-together-when-there-are-no-d
+            int sets = twotothe(f[p]) - 1; // i.e. 2^f[p] - 1  https://math.stackexchange.com/questions/161565/what-is-the-total-number-of-combinations-of-5-items-together-when-there-are-no-d
             int total = d[p] + sets + 1;
             std::cout << p << ": f=" << f[p] << ", sets=" << sets << ", d=" << d[p] << ", total = " << total << std::endl;
         }
@@ -151,6 +218,14 @@ void makesetcount(int n, int k)
 
 int main(int argc, char** argv)
 {
+    std::set<int> test { 1,2,3,4,5};
+    std::set<std::set<int> > combs = combinations<int>(test);
+    for(auto comb : combs)
+    {
+        for(auto i : comb) std::cout << " " << i << " ";
+        std::cout << std::endl;
+    }
+
     // fit* sets = new fit[2];
     // sets[0].primes.insert(1);
     // sets[1].primes.insert(2);
