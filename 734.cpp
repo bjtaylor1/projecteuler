@@ -29,45 +29,9 @@ public:
     }
     ~solver() { delete[] isprime; delete[] d; delete[] f; }
 
-    void make(std::set<int>& tuple, const std::set<int>::const_iterator first, int bits, mpz_class& count, int depth)
-    {
-        for(std::set<int>::const_iterator it = first; it != primes.end(); it++)
-        {
-            int val = *it;
-            int newbits = bits | val;
-
-            tuple.insert(val);
-
-            // if(isprime[newbits])
-            // {
-            //     mpz_class permutations_given, permutations_remaining;
-            //     mpz_class S(s);
-            //     mpz_fac_ui(permutations_given.get_mpz_t(), s);
-            //     mpz_pow_ui(permutations_remaining.get_mpz_t(), S.get_mpz_t(), k - s);
-            //     count = (count + permutations_given * permutations_remaining) % 1000000007;
-            // }
-            if(newbits <= n && isprime[newbits])
-            {
-                for(auto t : tuple) std::cout << " " << t;
-                std::cout << " ==" << newbits << std::endl;
-                count++; // for now
-            }
-       
-            if(tuple.size() < k)
-            {
-                make(tuple, std::next(it), newbits, count, depth+1);
-            }
-            tuple.erase(val);
-        }
-    }
-
     mpz_class solve()
     {
         mpz_class retval = 0;
-        std::set<int> tuple;
-        make(tuple, primes.begin(), 0, retval, 0);
-
-        std::cout << std::endl;
 
         // calculate the number of primes that 'fit into' each prime
         for(int x = 2; x <= n; x++) //if(isprime[x]) // for now - may need to 'relax' this to find all composites?
