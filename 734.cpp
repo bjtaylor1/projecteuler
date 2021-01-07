@@ -15,14 +15,14 @@ public:
     int p;
     std::set<int> primes;
 
-    void init(const int& p){this.p = p; primes.insert(p);}
+    void init(const int& _p){p = _p; primes.insert(p);}
 };
 
 class distinct // list of ways of making a number other numbers, not including the number itself
 {
 public:
     int p;
-    void init(const int& p) { this.p = p;}
+    void init(const int& _p) { p = _p;}
     std::set<std::set<int> > sets;
 };
 
@@ -49,6 +49,8 @@ public:
         memset(f, 0, (n+1)*sizeof(int));
         primes = makeprimes(n+1, isprime);
 
+        fD = new fit[n+1];
+        dD = new distinct[n+1];
         for(int p = 2; p<=n; p++)
         {
             f[p]=1;
@@ -149,16 +151,16 @@ void makesetcount(int n, int k)
 
 int main(int argc, char** argv)
 {
-    fit* sets = new fit[2];
-    sets[0].primes.insert(1);
-    sets[1].primes.insert(2);
-    for(int i = 0; i < 2; i++)
-    {
-        for(std::set<int>::const_iterator it = sets[i].primes.begin(); it != sets[i].primes.end(); it++) std::cout << (*it);
+    // fit* sets = new fit[2];
+    // sets[0].primes.insert(1);
+    // sets[1].primes.insert(2);
+    // for(int i = 0; i < 2; i++)
+    // {
+    //     for(std::set<int>::const_iterator it = sets[i].primes.begin(); it != sets[i].primes.end(); it++) std::cout << (*it);
 
-        std::cout << std::endl;
-    }
-    delete[] sets;
+    //     std::cout << std::endl;
+    // }
+    // delete[] sets;
 
     if(argc < 3) throw std::runtime_error("Usage: 734 n k");
     int n = std::stoi(argv[1]);
