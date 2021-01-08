@@ -9,17 +9,27 @@
 
 inline int twotothe(int n) { return n == 0 ? 1 : 2<<(n-1); }
 
+std::ostream& operator<<(std::ostream& os, const std::set<int>& s)
+{
+    int i = 0;
+    for(std::set<int>::const_iterator it = s.begin(); it != s.end(); it++)
+    {
+        os << " " << (*it) << " ";
+    }
+    return os;
+}
+
 class fit //list of primes that 'fit into' each prime
 {
 public:
     int p;
-    std::set<int> primes;
+    std::set<int> primes; //that fit into p. But not including p itself
 
     void init(const int& _p){p = _p; }
 };
 
 template<typename T>
-std::set<std::set<T> > combinations(const std::set<T>& items)
+std::set<std::set<T> > setcombinations(const std::set<T>& items)
 {
     if(items.size() >=63)
     {
@@ -55,14 +65,34 @@ public:
     int p;
     void init(const int& _p) { p = _p;}
     std::set<std::set<int> > sets;
-
-    void add_combination(const fit& f1, const fit& f2)
-    {
-
-    }
 };
 
+void add_combinations_with(std::set<std::set<int> >& combinations, const fit& f, const std::set<int>& defaultcombination)
+{
+    if(f.primes.size() > 0)
+    {
+        std::set<std::set<int> > combs = setcombinations(f.primes);
+        for(std::set<std::set<int> >::const_iterator it = combs.begin(); it != combs.end(); it++)
+        {
+            std::set<int> comb = *it;
+            comb.insert(defaultcombination.begin(), defaultcombination.end());
+            combinations.insert(comb);
+        }
+    }
+}
 
+std::set<std::set<int> > combine(const fit& f1, const fit& f2)
+{
+    std::set<std::set<int> > combinations;
+    std::set<int> defaultcombination;
+    defaultcombination.insert(f1.p);
+    defaultcombination.insert(f2.p);
+    combinations.insert(defaultcombination);
+
+    add_combinations_with(combinations, f1, defaultcombination);
+    add_combinations_with(combinations, f2, defaultcombination);
+    return combinations;
+}
 
 inline int distinct_combinations_calc(const int& a, const int& b)
 {
@@ -161,7 +191,9 @@ public:
                             int toadd = distinct_combinations(f[x]+1, f[y]+1);
 
                             d[pc] += toadd;
+                            auto newdistincts = combine(fD[x], fD[y]);
 
+                            dD[pc].sets.insert(newdistincts.begin(), newdistincts.end());
                             std::cout << x<<"|"<<y<<"="<<pc << ": " << "d[" << pc << "]+= " << (f[x]+1) << "x" << (f[y]+1) << "=" << toadd << " = " << d[pc] << std::endl;
                         }
                     }
@@ -177,6 +209,12 @@ public:
             int sets = twotothe(f[p]) - 1; // i.e. 2^f[p] - 1  https://math.stackexchange.com/questions/161565/what-is-the-total-number-of-combinations-of-5-items-together-when-there-are-no-d
             int total = d[p] + sets + 1;
             std::cout << p << ": f=" << f[p] << ", sets=" << sets << ", d=" << d[p] << ", total = " << total << std::endl;
+        }
+
+        std::cout << std::endl;
+        for(auto s : dD[n].sets)
+        {
+            std::cout << "D: " << s << std::endl;
         }
 
         return retval;
@@ -214,41 +252,12 @@ void makesetcount(int n, int k)
     std::cout << setcount(n,k) << std::endl;
 }
 
-
-
 int main(int argc, char** argv)
 {
-    std::set<int> test { 1,2,3,4,5};
-    std::set<std::set<int> > combs = combinations<int>(test);
-    for(auto comb : combs)
-    {
-        for(auto i : comb) std::cout << " " << i << " ";
-        std::cout << std::endl;
-    }
-
-    // fit* sets = new fit[2];
-    // sets[0].primes.insert(1);
-    // sets[1].primes.insert(2);
-    // for(int i = 0; i < 2; i++)
-    // {
-    //     for(std::set<int>::const_iterator it = sets[i].primes.begin(); it != sets[i].primes.end(); it++) std::cout << (*it);
-
-    //     std::cout << std::endl;
-    // }
-    // delete[] sets;
-
     if(argc < 3) throw std::runtime_error("Usage: 734 n k");
     int n = std::stoi(argv[1]);
     int k = std::stoi(argv[2]);
     solver s(n, k);
-    std::cout << s.solve() << std::endl;
-
-    //
-    // int n = std::stoi(argv[1]);
-    // bool* isprime = new bool[n+1];
-    // std::set<int> primes = makeprimes(n+1, isprime);
-    // std::cout << primes.size() << std::endl;
-    // mpz_class t(0);
-
+    s.solve();
     return 0;
 }
