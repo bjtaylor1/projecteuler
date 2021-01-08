@@ -96,10 +96,7 @@ std::set<std::set<int> > combine(const fit& f1, const fit& f2)
 
 inline int distinct_combinations_calc(const int& a, const int& b)
 {
-    if(a == 0 || b == 0) return 1;
-    if(a == 1) return b;
-    if(b == 1) return a;
-    return twotothe(a) + twotothe(b) - 3;
+    return twotothe(a) + twotothe(b) - 1;
     //i.e.
     //(2^a - 1) + (2^b - 1) - 1
     //= all the combinations of each one, with ALL of the other
@@ -188,11 +185,20 @@ public:
                         // distinct
                         if( (isprime[x]||d[x]>0) && (isprime[y]||d[y] > 0))
                         {
-                            int toadd = distinct_combinations(f[x]+1, f[y]+1);
+                            int toadd = distinct_combinations(f[x], f[y]);
 
                             d[pc] += toadd;
                             auto newdistincts = combine(fD[x], fD[y]);
-
+                            if(toadd != newdistincts.size())
+                            {
+                                std::cerr << "Discrepancy with " << x << "|" << y << " = " << pc << ": " << toadd << " vs " << newdistincts.size() << 
+                                    " f[x]=" << f[x] << ", f[y]=" << f[y] << std::endl;
+                                for(auto nd : newdistincts)
+                                {
+                                    std::cout << "  " << nd << std::endl;
+                                }
+                                throw std::runtime_error("Failed");
+                            }
                             dD[pc].sets.insert(newdistincts.begin(), newdistincts.end());
                             std::cout << x<<"|"<<y<<"="<<pc << ": " << "d[" << pc << "]+= " << (f[x]+1) << "x" << (f[y]+1) << "=" << toadd << " = " << d[pc] << std::endl;
                         }
