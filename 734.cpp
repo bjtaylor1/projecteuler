@@ -6,6 +6,7 @@
 #include "outputhelpers.h"
 #include "counter.h"
 #include "constants.h"
+#include "cache.h"
 
 class solver
 {
@@ -14,6 +15,7 @@ public:
     bool* prime;
     int* f; // number that 'fit into' each
     std::set<int> primes;
+    mpz_class ans;
 
     void makefit()
     {
@@ -30,9 +32,10 @@ public:
     {
         primes = makeprimes(n+1, prime);
         makefit();
+
     }
 
-    solver(int _n, int _k) : n(_n), k(_k)
+    solver(int _n, int _k) : n(_n), k(_k), ans(0)
     {
         prime = new bool[n+1];
         f = new int[n+1];
@@ -46,6 +49,11 @@ public:
         delete[] f;
     }
 };
+
+int testcache(const int& i)
+{
+    return i*2;
+}
 
 int main(int argc, char** argv)
 {
