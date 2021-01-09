@@ -20,17 +20,28 @@ public:
 
     void makefit()
     {
-        for(int pc = 2; pc <= n; pc++)
+        for(int pc = n; pc >= 2; pc--)
         {
-            for(std::set<int>::const_iterator it = primes.begin(); (*it)<=pc; it++)
+            if((pc % 1000) == 0) std::cout << pc << "..." << std::endl;
+
+            if((pc & 1) == 0)
             {
-                int p = *it;
-                if((pc|p) == pc)
+                // it's even, 2 is the only one that'll fit into it
+                f[pc] = (pc & 2) != 0 ? 1 : 0;
+            }
+            else
+            {                
+                for(std::set<int>::const_iterator it = primes.begin(); it != primes.end() && (*it)<=pc; it++)
                 {
-                    f[pc]++;
+                    int p = *it;
+                    if((pc|p) == pc)
+                    {
+                        f[pc]++;
+                    }
                 }
             }
         }
+        std::cout << std::endl;
     }
 
     mpz_class get_t(const int& p)
@@ -55,14 +66,18 @@ public:
     void solve()
     {
         primes = makeprimes(n+1, prime);
+        std::cout << "made primes" << std::endl;
         makefit();
+        std::cout << "made fit" << std::endl;
         mpz_class total(0);
         for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
             mpz_class t_this = get_t(*it);
             total = (total + t_this) % BILL7;
+            std::cout << "p=" << (*it) << ", total = " << total << std::endl;
         }
-        std::cout << total << std::endl;
+
+        std::cout << std::endl << total << std::endl;
     }
 
     solver(int _n, int _k) : n(_n), k(_k), ans(0)
