@@ -28,18 +28,19 @@ public:
         //     }
         // }
 
-        for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
+        for(int pc = 2; pc <= n; pc++)
         {
-            std::cout << (*it) << ": ";
-            for(std::set<int>::const_iterator it2 = primes.begin(); (*it2)<=(*it); it2++)
+            std::cout << pc << ": ";
+            for(std::set<int>::const_iterator it = primes.begin(); (*it)<=pc; it++)
             {
-                if(((*it)|(*it2)) == (*it)) 
+                int p = *it;
+                if((pc|p) == pc)
                 {
-                    std::cout << " " << (*it2);
-                    f[(*it)]++;
+                    std::cout << " " << p;
+                    f[pc]++;
                 }
             }
-            std::cout << " = " << f[(*it)] << std::endl;
+            std::cout << " = " << f[pc] << std::endl;
         }
         std::cout << std::endl;
     }
@@ -51,16 +52,15 @@ public:
     mpz_class calc_t(const int& p)
     {
         mpz_class res;
-        // std::cout << "p=" << p << ":" << std::endl;
+        if(p==23) std::cout << "p=" << p << ":" << std::endl;
         mpz_ui_pow_ui(res.get_mpz_t(), f[p], k);
-        // std::cout << "  f[p]=" << f[p] << ", k=" << k << std::endl;
-        for(std::set<int>::const_reverse_iterator it(primes.lower_bound(p)); it != primes.rend(); it++)
+        if(p==23) std::cout << "  f[p]=" << f[p] << ", k=" << k << std::endl;
+        for(int l = 2; l < p; l++)
         {
-            int lp = *it;
-            if( (p|lp)  == p )
+            if( ((p|l)  == p ) && f[l] > 0)
             {
-                mpz_class lt= get_t(lp);
-                // std::cout << "  -= " << lt << " (from " << lp << ")" << std::endl;
+                mpz_class lt= get_t(l);
+                if(p == 23) std::cout << "  -= " << lt << " (from " << l << ")" << std::endl;
                 res -= lt;
             }
         }
