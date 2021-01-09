@@ -20,29 +20,17 @@ public:
 
     void makefit()
     {
-        // for(int small = 2; small < n; small++) if(prime[small])
-        // {
-        //     for(int big = small+1; big <= n; big++) if(prime[big])
-        //     {
-        //         if((big|small)==big) f[big]++;
-        //     }
-        // }
-
         for(int pc = 2; pc <= n; pc++)
         {
-            std::cout << pc << ": ";
             for(std::set<int>::const_iterator it = primes.begin(); (*it)<=pc; it++)
             {
                 int p = *it;
                 if((pc|p) == pc)
                 {
-                    std::cout << " " << p;
                     f[pc]++;
                 }
             }
-            std::cout << " = " << f[pc] << std::endl;
         }
-        std::cout << std::endl;
     }
 
     mpz_class get_t(const int& p)
@@ -52,19 +40,15 @@ public:
     mpz_class calc_t(const int& p)
     {
         mpz_class res;
-        if(p==23) std::cout << "p=" << p << ":" << std::endl;
         mpz_ui_pow_ui(res.get_mpz_t(), f[p], k);
-        if(p==23) std::cout << "  f[p]=" << f[p] << ", k=" << k << std::endl;
         for(int l = 2; l < p; l++)
         {
             if( ((p|l)  == p ) && f[l] > 0)
             {
                 mpz_class lt= get_t(l);
-                if(p == 23) std::cout << "  -= " << lt << " (from " << l << ")" << std::endl;
                 res -= lt;
             }
         }
-        // std::cout << std::endl;
         return res;
     }
 
@@ -76,7 +60,6 @@ public:
         for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
             mpz_class t_this = get_t(*it);
-            std::cout << (*it) << ": " << t_this << std::endl;
             total = (total + t_this) % BILL7;
         }
         std::cout << total << std::endl;
