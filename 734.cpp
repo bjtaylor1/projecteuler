@@ -16,7 +16,7 @@ public:
     int* f; // number that 'fit into' each
     std::set<int> primes;
     mpz_class ans;
-    cache<int, mpz_class> tcache;
+    cache<int, long> tcache;
 
     void makefit()
     {
@@ -44,11 +44,11 @@ public:
         std::cout << std::endl;
     }
 
-    mpz_class get_t(const int& p)
+    long get_t(const int& p)
     {
         return tcache.get_or_add(p, [this](const int& _p){return this->calc_t(_p);} );
     }
-    mpz_class calc_t(const int& p)
+    long calc_t(const int& p)
     {
         mpz_class res;
         mpz_ui_pow_ui(res.get_mpz_t(), f[p], k);
@@ -56,11 +56,12 @@ public:
         {
             if( ((p|l)  == p ) && f[l] > 0)
             {
-                mpz_class lt= get_t(l);
+                long lt= get_t(l);
                 res -= lt;
             }
         }
-        return res;
+        res %= BILL7;
+        return res.get_ui();
     }
 
     void solve()
