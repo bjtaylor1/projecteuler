@@ -16,23 +16,70 @@ public:
     int* f; // number that 'fit into' each
     std::set<int> primes;
     mpz_class ans;
+    cache<int, mpz_class> tcache;
 
     void makefit()
     {
-        for(int small = 2; small < n; small++) if(prime[small])
+        // for(int small = 2; small < n; small++) if(prime[small])
+        // {
+        //     for(int big = small+1; big <= n; big++) if(prime[big])
+        //     {
+        //         if((big|small)==big) f[big]++;
+        //     }
+        // }
+
+        for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
         {
-            for(int big = small+1; big <= n; big++) if(prime[big])
+            std::cout << (*it) << ": ";
+            for(std::set<int>::const_iterator it2 = primes.begin(); (*it2)<=(*it); it2++)
             {
-                if((big|small)==big) f[big]++;
+                if(((*it)|(*it2)) == (*it)) 
+                {
+                    std::cout << " " << (*it2);
+                    f[(*it)]++;
+                }
+            }
+            std::cout << " = " << f[(*it)] << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
+    mpz_class get_t(const int& p)
+    {
+        return tcache.get_or_add(p, [this](const int& _p){return this->calc_t(_p);} );
+    }
+    mpz_class calc_t(const int& p)
+    {
+        mpz_class res;
+        // std::cout << "p=" << p << ":" << std::endl;
+        mpz_ui_pow_ui(res.get_mpz_t(), f[p], k);
+        // std::cout << "  f[p]=" << f[p] << ", k=" << k << std::endl;
+        for(std::set<int>::const_reverse_iterator it(primes.lower_bound(p)); it != primes.rend(); it++)
+        {
+            int lp = *it;
+            if( (p|lp)  == p )
+            {
+                mpz_class lt= get_t(lp);
+                // std::cout << "  -= " << lt << " (from " << lp << ")" << std::endl;
+                res -= lt;
             }
         }
+        // std::cout << std::endl;
+        return res;
     }
 
     void solve()
     {
         primes = makeprimes(n+1, prime);
         makefit();
-
+        mpz_class total(0);
+        for(std::set<int>::const_iterator it = primes.begin(); it != primes.end(); it++)
+        {
+            mpz_class t_this = get_t(*it);
+            std::cout << (*it) << ": " << t_this << std::endl;
+            total = (total + t_this) % BILL7;
+        }
+        std::cout << total << std::endl;
     }
 
     solver(int _n, int _k) : n(_n), k(_k), ans(0)
@@ -50,11 +97,6 @@ public:
     }
 };
 
-int testcache(const int& i)
-{
-    return i*2;
-}
-
 int main(int argc, char** argv)
 {
     if(argc < 3) throw std::runtime_error("Usage: 734 n k");
@@ -62,13 +104,6 @@ int main(int argc, char** argv)
     int k = std::stoi(argv[2]);
     solver s(n, k);
     s.solve();
-
-    std::cout << std::endl;
-    for(std::set<int>::const_iterator it = s.primes.begin(); it != s.primes.end(); it++)
-    {
-        int p = *it;
-        std::cout << p << ", f=" << s.f[p] << std::endl;
-    }
 
     return 0;
 }

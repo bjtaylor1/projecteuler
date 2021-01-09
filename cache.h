@@ -12,14 +12,12 @@ public:
         typename std::map<TKey, TVal>::const_iterator it = entries.find(key);
         if(it == entries.end())
         {
-            std::cout << "Cache miss" <<std::endl;
             TVal val = generator(key);
             entries.insert(typename std::pair<TKey, TVal>(key, val));
             return val;
         }
         else
         {
-            std::cout << "Cache hit" <<std::endl;
             return it->second;
         }
     }
